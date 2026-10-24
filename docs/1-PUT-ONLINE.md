@@ -23,12 +23,12 @@ You will create four free accounts. Each one does one job:
 ## Step 1 — Put the files on GitHub
 
 1. Go to **github.com** and create a free account (if you don't have one).
-2. Click the **+** at the top right → **New repository**.
-3. Name it `insightne-news`. Choose **Private**. Do **not** tick "Add a README". Click **Create repository**.
-4. Install **GitHub Desktop** from desktop.github.com and sign in.
-5. In GitHub Desktop: **File → Add local repository** → choose the folder `C:\Users\debna\insightne-news`.
-   If it says "this is not a git repository", click **create a repository** there, then **Publish repository**,
-   and pick the `insightne-news` repository you just made (keep **Private** ticked).
+2. Install **GitHub Desktop** from **desktop.github.com**, open it, and sign in with that GitHub account.
+3. In GitHub Desktop: **File → Add local repository…** → **Choose…** → pick the folder
+   `C:\Users\debna\insightne-news` → **Add repository**.
+4. Click the blue **Publish repository** button at the top.
+5. Name: `insightne-news`. Make sure **"Keep this code private"** is **ticked**. Click **Publish repository**.
+6. Check: go to github.com → your profile → **Repositories**. You should see `insightne-news` with a 🔒 Private label.
 
 Your secret password file (`.env.local`) and the practice database (`data/`) are automatically **left out**,
 so no secrets go to GitHub.

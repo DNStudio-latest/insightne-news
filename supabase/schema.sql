@@ -61,3 +61,9 @@ alter table stories enable row level security;
 alter table story_sources enable row level security;
 alter table seen_articles enable row level security;
 alter table collector_runs enable row level security;
+
+-- Give the secret key (and nobody else) access, also when "Automatically expose new tables" is off.
+grant usage on schema public to service_role;
+grant select, insert, update, delete on stories, story_sources, seen_articles, collector_runs to service_role;
+grant usage, select on all sequences in schema public to service_role;
+revoke all on stories, story_sources, seen_articles, collector_runs from anon, authenticated;

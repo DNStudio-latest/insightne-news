@@ -1,0 +1,16 @@
+{
+  "_help": "Website settings. Change the words between the quote marks. See README.md for what each one does.",
+  "siteName": "InsightNE News",
+  "tagline": "Important news from Tripura and Northeast India",
+  "youtubeUrl": "https://www.youtube.com/@InsightNE",
+  "youtubeName": "InsightNE",
+  "regions": ["Tripura", "Northeast"],
+  "topics": ["Politics", "Education", "Sports"],
+  "minimumScore": 6,
+  "onlyArticlesNewerThanHours": 48,
+  "maxArticlesPerRun": 200,
+  "autoPublish": {
+    "_help": "FUTURE OPTION. Keep \"enabled\": false. If you ever set it to true, stories come out without your approval ONLY when every source of the story has \"autoPublish\": true in sources.json AND the story is not marked NEEDS EXTRA CHECK.",
+    "enabled": false
+  }
+}

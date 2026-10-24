@@ -1,0 +1,32 @@
+// Run with:  npm run collect
+// On the internet this runs automatically every 3 hours (see .github/workflows/collect.yml).
+import { db, usingSupabase } from "../lib/db.js";
+import { createClaudeAi, createPracticeAi } from "../lib/ai.js";
+import { runPipeline } from "../lib/pipeline.js";
+import { settings, enabledSources, trustedSourceNames } from "../lib/config.js";
+
+const hasClaudeKey = Boolean(process.env.ANTHROPIC_API_KEY);
+
+if (usingSupabase && !hasClaudeKey) {
+  console.error("Stopping: the online database is set up but ANTHROPIC_API_KEY is missing. Add it to the GitHub secrets.");
+  process.exit(1);
+}
+
+const practiceMode = !hasClaudeKey;
+const ai = practiceMode ? createPracticeAi() : createClaudeAi({ topics: settings.topics });
+
+console.log(`InsightNE News collector — ${new Date().toISOString()}`);
+console.log(`Saving to: ${usingSupabase ? "Supabase (online)" : "data/local-db.json (practice mode)"}. AI: ${ai.model}`);
+
+const run = await runPipeline({
+  db,
+  ai,
+  sources: enabledSources(),
+  settings,
+  trusted: trustedSourceNames(),
+  practiceMode,
+});
+
+console.log("Done.", JSON.stringify({ ...run, feeds_failed: run.feeds_failed.map((f) => f.name) }));
+// Feed problems are normal; only a full stop counts as a failure.
+process.exit(run.error && run.stories_created === 0 && run.articles_kept > 0 ? 1 : 0);

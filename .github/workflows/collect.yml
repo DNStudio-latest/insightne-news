@@ -1,0 +1,29 @@
+# Runs the news collector every 3 hours, for free, on GitHub.
+# You can also run it by hand: GitHub > Actions > "Collect news" > "Run workflow".
+name: Collect news
+
+on:
+  schedule:
+    - cron: "15 */3 * * *" # every 3 hours, at 15 minutes past (times are UTC)
+  workflow_dispatch:
+
+concurrency:
+  group: collect-news
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run collect
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

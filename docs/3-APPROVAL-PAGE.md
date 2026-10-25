@@ -73,3 +73,33 @@ simply stay in Pending.
 Press **Sign out** at the top. If you don't, your phone stays signed in for 30 days.
 To change your password: change `ADMIN_PASSWORD` in Vercel (Project → Settings → Environment Variables),
 then **Deployments → ⋯ → Redeploy**.
+
+## ✍ Writing your own story (InsightNE Originals)
+
+Tap **✍ Write story** at the top of the approval page.
+
+| Box | What to write |
+|---|---|
+| **Headline** | Clear and factual, about 8–14 words. |
+| **Intro** | 1–2 sentences with the most important facts. Shown under the headline and on the front page. |
+| **Story text** | The full report. Leave an **empty line** between paragraphs. Start a line with `## ` for a subheading, or `> ` for a quote. |
+| **Photo** | Only **your own photos** (or ones you have permission for). Taken straight from your phone — it is made smaller automatically before uploading. |
+| **Caption / credit** | What the photo shows, and who took it. |
+| **Area / Topic** | Where the story appears on the site. |
+| **Written by** | Your name, or "InsightNE News Desk". |
+| **Make this the lead story** | Puts it big at the top of the front page (only one story is the lead at a time). |
+
+Then tap **PUBLISH** (goes live immediately) or **SAVE DRAFT** (waits under Pending; tap **CONTINUE WRITING** to finish it later).
+To change a published story: **Published** tab → **OPEN EDITOR** → change → **UPDATE**.
+
+**Claude can draft stories for you.** In the Claude app, send your notes, quotes or a voice-note transcript and ask for a
+draft. Claude saves it under **Pending** with the note "drafted by Claude". Open it, check every fact, then publish.
+
+## The front page
+
+- The **lead story** is the one you marked "Make this the lead story". If none is marked, it is your newest original
+  report with a photo, otherwise the newest story.
+- **LATEST** ticker, **Latest** list, **InsightNE Originals**, a block for each category and your **latest YouTube videos**
+  are all filled in automatically.
+- Readers who keep the page open see a **"New stories — tap to see"** button when you publish something new.
+- Every story has its own page with **WhatsApp, Facebook and X share buttons**.

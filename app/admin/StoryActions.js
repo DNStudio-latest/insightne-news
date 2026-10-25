@@ -1,18 +1,22 @@
 "use client";
 // The APPROVE / EDIT / REJECT buttons under each story.
 import { useState } from "react";
-import { approve, reject, saveEdit, unpublish, restore } from "./actions.js";
+import { approve, reject, saveEdit, unpublish, restore, makeLead } from "./actions.js";
 
 export default function StoryActions({ story, view, regions, topics }) {
   // In no-AI mode a story arrives without a summary; WRITE SUMMARY opens the writing box.
   const needsSummary = !story.summary?.trim();
   const [editing, setEditing] = useState(false);
   const id = <input type="hidden" name="id" value={story.id} />;
-  const editButton = (
-    <button className="btn btn-edit" type="button" onClick={() => setEditing(!editing)} aria-expanded={editing}>
-      {editing ? "CLOSE" : "EDIT"}
-    </button>
-  );
+  // Your own reports open in the full editor; news briefs are edited right here.
+  const editButton =
+    story.kind === "original" ? (
+      <a className="btn btn-edit" href={`/admin/write?id=${story.id}`} style={{ textDecoration: "none" }}>OPEN EDITOR</a>
+    ) : (
+      <button className="btn btn-edit" type="button" onClick={() => setEditing(!editing)} aria-expanded={editing}>
+        {editing ? "CLOSE" : "EDIT"}
+      </button>
+    );
 
   const approveFormId = `approve-${story.id}`;
 
@@ -26,7 +30,11 @@ export default function StoryActions({ story, view, regions, topics }) {
       <div className="actions">
         {view === "pending" && (
           <>
-            {needsSummary ? (
+            {needsSummary && story.kind === "original" ? (
+              <a className="btn btn-approve" href={`/admin/write?id=${story.id}`} style={{ gridColumn: "span 2", textDecoration: "none" }}>
+                CONTINUE WRITING
+              </a>
+            ) : needsSummary ? (
               <button className="btn btn-approve" type="button" style={{ gridColumn: "span 2" }} onClick={() => setEditing(!editing)} aria-expanded={editing}>
                 {editing ? "CLOSE" : "WRITE SUMMARY"}
               </button>
@@ -52,6 +60,11 @@ export default function StoryActions({ story, view, regions, topics }) {
               <button className="btn btn-reject" type="submit">UNPUBLISH</button>
             </form>
             {editButton}
+            <form action={makeLead}>
+              {id}
+              {story.is_lead && <input type="hidden" name="remove" value="1" />}
+              <button className="btn btn-edit" type="submit">{story.is_lead ? "UN-LEAD" : "MAKE LEAD"}</button>
+            </form>
           </>
         )}
         {view === "rejected" && (

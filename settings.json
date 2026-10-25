@@ -2,10 +2,30 @@
   "_help": "Website settings. Change the words between the quote marks. See README.md for what each one does.",
   "siteName": "InsightNE News",
   "tagline": "Important news from Tripura and Northeast India",
+  "siteUrl": "https://insightne-news.vercel.app",
   "youtubeUrl": "https://www.youtube.com/@InsightNE",
   "youtubeName": "InsightNE",
-  "regions": ["Tripura", "Northeast"],
-  "topics": ["Politics", "Education", "Sports"],
+  "youtubeChannelId": "UClLdHZm4Pkvf2zn3zCvyxtQ",
+  "publisher": {
+    "_help": "Shown on the About, Contact and Grievance pages. Fill in the real details before applying for ads.",
+    "name": "InsightNE News",
+    "editor": "Editor name (please fill in)",
+    "email": "",
+    "phone": "",
+    "address": "Agartala, Tripura, India",
+    "grievanceOfficer": "Grievance Officer name (please fill in)",
+    "grievanceEmail": ""
+  },
+  "defaultAuthor": "InsightNE News Desk",
+  "regions": [
+    "Tripura",
+    "Northeast"
+  ],
+  "topics": [
+    "Politics",
+    "Education",
+    "Sports"
+  ],
   "minimumScore": 6,
   "onlyArticlesNewerThanHours": 48,
   "maxArticlesPerRun": 200,

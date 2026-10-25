@@ -36,6 +36,7 @@ export default async function AdminPage({ searchParams }) {
         <a href="/admin?view=pending" aria-current={view === "pending" ? "page" : undefined}>Pending ({pendingCount})</a>
         <a href="/admin?view=published" aria-current={view === "published" ? "page" : undefined}>Published</a>
         <a href="/admin?view=rejected" aria-current={view === "rejected" ? "page" : undefined}>Rejected</a>
+        <a href="/admin/write">✍ Write story</a>
         <a href="/" target="_blank">View website ↗</a>
       </nav>
 
@@ -74,7 +75,8 @@ function AdminStory({ story, view }) {
   return (
     <article className="story">
       <div className="meta">
-        <span className="score">Score {story.score}/10</span>
+        {story.kind === "original" ? <span className="badge">Original</span> : <span className="score">Score {story.score}/10</span>}
+        {story.is_lead && <span className="badge" style={{ background: "var(--accent)" }}>Lead story</span>}
         <span className="tag">{story.region}</span>
         {story.topic && <span className="tag">{story.topic}</span>}
         <span>Collected {formatDate(story.created_at)}</span>
@@ -94,7 +96,11 @@ function AdminStory({ story, view }) {
         </div>
       )}
 
+      {story.image_url && <img src={story.image_url} alt="" style={{ maxHeight: 160, borderRadius: 8, marginTop: 8 }} />}
       <h2>{story.headline}</h2>
+      {story.status === "approved" && story.slug && (
+        <p className="byline"><a href={`/story/${story.slug}`} target="_blank">View on website ↗</a></p>
+      )}
       {story.summary?.trim() ? (
         <p className="summary">{story.summary}</p>
       ) : (

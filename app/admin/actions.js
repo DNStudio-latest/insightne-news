@@ -76,3 +76,60 @@ export async function restore(formData) {
   await db.updateStory(String(formData.get("id")), { status: "pending" });
   refresh("rejected", "Moved back to Pending");
 }
+
+export async function makeLead(formData) {
+  await requireLogin();
+  const id = String(formData.get("id"));
+  await db.setLead(formData.get("remove") ? null : id);
+  refresh("published", formData.get("remove") ? "Removed as lead story" : "This is now the lead story on the front page");
+}
+
+const text = (formData, name, max) => String(formData.get(name) || "").trim().slice(0, max);
+
+// Your own reports, written in the "Write a story" editor.
+export async function saveOriginal(formData) {
+  await requireLogin();
+  const id = text(formData, "id", 60);
+  const existing = id ? await db.getStory(id) : null;
+  const publish = formData.get("intent") === "publish";
+  const backToEditor = (message) => redirect(`/admin/write?${id ? `id=${id}&` : ""}error=${encodeURIComponent(message)}`);
+
+  const fields = {
+    kind: "original",
+    headline: text(formData, "headline", 200),
+    summary: text(formData, "summary", 600),
+    body: String(formData.get("body") || "").trim().slice(0, 60000),
+    region: settings.regions.includes(formData.get("region")) ? formData.get("region") : settings.regions[0],
+    topic: settings.topics.includes(formData.get("topic")) ? formData.get("topic") : null,
+    author: text(formData, "author", 120) || settings.defaultAuthor,
+    image_caption: text(formData, "image_caption", 300) || null,
+    image_credit: text(formData, "image_credit", 120) || null,
+    image_url: formData.get("removeImage") ? null : existing?.image_url || null,
+  };
+  if (!fields.headline) backToEditor("Please write a headline.");
+  if (publish && (!fields.summary || !fields.body)) backToEditor("Please write the intro and the story text before publishing.");
+
+  const file = formData.get("image");
+  if (file && typeof file === "object" && file.size > 0) {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) backToEditor("The photo must be a JPG, PNG or WEBP image.");
+    if (file.size > 4 * 1024 * 1024) backToEditor("The photo is too big (over 4 MB).");
+    fields.image_url = await db.uploadImage(new Uint8Array(await file.arrayBuffer()), file.type);
+  }
+
+  if (publish) {
+    // Publishing from the editor is the editor's check, so the "needs check" note is cleared.
+    Object.assign(fields, { status: "approved", published_at: existing?.published_at || new Date().toISOString(), needs_check: false, check_reasons: [] });
+  } else {
+    Object.assign(fields, { status: "pending", published_at: null });
+  }
+
+  let storyId = id;
+  if (existing) await db.updateStory(id, fields);
+  else storyId = await db.createStory({ ...fields, score: null, needs_check: false, check_reasons: [] });
+
+  const wantsLead = Boolean(formData.get("is_lead"));
+  if (publish && wantsLead) await db.setLead(storyId);
+  else if (existing?.is_lead && (!wantsLead || !publish)) await db.setLead(null);
+
+  refresh(publish ? "published" : "pending", publish ? "Your story is published" : "Draft saved — find it under Pending");
+}

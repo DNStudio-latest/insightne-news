@@ -71,3 +71,27 @@ revoke all on stories, story_sources, seen_articles, collector_runs from anon, a
 -- Added for no-AI mode: the short intro from each source's feed, shown only on your private approval page
 -- to help you write the summary. (Safe to run this whole file again; it only adds what is missing.)
 alter table story_sources add column if not exists snippet text;
+
+-- ===== Added for the full news site: story pages, your own articles, photos, lead story =====
+alter table stories add column if not exists slug text;
+alter table stories add column if not exists kind text not null default 'brief';   -- 'brief' (from other sites) or 'original' (your own report)
+alter table stories add column if not exists body text;                             -- full article text (originals)
+alter table stories add column if not exists image_url text;
+alter table stories add column if not exists image_caption text;
+alter table stories add column if not exists image_credit text;
+alter table stories add column if not exists author text;
+alter table stories add column if not exists is_lead boolean not null default false;
+alter table stories alter column score drop not null;
+create unique index if not exists stories_slug on stories (slug);
+create index if not exists stories_kind_published on stories (kind, published_at desc);
+
+-- Give every older story a web address (slug), e.g. "cm-opens-new-office-578fab"
+update stories
+set slug = coalesce(nullif(trim(both '-' from left(regexp_replace(lower(headline), '[^a-z0-9]+', '-', 'g'), 70)), ''), 'story')
+           || '-' || left(id::text, 6)
+where slug is null;
+
+-- A public folder for your own photos (anyone can view them; only the website can add them)
+insert into storage.buckets (id, name, public)
+values ('images', 'images', true)
+on conflict (id) do update set public = true;

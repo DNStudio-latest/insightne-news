@@ -210,3 +210,27 @@ test("Claude requests use Haiku, low effort and a strict answer format", async (
   const refusing = createClaudeAi({ client: { messages: { parse: async () => ({ stop_reason: "refusal", parsed_output: null }) } } });
   await assert.rejects(refusing.score([{ id: "a1" }]), /declined/);
 });
+
+test("if the service refuses the strict format, Claude is asked for plain JSON instead", async () => {
+  const Anthropic = (await import("@anthropic-ai/sdk")).default;
+  let parseCalls = 0;
+  const created = [];
+  const client = {
+    messages: {
+      async parse() {
+        parseCalls++;
+        throw Object.create(Anthropic.BadRequestError.prototype);
+      },
+      async create(params) {
+        created.push(params);
+        return { stop_reason: "end_turn", content: [{ type: "text", text: '```json\n{"scores":[{"id":"a1","score":7}]}\n```' }] };
+      },
+    },
+  };
+  const ai = createClaudeAi({ client });
+  assert.equal((await ai.score([{ id: "a1", sourceName: "X", title: "T", snippet: "S" }])).get("a1"), 7);
+  assert.equal((await ai.score([{ id: "a1", sourceName: "X", title: "T", snippet: "S" }])).get("a1"), 7);
+  assert.equal(parseCalls, 1, "after the first refusal it goes straight to plain JSON");
+  assert.match(created[0].system, /Reply with only one JSON object/);
+  assert.equal(created[0].output_config, undefined);
+});

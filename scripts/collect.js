@@ -5,10 +5,10 @@ import { createClaudeAi, createPracticeAi } from "../lib/ai.js";
 import { runPipeline } from "../lib/pipeline.js";
 import { settings, enabledSources, trustedSourceNames } from "../lib/config.js";
 
-const hasClaudeKey = Boolean(process.env.ANTHROPIC_API_KEY);
+const hasClaudeKey = Boolean(process.env.ANTHROPIC_API_KEY || process.env.OPENROUTER_API_KEY);
 
 if (usingSupabase && !hasClaudeKey) {
-  console.error("Stopping: the online database is set up but ANTHROPIC_API_KEY is missing. Add it to the GitHub secrets.");
+  console.error("Stopping: the online database is set up but no Claude key is set. Add OPENROUTER_API_KEY (or ANTHROPIC_API_KEY) to the GitHub secrets.");
   process.exit(1);
 }
 

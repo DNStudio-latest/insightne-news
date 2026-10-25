@@ -63,8 +63,8 @@ If you add a new topic (for example `"Health"`), Claude starts using it from the
 ## Money and safety
 
 - **Free:** GitHub, Supabase, Vercel (Hobby plan, for non-commercial sites).
-- **Paid:** Claude Haiku (the lowest-cost Claude model). Expected cost: **about $1–3 a month**.
-  Set a monthly spending limit of $5 at console.anthropic.com → Settings → Limits (Guide 1, Step 3).
+- **Paid:** Claude Haiku (the lowest-cost Claude model), bought through **OpenRouter** with crypto, or directly from Anthropic. Expected cost: **about $1–3 a month**.
+  Prepaid OpenRouter credit plus a $5 key limit caps spending (Guide 1, Step 3).
 - Extra cost guard: at most 200 articles per run, and articles already checked are never sent to Claude again.
 - All passwords and keys are kept in **secret settings** (Vercel and GitHub), never in the code.
   The file `.env.example` lists their names, with no values.
@@ -102,7 +102,7 @@ The practice password is in the file `.env.local` (this file stays on your compu
 - Supabase Postgres via `@supabase/supabase-js` using the secret key on the server only; row-level security on,
   no public policies. Tables in `supabase/schema.sql`. Local JSON fallback in `lib/db.js`.
 - Collector: `scripts/collect.js` → `lib/pipeline.js`; scheduled by `.github/workflows/collect.yml` (cron every 3 h).
-- Claude: `lib/ai.js`, model `claude-haiku-5-5` (override with `CLAUDE_MODEL`), `effort: "low"`,
+- Claude: `lib/ai.js`, Anthropic SDK pointed at OpenRouter (`OPENROUTER_API_KEY`, model `anthropic/claude-haiku-5.5`) or Anthropic (`ANTHROPIC_API_KEY`, `claude-haiku-5-5`); `effort: "low"`,
   structured outputs via `zodOutputFormat`.
 - Admin auth: `ADMIN_PASSWORD` + HMAC-signed httpOnly cookie (`SESSION_SECRET`), 30 days.
 - Tests: `npm test` (node:test; no network or AI cost).

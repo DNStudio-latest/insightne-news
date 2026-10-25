@@ -48,7 +48,25 @@ so no secrets go to GitHub.
 
    ⚠ The secret key is like a master key. Never share it or put it in a file inside the project.
 
-## Step 3 — Get a Claude API key and set a spending limit
+## Step 3 — Get a Claude key and set a spending limit
+
+There are two ways to pay for Claude. Use **one** of them.
+
+### Way A — through OpenRouter (works with crypto; what InsightNE uses)
+
+Indian bank cards are often refused by foreign websites. OpenRouter sells the same Claude Haiku model at the
+same price and accepts crypto. (It adds a small fee of about 5% when you buy credit, and crypto top-ups cannot be refunded.)
+
+1. Go to **openrouter.ai** → **Sign in** (Google, GitHub or email).
+2. Click your profile → **Credits** → **Add credits** → choose **Crypto** and a small amount, such as **$5**.
+   **This is the only step that costs money.** You do the payment yourself in your crypto wallet.
+   Prepaid credit is also a natural spending limit: when it runs out, Claude simply stops until you add more.
+3. Click your profile → **Keys** → **Create Key**. Name it `insightne-collector`.
+   Set **Credit limit** to **5** (dollars) — a second safety limit for this key. Click **Create**.
+4. Copy the key (starts with `sk-or-`). You will only see it once.
+5. In Step 4, save it as `OPENROUTER_API_KEY` (not `ANTHROPIC_API_KEY`).
+
+### Way B — directly from Anthropic (needs a card that pays foreign websites)
 
 1. Go to **console.anthropic.com** and create an account.
 2. **Set the spending limit first:** **Settings → Limits** → set a **monthly spend limit** of **$5**.
@@ -68,7 +86,7 @@ so no secrets go to GitHub.
    |---|---|
    | `SUPABASE_URL` | your Supabase Project URL |
    | `SUPABASE_SECRET_KEY` | your Supabase secret key |
-   | `ANTHROPIC_API_KEY` | your Claude key (`sk-ant-…`) |
+   | `OPENROUTER_API_KEY` | your OpenRouter key (`sk-or-…`) — **or**, if you used Way B, name it `ANTHROPIC_API_KEY` with your `sk-ant-…` key |
 
 3. Click the **Actions** tab. If asked, click **"I understand my workflows, go ahead and enable them"**.
 4. Click **Collect news** on the left → **Run workflow** → **Run workflow**. Wait 2–3 minutes.

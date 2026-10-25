@@ -1,7 +1,7 @@
 // Pieces shared by the public pages.
-import { settings, categories, slugify } from "../lib/config.js";
+import { settings, generalRegion, states, regions, topics, slugify } from "../lib/config.js";
 import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js";
-import { CopyLinkButton } from "./client.js";
+import { CopyLinkButton, NavBar } from "./client.js";
 
 export const storyUrl = (story) => `/story/${story.slug}`;
 export const categoryUrl = (name) => `/category/${slugify(name)}`;
@@ -60,17 +60,13 @@ export function SiteHeader({ current, ticker = [], updatedAt }) {
           </form>
         </div>
       </div>
-      <nav className="navbar" aria-label="Sections">
-        <div className="container nav">
-          <a href="/" aria-current={!current ? "page" : undefined}>Home</a>
-          {categories.map((c) => (
-            <a key={c} href={categoryUrl(c)} aria-current={current === c ? "page" : undefined}>{c}</a>
-          ))}
-          <a href="/originals" aria-current={current === "Originals" ? "page" : undefined}>Originals</a>
-          <a href="/videos" aria-current={current === "Videos" ? "page" : undefined}>Videos</a>
-          <a href="/search" aria-current={current === "Search" ? "page" : undefined}>🔍 Search</a>
-        </div>
-      </nav>
+      <NavBar
+        current={current}
+        generalRegion={generalRegion}
+        states={states}
+        stateLinks={regions.map((r) => [r, categoryUrl(r)])}
+        items={[...topics.map((t) => [t, categoryUrl(t)]), ["Originals", "/originals"], ["Videos", "/videos"], ["Search", "/search"]]}
+      />
       {ticker.length > 0 && (
         <div className="ticker" aria-label="Latest headlines">
           <div className="container">
@@ -153,12 +149,12 @@ export function SectionHead({ title, href }) {
 }
 
 // One big story with a list of headlines beside it.
-export function CategoryBlock({ title, stories }) {
+export function CategoryBlock({ title, stories, href = categoryUrl(title) }) {
   if (!stories.length) return null;
   const [top, ...rest] = stories;
   return (
     <section className="section">
-      <SectionHead title={title} href={categoryUrl(title)} />
+      <SectionHead title={title} href={href} />
       <div className="cat-block">
         <Card story={top} />
         <ul className="hl-list">
@@ -169,6 +165,35 @@ export function CategoryBlock({ title, stories }) {
             </li>
           ))}
         </ul>
+      </div>
+    </section>
+  );
+}
+
+// A small box per state with its latest headlines (only states that have news).
+export function StatesBoxes({ storiesByState }) {
+  const filled = storiesByState.filter(([, list]) => list.length);
+  if (!filled.length) return null;
+  return (
+    <section className="section">
+      <SectionHead title="News from the states" href={categoryUrl(generalRegion)} />
+      <div className="states-grid">
+        {filled.map(([state, list]) => (
+          <div key={state} className="state-box">
+            <h3>
+              <a href={categoryUrl(state)}>{state}</a>
+              <a className="more" href={categoryUrl(state)}>More →</a>
+            </h3>
+            <ul className="hl-list">
+              {list.map((s) => (
+                <li key={s.id}>
+                  <a className="h-link" href={storyUrl(s)}>{s.headline}</a>
+                  <div className="byline">{timeAgo(s.published_at)}</div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -241,8 +266,8 @@ export function SiteFooter() {
         <div>
           <h4>Sections</h4>
           <ul>
-            {categories.map((c) => (
-              <li key={c}><a href={categoryUrl(c)}>{c}</a></li>
+            {[...regions, ...topics].map((c) => (
+              <li key={c}><a href={categoryUrl(c)}>{c === generalRegion ? `All ${generalRegion}` : c}</a></li>
             ))}
             <li><a href="/originals">Originals</a></li>
             <li><a href="/videos">Videos</a></li>

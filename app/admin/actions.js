@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "../../lib/db.js";
-import { settings } from "../../lib/config.js";
+import { settings, regions } from "../../lib/config.js";
 import { isLoggedIn, passwordIsCorrect, startSession, endSession } from "../../lib/auth.js";
 
 async function requireLogin() {
@@ -18,7 +18,7 @@ function refresh(view = "pending", notice = "") {
 function editedFields(formData) {
   const headline = String(formData.get("headline") || "").trim().slice(0, 200);
   const summary = String(formData.get("summary") || "").trim().slice(0, 1200);
-  const region = settings.regions.includes(formData.get("region")) ? formData.get("region") : settings.regions[0];
+  const region = regions.includes(formData.get("region")) ? formData.get("region") : regions[0];
   const topic = settings.topics.includes(formData.get("topic")) ? formData.get("topic") : null;
   if (!headline || !summary) refresh(String(formData.get("view") || "pending"), "Headline and summary cannot be empty");
   return { headline, summary, region, topic };
@@ -99,7 +99,7 @@ export async function saveOriginal(formData) {
     headline: text(formData, "headline", 200),
     summary: text(formData, "summary", 600),
     body: String(formData.get("body") || "").trim().slice(0, 60000),
-    region: settings.regions.includes(formData.get("region")) ? formData.get("region") : settings.regions[0],
+    region: regions.includes(formData.get("region")) ? formData.get("region") : regions[0],
     topic: settings.topics.includes(formData.get("topic")) ? formData.get("topic") : null,
     author: text(formData, "author", 120) || settings.defaultAuthor,
     image_caption: text(formData, "image_caption", 300) || null,

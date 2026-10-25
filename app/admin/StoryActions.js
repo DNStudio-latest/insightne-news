@@ -89,7 +89,7 @@ export default function StoryActions({ story, view, regions, topics }) {
           </label>
           <div className="edit-row">
             <label>
-              Area
+              State
               <select name="region" defaultValue={story.region}>
                 {regions.map((r) => (
                   <option key={r}>{r}</option>

@@ -7,7 +7,7 @@ export default function AboutPage() {
   return (
     <InfoPage title={`About ${settings.siteName}`}>
       <p>
-        {settings.siteName} is an independent digital news platform covering Tripura and the wider Northeast of India. We
+        {settings.siteName} is an independent digital news platform covering all eight states of Northeast India: Tripura, Assam, Meghalaya, Manipur, Mizoram, Nagaland, Arunachal Pradesh and Sikkim. We
         publish our own ground reports and video stories, along with short news briefs that help readers keep up with the
         most important developments in the region.
       </p>

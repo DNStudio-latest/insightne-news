@@ -5,7 +5,7 @@ import { PageShell, SectionHead, StoryGrid } from "../components.js";
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "InsightNE Originals",
-  description: `Our own reports from Tripura and the Northeast, by the ${settings.siteName} team.`,
+  description: `Our own reports from across Northeast India, by the ${settings.siteName} team.`,
   alternates: { canonical: "/originals" },
 };
 const PER_PAGE = 18;

@@ -94,7 +94,7 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor }) {
 
       <div className="row">
         <label>
-          Area
+          State
           <select name="region" defaultValue={story?.region || regions[0]}>
             {regions.map((r) => (
               <option key={r}>{r}</option>

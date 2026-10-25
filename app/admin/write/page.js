@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { db } from "../../../lib/db.js";
-import { settings } from "../../../lib/config.js";
+import { settings, regions } from "../../../lib/config.js";
 import { isLoggedIn } from "../../../lib/auth.js";
 import StoryEditor from "./StoryEditor.js";
 
@@ -31,7 +31,7 @@ export default async function WritePage({ searchParams }) {
       )}
       <StoryEditor
         story={story}
-        regions={settings.regions}
+        regions={regions}
         topics={settings.topics}
         defaultAuthor={settings.defaultAuthor}
       />

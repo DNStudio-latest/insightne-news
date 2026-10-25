@@ -1,7 +1,7 @@
 {
   "_help": "Website settings. Change the words between the quote marks. See README.md for what each one does.",
   "siteName": "InsightNE News",
-  "tagline": "Important news from Tripura and Northeast India",
+  "tagline": "News and stories from the eight states of Northeast India",
   "siteUrl": "https://insightne-news.vercel.app",
   "youtubeUrl": "https://www.youtube.com/@InsightNE",
   "youtubeName": "InsightNE",
@@ -17,9 +17,16 @@
     "grievanceEmail": ""
   },
   "defaultAuthor": "InsightNE News Desk",
-  "regions": [
+  "generalRegion": "Northeast",
+  "states": [
     "Tripura",
-    "Northeast"
+    "Assam",
+    "Meghalaya",
+    "Manipur",
+    "Mizoram",
+    "Nagaland",
+    "Arunachal Pradesh",
+    "Sikkim"
   ],
   "topics": [
     "Politics",

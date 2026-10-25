@@ -16,7 +16,7 @@ export default function OpenGraphImage() {
           <span style={{ color: "#ee8a70", marginLeft: 24 }}>{rest.join(" ")}</span>
         </div>
         <div style={{ fontSize: 40, marginTop: 20, opacity: 0.9 }}>{settings.tagline}</div>
-        <div style={{ display: "flex", marginTop: 50, fontSize: 28, opacity: 0.75 }}>Tripura · Northeast · Politics · Education · Sports</div>
+        <div style={{ display: "flex", marginTop: 50, fontSize: 28, opacity: 0.75 }}>Tripura · Assam · Meghalaya · Manipur · Mizoram · Nagaland · Arunachal · Sikkim</div>
       </div>
     ),
     size,

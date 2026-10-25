@@ -244,3 +244,30 @@ main { padding: 20px 0 40px; }
 .notice { background: var(--brand-soft); color: var(--brand); padding: 8px 12px; border-radius: 8px; font-size: 0.88rem; margin-bottom: 12px; font-weight: 600; }
 .no-summary { color: var(--warn); font-weight: 600; font-style: italic; }
 .img-link { display: block; text-decoration: none; }
+
+/* Northeast ▾ menu and the row of eight states */
+.nav-drop { flex: none; font: inherit; font-size: 0.92rem; font-weight: 600; padding: 7px 13px; border-radius: 999px; border: 0; background: transparent; color: var(--text); cursor: pointer; }
+.nav-drop:hover { background: var(--bg); }
+.nav-drop.active, .nav-drop[aria-expanded="true"] { background: var(--brand-soft); color: var(--brand); }
+.subnav { background: var(--brand-soft); border-top: 1px solid var(--line); }
+.subnav .nav a { font-size: 0.86rem; padding: 6px 12px; }
+.subnav .nav a[aria-current="page"] { background: var(--brand); color: var(--card); }
+.footer-cols ul { columns: 2; }
+
+/* Artwork colours for each state */
+.art-assam { background: linear-gradient(135deg, #8a3b12, #d9822b); }
+.art-meghalaya { background: linear-gradient(135deg, #1b5e5a, #3fa38c); }
+.art-manipur { background: linear-gradient(135deg, #5a2a6e, #b0558f); }
+.art-mizoram { background: linear-gradient(135deg, #234e7a, #4f9bd1); }
+.art-nagaland { background: linear-gradient(135deg, #6b1d1d, #c23b3b); }
+.art-arunachal-pradesh { background: linear-gradient(135deg, #2f5d1e, #7cab3a); }
+.art-sikkim { background: linear-gradient(135deg, #2c3e66, #7f97c9); }
+
+/* State blocks on the front page */
+.states-grid { display: grid; gap: 18px; grid-template-columns: 1fr; }
+@media (min-width: 700px) { .states-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1000px) { .states-grid { grid-template-columns: repeat(3, 1fr); } }
+.state-box { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.state-box h3 { font-family: var(--serif); font-size: 1.05rem; margin: 0 0 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.state-box h3 a { color: var(--text); text-decoration: none; }
+.state-box h3 .more { font-family: var(--sans); font-size: 0.78rem; font-weight: 700; color: var(--brand); }

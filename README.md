@@ -55,7 +55,7 @@ Add `OPENROUTER_API_KEY` or `ANTHROPIC_API_KEY` later and Claude takes over agai
 |---|---|
 | `siteName`, `tagline` | Shown at the top of the website |
 | `youtubeUrl`, `youtubeName` | The YouTube box on every page |
-| `regions` | The two area categories: Tripura, Northeast. Every story gets one. |
+| `generalRegion`, `states` | "Northeast" plus the eight states. Every story is filed under one state, or under Northeast when it covers several. The menu shows them under **Northeast ▾**. |
 | `topics` | Extra categories: Politics, Education, Sports. A story gets one, or none. |
 | `minimumScore` | Stories below this score are dropped (now 6) |
 | `onlyArticlesNewerThanHours` | Ignore articles older than this (now 48 hours) |

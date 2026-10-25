@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/db.js";
-import { settings, categoryFromSlug, slugify } from "../../../lib/config.js";
+import { settings, generalRegion, categoryFromSlug, sectionFilter, slugify } from "../../../lib/config.js";
 import { PageShell, SectionHead, StoryGrid } from "../../components.js";
 
 export const dynamic = "force-dynamic";
@@ -21,13 +21,12 @@ export default async function CategoryPage({ params, searchParams }) {
   if (!category) notFound();
   const page = Math.max(1, Number((await searchParams).page) || 1);
 
-  const isRegion = settings.regions.includes(category);
-  const filter = isRegion ? { region: category } : { topic: category };
-  const stories = await db.listStories({ status: "approved", ...filter, limit: PER_PAGE + 1, offset: (page - 1) * PER_PAGE });
+  const stories = await db.listStories({ status: "approved", ...sectionFilter(category), limit: PER_PAGE + 1, offset: (page - 1) * PER_PAGE });
+  const title = category === generalRegion ? `All ${generalRegion} news` : `${category} news`;
 
   return (
     <PageShell current={category}>
-      <SectionHead title={`${category} news`} />
+      <SectionHead title={title} />
       <StoryGrid stories={stories.slice(0, PER_PAGE)} />
       {stories.length > PER_PAGE && (
         <div className="pager">

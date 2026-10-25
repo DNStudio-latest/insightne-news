@@ -240,7 +240,7 @@ test("no-AI mode: rules score, group and categorize; summaries are left for the 
   assert.equal(ruleScore({ title: "Flood alert issued in Agartala as Haora river rises" }), 9);
   assert.equal(ruleScore({ title: "Tripura cabinet approves new scheme" }), 9);
   assert.equal(ruleScore({ title: "আগরতলায় নতুন সেতুর উদ্বোধন" }), 8);
-  assert.equal(ruleScore({ title: "Meghalaya to hold village council polls" }), 7);
+  assert.equal(ruleScore({ title: "Meghalaya to hold village council polls" }), 8);
   assert.equal(ruleScore({ title: "Malabar Gold hosts jewellery show in Hyderabad", snippet: "Tripura Star News" }), 3);
   assert.ok(ruleScore({ title: "Stock market closes higher" }) < 6);
   assert.ok(!sameNews("Udaipur in Rajasthan votes", "Tripura budget session begins"));
@@ -283,4 +283,18 @@ test("no-AI mode: differently worded reports from the same place are grouped; na
   assert.ok(!sameNews("Police seize drugs in Agartala", "Agartala police hold road safety rally"));
   assert.ok(ruleScore({ title: "2nd ODI: Preparation brings clarity, says Tejal Hasabnis", sourceRegion: "Tripura" }) < 6);
   assert.ok(ruleScore({ title: "প্রধানমন্ত্রী মোদিকে নিয়ে খার্গের মন্তব্যে বিতর্ক", sourceRegion: "Tripura" }) < 6);
+});
+
+test("stories are filed under one of the eight states, or Northeast when several are involved", async () => {
+  const { ruleRegion } = await import("../lib/rules.js");
+  const { sectionFilter, categoryFromSlug } = await import("../lib/config.js");
+  assert.equal(ruleRegion([{ title: "Guwahati traffic rules changed" }]), "Assam");
+  assert.equal(ruleRegion([{ title: "Gangtok landslide blocks highway" }]), "Sikkim");
+  assert.equal(ruleRegion([{ title: "Meghalaya, Assam border talks resume" }]), "Northeast");
+  assert.equal(ruleRegion([{ title: "Murder accused dies in hospital", sourceRegion: "Tripura" }]), "Tripura");
+  assert.equal(ruleRegion([{ title: "Seven Sisters tourism push" }]), "Northeast");
+  assert.deepEqual(sectionFilter("Northeast"), {});
+  assert.deepEqual(sectionFilter("Arunachal Pradesh"), { region: "Arunachal Pradesh" });
+  assert.deepEqual(sectionFilter("Sports"), { topic: "Sports" });
+  assert.equal(categoryFromSlug("arunachal-pradesh"), "Arunachal Pradesh");
 });

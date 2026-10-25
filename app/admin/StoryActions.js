@@ -4,6 +4,8 @@ import { useState } from "react";
 import { approve, reject, saveEdit, unpublish, restore } from "./actions.js";
 
 export default function StoryActions({ story, view, regions, topics }) {
+  // In no-AI mode a story arrives without a summary; WRITE SUMMARY opens the writing box.
+  const needsSummary = !story.summary?.trim();
   const [editing, setEditing] = useState(false);
   const id = <input type="hidden" name="id" value={story.id} />;
   const editButton = (
@@ -16,7 +18,7 @@ export default function StoryActions({ story, view, regions, topics }) {
 
   return (
     <>
-      {view === "pending" && story.needs_check && (
+      {view === "pending" && story.needs_check && !needsSummary && (
         <label className="confirm">
           <input type="checkbox" form={approveFormId} required /> I have checked this story before approving
         </label>
@@ -24,11 +26,19 @@ export default function StoryActions({ story, view, regions, topics }) {
       <div className="actions">
         {view === "pending" && (
           <>
-            <form action={approve} id={approveFormId}>
-              {id}
-              <button className="btn btn-approve" type="submit">APPROVE</button>
-            </form>
-            {editButton}
+            {needsSummary ? (
+              <button className="btn btn-approve" type="button" style={{ gridColumn: "span 2" }} onClick={() => setEditing(!editing)} aria-expanded={editing}>
+                {editing ? "CLOSE" : "WRITE SUMMARY"}
+              </button>
+            ) : (
+              <>
+                <form action={approve} id={approveFormId}>
+                  {id}
+                  <button className="btn btn-approve" type="submit">APPROVE</button>
+                </form>
+                {editButton}
+              </>
+            )}
             <form action={reject}>
               {id}
               <button className="btn btn-reject" type="submit">REJECT</button>
@@ -62,7 +72,7 @@ export default function StoryActions({ story, view, regions, topics }) {
           </label>
           <label>
             Summary
-            <textarea name="summary" defaultValue={story.summary} required maxLength={1200} />
+            <textarea name="summary" defaultValue={story.summary} required maxLength={1200} placeholder="Write 2–3 sentences in your own words. Don't copy sentences from the source." />
           </label>
           <div className="edit-row">
             <label>
@@ -83,8 +93,13 @@ export default function StoryActions({ story, view, regions, topics }) {
               </select>
             </label>
           </div>
+          {view === "pending" && story.needs_check && (
+            <label className="confirm">
+              <input type="checkbox" required /> I have checked this story before approving
+            </label>
+          )}
           <div className="edit-buttons">
-            <button className="btn btn-edit" type="submit">SAVE</button>
+            <button className="btn btn-edit" type="submit" formNoValidate>SAVE</button>
             {view === "pending" && (
               <button className="btn btn-approve" type="submit" name="andApprove" value="1">SAVE & APPROVE</button>
             )}

@@ -15,10 +15,10 @@ It is made for your phone. Tip: open it once and choose **Add to Home Screen**.
 
 ## Each story card shows
 
-- **Score 8/10** — how important Claude thinks it is for Tripura and Northeast readers (only 6 and above are shown).
+- **Score 8/10** — how important the story is for Tripura and Northeast readers, judged by Claude or, in no-AI mode, by simple rules (only 6 and above are shown).
 - **Tripura / Northeast** and a topic such as **Politics** — where it will appear on the site.
 - **⚠ NEEDS EXTRA CHECK** with reasons — see below.
-- **Headline and summary** — written in our own words, not copied.
+- **Headline and summary** — written in our own words, not copied. (In no-AI mode you write the summary; see below.)
 - **Sources** — every site that reported it. Tap one to open the original article. "Their headline" shows
   the original title so you can compare.
 
@@ -29,6 +29,21 @@ It is made for your phone. Tip: open it once and choose **Add to Home Screen**.
 | **APPROVE** | Publishes it on the website **immediately**. |
 | **EDIT** | Opens a box where you can change the headline, summary, area and topic. Then press **SAVE** (keeps it pending) or **SAVE & APPROVE** (publishes it). |
 | **REJECT** | Removes it from the list. It never appears on the site. (You can bring it back from the **Rejected** tab.) |
+
+## No-AI mode: WRITE SUMMARY
+
+While no Claude key is set, the website runs in **no-AI mode** (free). Simple rules pick and group the stories,
+and each story arrives with **"✍ No summary yet"**. Instead of APPROVE you see **WRITE SUMMARY**:
+
+1. Read the source. Tap its name to open the full article. "Their intro" shows the first lines from their feed
+   (only you can see this).
+2. Tap **WRITE SUMMARY**. Write **2–3 sentences in your own words**. Don't copy sentences from the source.
+   You can also improve the headline and change the area or topic.
+3. Tap **SAVE & APPROVE** to publish, or **SAVE** to finish it later.
+
+A story without a summary can never be published, not even by the auto-publish option.
+The "Last check" line at the top says **(no-AI mode)** while this mode is on. When a Claude key is added
+(see Guide 1, Step 3), Claude writes the summaries again automatically.
 
 ## ⚠ NEEDS EXTRA CHECK
 

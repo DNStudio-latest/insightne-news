@@ -20,7 +20,7 @@ function editedFields(formData) {
   const summary = String(formData.get("summary") || "").trim().slice(0, 1200);
   const region = settings.regions.includes(formData.get("region")) ? formData.get("region") : settings.regions[0];
   const topic = settings.topics.includes(formData.get("topic")) ? formData.get("topic") : null;
-  if (!headline || !summary) throw new Error("Headline and summary cannot be empty.");
+  if (!headline || !summary) refresh(String(formData.get("view") || "pending"), "Headline and summary cannot be empty");
   return { headline, summary, region, topic };
 }
 
@@ -39,7 +39,11 @@ export async function logout() {
 
 export async function approve(formData) {
   await requireLogin();
-  await db.updateStory(String(formData.get("id")), { status: "approved", published_at: new Date().toISOString() });
+  const id = String(formData.get("id"));
+  // Nothing goes on the website without a summary.
+  const story = await db.getStory(id);
+  if (!story?.summary?.trim()) refresh("pending", "Write a summary before approving (tap WRITE SUMMARY)");
+  await db.updateStory(id, { status: "approved", published_at: new Date().toISOString() });
   refresh("pending", "Published");
 }
 

@@ -234,3 +234,53 @@ test("if the service refuses the strict format, Claude is asked for plain JSON i
   assert.match(created[0].system, /Reply with only one JSON object/);
   assert.equal(created[0].output_config, undefined);
 });
+
+test("no-AI mode: rules score, group and categorize; summaries are left for the editor", async () => {
+  const { createRulesAi, ruleScore, sameNews, ruleTopic } = await import("../lib/rules.js");
+  assert.equal(ruleScore({ title: "Flood alert issued in Agartala as Haora river rises" }), 9);
+  assert.equal(ruleScore({ title: "Tripura cabinet approves new scheme" }), 9);
+  assert.equal(ruleScore({ title: "আগরতলায় নতুন সেতুর উদ্বোধন" }), 8);
+  assert.equal(ruleScore({ title: "Meghalaya to hold village council polls" }), 7);
+  assert.equal(ruleScore({ title: "Malabar Gold hosts jewellery show in Hyderabad", snippet: "Tripura Star News" }), 3);
+  assert.ok(ruleScore({ title: "Stock market closes higher" }) < 6);
+  assert.ok(!sameNews("Udaipur in Rajasthan votes", "Tripura budget session begins"));
+  assert.ok(sameNews("Tripura budget session begins on Monday", "Budget session of Tripura assembly begins Monday"));
+  assert.equal(ruleTopic("BJP and Congress clash in assembly over election", ["Politics", "Education", "Sports"]), "Politics");
+  assert.equal(ruleTopic("TBSE board results: students celebrate", ["Politics", "Education", "Sports"]), "Education");
+
+  reset();
+  const feed = [
+    article(50, "Tripura Times", "Tripura budget session begins on Monday"),
+    article(51, "EastMojo", "Budget session of Tripura assembly begins Monday"),
+    article(52, "Syllad", "Film trailer launched in Mumbai"),
+  ];
+  const run = await runPipeline({ db, ai: createRulesAi({ topics: ["Politics"] }), sources: [], settings, fetchFeeds: async () => ({ articles: feed, okCount: 1, failed: [] }), log: quiet });
+  assert.equal(run.practice_mode, true);
+  const [story] = await db.listStories({ status: "pending" });
+  assert.equal(run.stories_created, 1);
+  assert.equal(story.summary, "", "summary left for the editor");
+  assert.equal(story.region, "Tripura");
+  assert.equal(story.topic, "Politics");
+  assert.equal(story.sources.length, 2);
+
+  // Even with auto-publish on, a story without a summary never goes live.
+  reset();
+  await runPipeline({ db, ai: createRulesAi(), sources: [], settings: { ...settings, autoPublish: { enabled: true } }, trusted: new Set(["Tripura Times", "EastMojo"]), fetchFeeds: async () => ({ articles: feed, okCount: 1, failed: [] }), log: quiet });
+  assert.equal((await db.listStories({ status: "approved" })).length, 0);
+});
+
+test("no-AI mode: local stories from Tripura papers count as Tripura news", async () => {
+  const { ruleScore } = await import("../lib/rules.js");
+  assert.equal(ruleScore({ title: "Pistol recovered during police checking; tension in Boxanagar" }), 8);
+  assert.equal(ruleScore({ title: "Usha Bazar murder case: accused dies in hospital", sourceRegion: "Tripura" }), 7);
+  assert.ok(ruleScore({ title: "Rajasthan: voting begins in gram panchayats", sourceRegion: "Tripura" }) < 6);
+  assert.ok(ruleScore({ title: "Usha Bazar murder case: accused dies in hospital", sourceRegion: "Northeast" }) < 6);
+});
+
+test("no-AI mode: differently worded reports from the same place are grouped; national news from Tripura papers is not kept", async () => {
+  const { sameNews, ruleScore } = await import("../lib/rules.js");
+  assert.ok(sameNews("Pistol seized from car during police search in Boxanagar", "Pistol Recovered from Vehicle During Police Checking ; Tension in Boxanagar"));
+  assert.ok(!sameNews("Police seize drugs in Agartala", "Agartala police hold road safety rally"));
+  assert.ok(ruleScore({ title: "2nd ODI: Preparation brings clarity, says Tejal Hasabnis", sourceRegion: "Tripura" }) < 6);
+  assert.ok(ruleScore({ title: "প্রধানমন্ত্রী মোদিকে নিয়ে খার্গের মন্তব্যে বিতর্ক", sourceRegion: "Tripura" }) < 6);
+});

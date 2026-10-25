@@ -57,7 +57,7 @@ function RunBox({ run }) {
   return (
     <div className="run-box">
       <strong>Last check:</strong> {formatDate(run.started_at)}
-      {run.practice_mode && " (practice mode)"} · {run.feeds_ok} feeds worked · {run.articles_new} new articles · {run.stories_created} new stories
+      {run.practice_mode && " (no-AI mode)"} · {run.feeds_ok} feeds worked · {run.articles_new} new articles · {run.stories_created} new stories
       {run.feeds_failed?.length > 0 && (
         <ul>
           {run.feeds_failed.map((f) => (
@@ -95,13 +95,18 @@ function AdminStory({ story, view }) {
       )}
 
       <h2>{story.headline}</h2>
-      <p className="summary">{story.summary}</p>
+      {story.summary?.trim() ? (
+        <p className="summary">{story.summary}</p>
+      ) : (
+        <p className="summary no-summary">✍ No summary yet. Read the source, then write 2–3 sentences in your own words.</p>
+      )}
 
       <ul className="src-list">
         {story.sources.map((s) => (
           <li key={s.url}>
             <a href={s.url} target="_blank" rel="noopener noreferrer">{s.source_name} ↗</a>
             {s.original_title && <span className="orig">Their headline: {s.original_title}</span>}
+            {s.snippet && <span className="orig">Their intro: {s.snippet}</span>}
           </li>
         ))}
       </ul>

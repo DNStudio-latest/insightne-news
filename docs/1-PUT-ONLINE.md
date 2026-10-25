@@ -9,10 +9,11 @@ You will create four free accounts. Each one does one job:
 | **GitHub** | Keeps a copy of your website's files, and runs the news collector every 3 hours | Free |
 | **Supabase** | The database: stores stories, sources, and your approvals | Free |
 | **Vercel** | Shows your website on the internet | Free (see the note below) |
-| **Anthropic (Claude)** | The AI that scores and summarizes stories | **Pay as you use** — about **$1–3 a month** (₹85–250) |
+| **Claude (optional)** | The AI that scores and summarizes stories | **Pay as you use** — about **$1–3 a month** (₹85–250) |
 
-> **The only thing that costs money is Claude.** Before you add money there, read Step 3 and
-> set a spending limit. Nothing else in this guide asks for a card.
+> **The only thing that costs money is Claude, and it is optional.** Without it the site runs in
+> **no-AI mode**: simple rules pick the stories and you write the summaries (see Guide 3). You can skip
+> Step 3 and add Claude any time later. Nothing else in this guide asks for a card.
 
 > **Note about Vercel's free plan:** it is meant for personal, non-commercial websites. If you later put
 > paid ads on the site, Vercel asks you to move to its Pro plan (about $20 a month). Ask me first and we can
@@ -80,13 +81,13 @@ same price and accepts crypto. (It adds a small fee of about 5% when you buy cre
 ## Step 4 — Give GitHub the secrets (for the collector)
 
 1. On github.com, open your `insightne-news` repository → **Settings** → **Secrets and variables** → **Actions**.
-2. Click **New repository secret** three times and add:
+2. Click **New repository secret** and add these (the third one only if you did Step 3):
 
    | Name | Value |
    |---|---|
    | `SUPABASE_URL` | your Supabase Project URL |
    | `SUPABASE_SECRET_KEY` | your Supabase secret key |
-   | `OPENROUTER_API_KEY` | your OpenRouter key (`sk-or-…`) — **or**, if you used Way B, name it `ANTHROPIC_API_KEY` with your `sk-ant-…` key |
+   | `OPENROUTER_API_KEY` | *Only if you did Step 3:* your OpenRouter key (`sk-or-…`) — **or**, if you used Way B, name it `ANTHROPIC_API_KEY` with your `sk-ant-…` key. Without it, the collector runs in no-AI mode. |
 
 3. Click the **Actions** tab. If asked, click **"I understand my workflows, go ahead and enable them"**.
 4. Click **Collect news** on the left → **Run workflow** → **Run workflow**. Wait 2–3 minutes.

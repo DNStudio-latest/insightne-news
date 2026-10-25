@@ -21,6 +21,19 @@ Readers (the home page)
   newest approved stories · categories · source names and "Read full story" links · YouTube box
 ```
 
+### No-AI mode (free, used automatically when no Claude key is set)
+
+Steps 2–5 are done by simple rules in `lib/rules.js` instead of Claude:
+- **Select:** Tripura place names (English and Bengali) score highest, then other Northeast places; stories from
+  the Tripura papers (`"region": "Tripura"` in `sources.json`) count as Tripura news unless they name a place
+  outside the Northeast; important words (flood, cabinet, election…) add a point; adverts and entertainment lose points.
+- **Arrange:** headlines that share most of their important words, or a place and two more words, are grouped.
+- **Summarize:** the original headline is kept and the summary is left empty. **You write it** on the approval
+  page (WRITE SUMMARY). A story without a summary can never be published.
+- **Flag:** the sensitive-word warnings still work.
+
+Add `OPENROUTER_API_KEY` or `ANTHROPIC_API_KEY` later and Claude takes over again, with no other change.
+
 ## The guides
 
 | Guide | For |
@@ -81,10 +94,10 @@ In `settings.json`, `"autoPublish": { "enabled": false }`. If you ever change it
 
 Everything else still waits in Pending. Auto-published stories are labelled "auto-published" in your Published tab.
 
-## Trying it on your own computer (practice mode)
+## Trying it on your own computer
 
-Without any accounts, the project runs in **practice mode**: stories are saved in `data/local-db.json`
-and no AI is used (summaries are placeholders, which is free).
+Without any accounts, stories are saved in `data/local-db.json`
+and no-AI mode is used (free).
 
 ```
 npm install

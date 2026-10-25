@@ -1,10 +1,11 @@
 {
-  "_help": "This is your list of news sources. To turn a source off, change \"enabled\": true to \"enabled\": false. To add one, copy a block, paste it, and change the details. See docs/2-NEWS-SOURCES.md for step-by-step help.",
+  "_help": "This is your list of news sources. To turn a source off, change \"enabled\": true to \"enabled\": false. To add one, copy a block, paste it, and change the details. See docs/2-NEWS-SOURCES.md for step-by-step help. \"region\" says what the source mostly covers (Tripura or Northeast); it helps when no AI is used.",
   "sources": [
     {
       "name": "Tripura Times",
       "website": "https://tripuratimes.com",
       "feed": "https://tripuratimes.com/rss.xml",
+      "region": "Tripura",
       "enabled": true,
       "autoPublish": false
     },
@@ -12,6 +13,7 @@
       "name": "Tripura Chronicle",
       "website": "https://tripurachronicle.in",
       "feed": "https://tripurachronicle.in/feed/",
+      "region": "Tripura",
       "enabled": true,
       "autoPublish": false
     },
@@ -19,6 +21,7 @@
       "name": "Tripura Star News",
       "website": "https://tripurastarnews.com",
       "feed": "https://tripurastarnews.com/feed/",
+      "region": "Tripura",
       "enabled": true,
       "autoPublish": false
     },
@@ -26,6 +29,7 @@
       "name": "Jagaran Tripura",
       "website": "https://jagarantripura.com",
       "feed": "https://jagarantripura.com/feed/",
+      "region": "Tripura",
       "enabled": true,
       "autoPublish": false
     },
@@ -33,6 +37,7 @@
       "name": "Northeast Now",
       "website": "https://nenow.in",
       "feed": "https://nenow.in/feed",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -40,6 +45,7 @@
       "name": "Northeast Now",
       "website": "https://nenow.in",
       "feed": "https://nenow.in/north-east/tripura/feed",
+      "region": "Tripura",
       "enabled": true,
       "autoPublish": false
     },
@@ -47,6 +53,7 @@
       "name": "EastMojo",
       "website": "https://www.eastmojo.com",
       "feed": "https://www.eastmojo.com/feed/",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -54,6 +61,7 @@
       "name": "EastMojo",
       "website": "https://www.eastmojo.com",
       "feed": "https://www.eastmojo.com/tripura/feed/",
+      "region": "Tripura",
       "enabled": true,
       "autoPublish": false
     },
@@ -61,6 +69,7 @@
       "name": "India Today NE",
       "website": "https://www.indiatodayne.in",
       "feed": "https://www.indiatodayne.in/rss/home",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -68,6 +77,7 @@
       "name": "The Sentinel",
       "website": "https://www.sentinelassam.com",
       "feed": "https://www.sentinelassam.com/feed",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -75,6 +85,7 @@
       "name": "Pratidin Time",
       "website": "https://www.pratidintime.com",
       "feed": "https://www.pratidintime.com/rss",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -82,6 +93,7 @@
       "name": "Hub News",
       "website": "https://hubnetwork.in",
       "feed": "https://hubnetwork.in/feed/",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -89,6 +101,7 @@
       "name": "The Shillong Times",
       "website": "https://theshillongtimes.com",
       "feed": "https://theshillongtimes.com/feed/",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -96,6 +109,7 @@
       "name": "Syllad",
       "website": "https://www.syllad.com",
       "feed": "https://www.syllad.com/feed/",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -103,6 +117,7 @@
       "name": "Highland Post",
       "website": "https://www.highlandpost.com",
       "feed": "https://www.highlandpost.com/feed/",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -110,6 +125,7 @@
       "name": "The Morung Express",
       "website": "https://morungexpress.com",
       "feed": "https://morungexpress.com/feed",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -117,6 +133,7 @@
       "name": "Nagaland Post",
       "website": "https://nagalandpost.com",
       "feed": "https://nagalandpost.com/feed/",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -124,6 +141,7 @@
       "name": "The Frontier Manipur",
       "website": "https://www.thefrontiermanipur.com",
       "feed": "https://www.thefrontiermanipur.com/feed/",
+      "region": "Northeast",
       "enabled": true,
       "autoPublish": false
     },
@@ -131,6 +149,7 @@
       "name": "Google News search: Tripura",
       "website": "https://news.google.com",
       "feed": "https://news.google.com/rss/search?q=Tripura&hl=en-IN&gl=IN&ceid=IN:en",
+      "region": "Northeast",
       "enabled": false,
       "autoPublish": false,
       "_note": "OFF by default. Brings in Tripura stories from many national papers, but you do not choose which papers."
@@ -139,6 +158,7 @@
       "name": "Imphal Free Press",
       "website": "https://www.ifp.co.in",
       "feed": "https://www.ifp.co.in/feed",
+      "region": "Northeast",
       "enabled": false,
       "autoPublish": false,
       "_note": "OFF: the feed has not updated since August 2026."

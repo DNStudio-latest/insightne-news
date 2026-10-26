@@ -1,6 +1,7 @@
 "use client";
 // Small pieces that run in the reader's browser.
 import { useEffect, useState } from "react";
+import { Analytics } from "@vercel/analytics/next";
 
 export function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false);
@@ -74,4 +75,10 @@ export function LiveUpdates({ since }) {
       ↑ New stories — tap to see
     </button>
   );
+}
+
+// Counts visitors with Vercel Web Analytics (no cookies). Your own approval pages are not counted.
+
+export function SiteAnalytics() {
+  return <Analytics beforeSend={(event) => (new URL(event.url).pathname.startsWith("/admin") ? null : event)} />;
 }

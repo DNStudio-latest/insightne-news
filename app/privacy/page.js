@@ -14,6 +14,7 @@ export default function PrivacyPage() {
         <li>We do not ask readers to create an account and we do not collect your name, email or phone number unless you write to us.</li>
         <li>Like most websites, our hosting provider automatically records basic technical information (such as your IP address, browser type and the pages you visit) to keep the site secure and working.</li>
         <li>If you email us, we use your message and address only to reply to you.</li>
+        <li>We count visits with Vercel Web Analytics, which does not use cookies and does not identify you. It tells us things like how many people read a page and which country or state they read from.</li>
       </ul>
       <h2>Cookies</h2>
       <p>

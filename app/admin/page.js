@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { db } from "../../lib/db.js";
+import { db, cleanSearch } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
 import { isLoggedIn } from "../../lib/auth.js";
 import { formatDate } from "../../lib/format.js";
@@ -10,18 +10,37 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Approval page", robots: { index: false, follow: false } };
 
 const VIEWS = { pending: "pending", published: "approved", rejected: "rejected" };
+const MAX_SHOWN = 100;
+
+// When the news happened: the newest report among its sources (or when we collected it).
+function newsTime(story) {
+  if (story.status === "approved" && story.published_at) return new Date(story.published_at).getTime();
+  const reported = Math.max(0, ...story.sources.map((s) => (s.published_at ? new Date(s.published_at).getTime() : 0)));
+  return reported || new Date(story.created_at).getTime();
+}
+
+const SORTS = {
+  newest: (a, b) => newsTime(b) - newsTime(a),
+  important: (a, b) => (b.score ?? 99) - (a.score ?? 99) || newsTime(b) - newsTime(a),
+};
 
 export default async function AdminPage({ searchParams }) {
   if (!(await isLoggedIn())) redirect("/admin/login");
   const params = await searchParams;
   const view = VIEWS[params.view] ? params.view : "pending";
+  const q = cleanSearch(params.q);
+  const state = regions.includes(params.state) ? params.state : "";
+  const sort = SORTS[params.sort] ? params.sort : "newest";
+  const filtering = Boolean(q || state);
 
-  const [stories, pendingStories, lastRun] = await Promise.all([
-    db.listStories({ status: VIEWS[view], limit: view === "pending" ? 100 : 40 }),
-    view === "pending" ? null : db.listStories({ status: "pending", limit: 100 }),
+  const [found, pendingAll, lastRun] = await Promise.all([
+    q ? db.searchStories(q, { status: VIEWS[view], limit: 300 }) : db.listStories({ status: VIEWS[view], limit: 500 }),
+    view === "pending" && !filtering ? null : db.listStories({ status: "pending", limit: 500 }),
     db.lastRun(),
   ]);
-  const pendingCount = (pendingStories ?? stories).length;
+  const matching = found.filter((s) => !state || s.region === state).sort(SORTS[sort]);
+  const stories = matching.slice(0, MAX_SHOWN);
+  const pendingCount = (pendingAll ?? found).length;
 
   return (
     <div className="wrap">
@@ -43,8 +62,41 @@ export default async function AdminPage({ searchParams }) {
       {params.done && <div className="notice">✓ {params.done}</div>}
       <RunBox run={lastRun} />
 
+      <form className="admin-filter" action="/admin" role="search">
+        <input type="hidden" name="view" value={view} />
+        <label className="sr-only" htmlFor="admin-q">Search stories</label>
+        <input id="admin-q" name="q" type="search" defaultValue={q} placeholder="🔍 Search: a name, place or word" />
+        <div className="filter-row">
+          <select name="state" defaultValue={state} aria-label="State">
+            <option value="">All states</option>
+            {regions.map((r) => (
+              <option key={r} value={r}>{r === regions[0] ? `${r} (several states)` : r}</option>
+            ))}
+          </select>
+          <select name="sort" defaultValue={sort} aria-label="Order">
+            <option value="newest">Newest first</option>
+            <option value="important">Most important first</option>
+          </select>
+          <button className="btn btn-approve" type="submit">SEARCH</button>
+        </div>
+        {(filtering || sort !== "newest") && (
+          <p className="filter-result">
+            {matching.length} {matching.length === 1 ? "story" : "stories"}
+            {q && <> matching “{q}”</>}
+            {state && <> in {state}</>} · <a href={`/admin?view=${view}`}>Clear</a>
+          </p>
+        )}
+      </form>
+
       <div className="stories">
-        {stories.length === 0 && <div className="empty">{view === "pending" ? "Nothing waiting. New stories arrive every 3 hours." : "Nothing here yet."}</div>}
+        {matching.length > MAX_SHOWN && (
+          <p className="note">Showing the first {MAX_SHOWN} of {matching.length}. Use search or a state to find others.</p>
+        )}
+        {stories.length === 0 && (
+          <div className="empty">
+            {filtering ? "No stories found. Try another word or state." : view === "pending" ? "Nothing waiting. New stories arrive every 3 hours." : "Nothing here yet."}
+          </div>
+        )}
         {stories.map((story) => (
           <AdminStory key={story.id} story={story} view={view} />
         ))}
@@ -79,7 +131,7 @@ function AdminStory({ story, view }) {
         {story.is_lead && <span className="badge" style={{ background: "var(--accent)" }}>Lead story</span>}
         <span className="tag">{story.region}</span>
         {story.topic && <span className="tag">{story.topic}</span>}
-        <span>Collected {formatDate(story.created_at)}</span>
+        <span>{story.status === "approved" ? "Published" : "Reported"} {formatDate(new Date(newsTime(story)).toISOString())}</span>
         {story.auto_published && <span>· auto-published</span>}
       </div>
 

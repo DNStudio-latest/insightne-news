@@ -276,3 +276,11 @@ main { padding: 20px 0 40px; }
 .edit-form label.confirm input { width: 20px; height: 20px; flex: none; }
 .edit-form .hint { font-weight: 400; font-size: 0.78rem; }
 .edit-form input[type=file] { font-size: 14px; padding: 8px; }
+
+/* Search and filters on the approval page */
+.admin-filter { display: grid; gap: 8px; margin: 0 0 14px; }
+.admin-filter input[type=search], .admin-filter select { font: inherit; font-size: 16px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--text); width: 100%; }
+.admin-filter .filter-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; }
+.admin-filter .filter-row .btn { width: auto; padding: 10px 14px; }
+.filter-result { margin: 0; font-size: 0.88rem; color: var(--muted); font-weight: 600; }
+@media (max-width: 380px) { .admin-filter .filter-row { grid-template-columns: 1fr 1fr; } .admin-filter .filter-row .btn { grid-column: 1 / -1; width: 100%; } }

@@ -282,7 +282,8 @@ test("no-AI mode: differently worded reports from the same place are grouped; na
   assert.ok(sameNews("Pistol seized from car during police search in Boxanagar", "Pistol Recovered from Vehicle During Police Checking ; Tension in Boxanagar"));
   assert.ok(!sameNews("Police seize drugs in Agartala", "Agartala police hold road safety rally"));
   assert.ok(ruleScore({ title: "2nd ODI: Preparation brings clarity, says Tejal Hasabnis", sourceRegion: "Tripura" }) < 6);
-  assert.ok(ruleScore({ title: "প্রধানমন্ত্রী মোদিকে নিয়ে খার্গের মন্তব্যে বিতর্ক", sourceRegion: "Tripura" }) < 6);
+  // Big national news (here: the Prime Minister) is kept, but as "India" news, not Tripura news.
+  assert.ok(ruleScore({ title: "প্রধানমন্ত্রী মোদিকে নিয়ে খার্গের মন্তব্যে বিতর্ক", sourceRegion: "Tripura" }) >= 6);
 });
 
 test("stories are filed under one of the eight states, or Northeast when several are involved", async () => {
@@ -293,8 +294,37 @@ test("stories are filed under one of the eight states, or Northeast when several
   assert.equal(ruleRegion([{ title: "Meghalaya, Assam border talks resume" }]), "Northeast");
   assert.equal(ruleRegion([{ title: "Murder accused dies in hospital", sourceRegion: "Tripura" }]), "Tripura");
   assert.equal(ruleRegion([{ title: "Seven Sisters tourism push" }]), "Northeast");
-  assert.deepEqual(sectionFilter("Northeast"), {});
+  assert.equal(sectionFilter("Northeast").regionIn.length, 9);
   assert.deepEqual(sectionFilter("Arunachal Pradesh"), { region: "Arunachal Pradesh" });
   assert.deepEqual(sectionFilter("Sports"), { topic: "Sports" });
   assert.equal(categoryFromSlug("arunachal-pradesh"), "Arunachal Pradesh");
+});
+
+test("national and world news: only big stories, filed under India or World, and capped per run", async () => {
+  const { ruleScore, ruleRegion } = await import("../lib/rules.js");
+  const { sectionFilter } = await import("../lib/config.js");
+  assert.ok(ruleScore({ title: "Supreme Court strikes down electoral bonds law" }) >= 6);
+  assert.ok(ruleScore({ title: "Mumbai traffic jam on Monday" }) < 6);
+  assert.ok(ruleScore({ title: "South Korea migrant population rises", sourceRegion: "Tripura" }) < 6);
+  assert.equal(ruleRegion([{ title: "Supreme Court strikes down electoral bonds law" }]), "India");
+  assert.equal(ruleRegion([{ title: "Earthquake hits Nepal" }]), "World");
+  assert.equal(ruleRegion([{ title: "Kim Jong-un visit may restart talks, says South Korea", sourceRegion: "Tripura" }]), "World");
+  assert.deepEqual(sectionFilter("Northeast").regionIn.includes("India"), false);
+  assert.deepEqual(sectionFilter("World"), { region: "World" });
+
+  reset();
+  const big = [
+    "Supreme Court strikes down electoral bonds law",
+    "Earthquake shakes Nepal capital overnight",
+    "Parliament passes new telecom bill",
+    "RBI keeps interest rates unchanged",
+    "ISRO launches weather satellite",
+  ].map((t, i) => article(60 + i, "Nagaland Post", t));
+  const ne = [article(70, "Tripura Times", "Flood alert in Agartala")];
+  const { createRulesAi } = await import("../lib/rules.js");
+  const run = await runPipeline({ db, ai: createRulesAi(), sources: [], settings: { ...settings, maxOutsideNortheastPerRun: 2 }, fetchFeeds: async () => ({ articles: [...big, ...ne], okCount: 1, failed: [] }), log: quiet });
+  assert.equal(run.articles_kept, 3, "2 national + 1 Northeast");
+  const regions = (await db.listStories({ status: "pending" })).map((s) => s.region).sort();
+  assert.equal(regions.length, 3);
+  assert.ok(regions.includes("Tripura"));
 });

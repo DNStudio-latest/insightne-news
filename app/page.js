@@ -1,5 +1,5 @@
 import { db } from "../lib/db.js";
-import { settings, generalRegion, states, topics } from "../lib/config.js";
+import { settings, generalRegion, states, northeastRegions, widerRegions, topics } from "../lib/config.js";
 import { latestVideos } from "../lib/youtube.js";
 import { PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
 import { LiveUpdates } from "./client.js";
@@ -51,9 +51,13 @@ export default async function HomePage() {
         </section>
       )}
 
-      <CategoryBlock title={`Across the ${generalRegion}`} href={categoryUrl(generalRegion)} stories={acrossTheRegion(others, 5)} />
+      <CategoryBlock title={`Across the ${generalRegion}`} href={categoryUrl(generalRegion)} stories={acrossTheRegion(others.filter((s) => northeastRegions.includes(s.region)), 5)} />
 
       <StatesBoxes storiesByState={storiesByState} />
+
+      {widerRegions.map((r) => (
+        <CategoryBlock key={r} title={r} stories={others.filter((s) => s.region === r).slice(0, 5)} />
+      ))}
 
       <Videos videos={videos} />
 

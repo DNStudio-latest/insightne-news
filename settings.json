@@ -28,12 +28,18 @@
     "Arunachal Pradesh",
     "Sikkim"
   ],
+  "widerRegions": [
+    "India",
+    "World"
+  ],
+  "_widerHelp": "National and world news is included only when it is important, and at most maxOutsideNortheastPerRun such stories are kept per run, so Northeast news always comes first.",
   "topics": [
     "Politics",
     "Education",
     "Sports"
   ],
   "minimumScore": 6,
+  "maxOutsideNortheastPerRun": 15,
   "onlyArticlesNewerThanHours": 48,
   "maxArticlesPerRun": 200,
   "autoPublish": {

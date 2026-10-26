@@ -1,5 +1,5 @@
 // Pieces shared by the public pages.
-import { settings, generalRegion, states, regions, topics, slugify } from "../lib/config.js";
+import { settings, generalRegion, states, regions, northeastRegions, widerRegions, topics, slugify } from "../lib/config.js";
 import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js";
 import { CopyLinkButton, NavBar } from "./client.js";
 
@@ -64,8 +64,8 @@ export function SiteHeader({ current, ticker = [], updatedAt }) {
         current={current}
         generalRegion={generalRegion}
         states={states}
-        stateLinks={regions.map((r) => [r, categoryUrl(r)])}
-        items={[...topics.map((t) => [t, categoryUrl(t)]), ["Originals", "/originals"], ["Videos", "/videos"], ["Search", "/search"]]}
+        stateLinks={northeastRegions.map((r) => [r, categoryUrl(r)])}
+        items={[...[...widerRegions, ...topics].map((t) => [t, categoryUrl(t)]), ["Originals", "/originals"], ["Videos", "/videos"], ["Search", "/search"]]}
       />
       {ticker.length > 0 && (
         <div className="ticker" aria-label="Latest headlines">

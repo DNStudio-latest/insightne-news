@@ -27,7 +27,7 @@ It is made for your phone. Tip: open it once and choose **Add to Home Screen**.
 | Button | What it does |
 |---|---|
 | **APPROVE** | Publishes it on the website **immediately**. |
-| **EDIT** | Opens a box where you can change the headline, summary, area and topic. Then press **SAVE** (keeps it pending) or **SAVE & APPROVE** (publishes it). |
+| **EDIT** | Opens a box where you can change the headline, summary, state, topic and **add your own photo** (with caption and credit). Then press **SAVE** (keeps it pending) or **SAVE & APPROVE** (publishes it). |
 | **REJECT** | Removes it from the list. It never appears on the site. (You can bring it back from the **Rejected** tab.) |
 
 ## No-AI mode: WRITE SUMMARY

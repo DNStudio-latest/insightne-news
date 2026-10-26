@@ -53,10 +53,27 @@ export async function reject(formData) {
   refresh("pending", "Rejected");
 }
 
+// Photo, caption and credit from a form. Keeps the old photo unless a new one is chosen or "Remove photo" is tapped.
+async function photoFields(formData, existing, onError) {
+  const fields = {
+    image_caption: text(formData, "image_caption", 300) || null,
+    image_credit: text(formData, "image_credit", 120) || null,
+    image_url: formData.get("removeImage") ? null : existing?.image_url || null,
+  };
+  const file = formData.get("image");
+  if (file && typeof file === "object" && file.size > 0) {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) onError("The photo must be a JPG, PNG or WEBP image.");
+    if (file.size > 4 * 1024 * 1024) onError("The photo is too big (over 4 MB).");
+    fields.image_url = await db.uploadImage(new Uint8Array(await file.arrayBuffer()), file.type);
+  }
+  return fields;
+}
+
 export async function saveEdit(formData) {
   await requireLogin();
-  const fields = editedFields(formData);
   const id = String(formData.get("id"));
+  const view = String(formData.get("view") || "pending");
+  const fields = { ...editedFields(formData), ...(await photoFields(formData, await db.getStory(id), (message) => refresh(view, message))) };
   if (formData.get("andApprove")) {
     await db.updateStory(id, { ...fields, status: "approved", published_at: new Date().toISOString() });
     refresh("pending", "Saved and published");
@@ -102,19 +119,10 @@ export async function saveOriginal(formData) {
     region: regions.includes(formData.get("region")) ? formData.get("region") : regions[0],
     topic: settings.topics.includes(formData.get("topic")) ? formData.get("topic") : null,
     author: text(formData, "author", 120) || settings.defaultAuthor,
-    image_caption: text(formData, "image_caption", 300) || null,
-    image_credit: text(formData, "image_credit", 120) || null,
-    image_url: formData.get("removeImage") ? null : existing?.image_url || null,
   };
   if (!fields.headline) backToEditor("Please write a headline.");
   if (publish && (!fields.summary || !fields.body)) backToEditor("Please write the intro and the story text before publishing.");
-
-  const file = formData.get("image");
-  if (file && typeof file === "object" && file.size > 0) {
-    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) backToEditor("The photo must be a JPG, PNG or WEBP image.");
-    if (file.size > 4 * 1024 * 1024) backToEditor("The photo is too big (over 4 MB).");
-    fields.image_url = await db.uploadImage(new Uint8Array(await file.arrayBuffer()), file.type);
-  }
+  Object.assign(fields, await photoFields(formData, existing, backToEditor));
 
   if (publish) {
     // Publishing from the editor is the editor's check, so the "needs check" note is cleared.

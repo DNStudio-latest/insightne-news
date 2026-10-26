@@ -271,3 +271,8 @@ main { padding: 20px 0 40px; }
 .state-box h3 { font-family: var(--serif); font-size: 1.05rem; margin: 0 0 6px; display: flex; justify-content: space-between; align-items: baseline; }
 .state-box h3 a { color: var(--text); text-decoration: none; }
 .state-box h3 .more { font-family: var(--sans); font-size: 0.78rem; font-weight: 700; color: var(--brand); }
+/* Tick box and photo inside the EDIT box */
+.edit-form label.confirm { display: flex; flex-direction: row; align-items: center; gap: 8px; color: var(--warn); font-size: 0.9rem; }
+.edit-form label.confirm input { width: 20px; height: 20px; flex: none; }
+.edit-form .hint { font-weight: 400; font-size: 0.78rem; }
+.edit-form input[type=file] { font-size: 14px; padding: 8px; }

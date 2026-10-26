@@ -2,11 +2,29 @@
 // The APPROVE / EDIT / REJECT buttons under each story.
 import { useState } from "react";
 import { approve, reject, saveEdit, unpublish, restore, makeLead } from "./actions.js";
+import { shrinkPhoto } from "./photo.js";
 
 export default function StoryActions({ story, view, regions, topics }) {
   // In no-AI mode a story arrives without a summary; WRITE SUMMARY opens the writing box.
   const needsSummary = !story.summary?.trim();
   const [editing, setEditing] = useState(false);
+  const [photo, setPhoto] = useState(null);
+  const [preview, setPreview] = useState(story.image_url || null);
+  const [removeImage, setRemoveImage] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  // Sends the smaller photo (made on the phone) instead of the original big file.
+  async function submitEdit(formData) {
+    setBusy(true);
+    formData.delete("image");
+    if (photo) formData.set("image", photo);
+    if (removeImage) formData.set("removeImage", "1");
+    try {
+      await saveEdit(formData);
+    } finally {
+      setBusy(false);
+    }
+  }
   const id = <input type="hidden" name="id" value={story.id} />;
   // Your own reports open in the full editor; news briefs are edited right here.
   const editButton =
@@ -76,7 +94,7 @@ export default function StoryActions({ story, view, regions, topics }) {
       </div>
 
       {editing && (
-        <form action={saveEdit} className="edit-form">
+        <form action={submitEdit} className="edit-form">
           {id}
           <input type="hidden" name="view" value={view} />
           <label>
@@ -106,15 +124,46 @@ export default function StoryActions({ story, view, regions, topics }) {
               </select>
             </label>
           </div>
+          <label>
+            Photo <span className="hint">(optional, only your own photo or one you have permission to use)</span>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={async (e) => {
+                const file = await shrinkPhoto(e.target.files?.[0]);
+                setPhoto(file || null);
+                setRemoveImage(false);
+                setPreview(file ? URL.createObjectURL(file) : story.image_url || null);
+              }}
+            />
+          </label>
+          {preview && !removeImage && (
+            <div>
+              <img className="photo-preview" src={preview} alt="Photo preview" />
+              <button type="button" className="btn btn-plain" style={{ marginTop: 8 }} onClick={() => { setRemoveImage(true); setPhoto(null); }}>
+                Remove photo
+              </button>
+            </div>
+          )}
+          <div className="edit-row">
+            <label>
+              Photo caption
+              <input name="image_caption" defaultValue={story.image_caption || ""} maxLength={300} placeholder="What the photo shows" />
+            </label>
+            <label>
+              Photo credit
+              <input name="image_credit" defaultValue={story.image_credit || ""} maxLength={120} placeholder="e.g. InsightNE" />
+            </label>
+          </div>
           {view === "pending" && story.needs_check && (
             <label className="confirm">
               <input type="checkbox" required /> I have checked this story before approving
             </label>
           )}
           <div className="edit-buttons">
-            <button className="btn btn-edit" type="submit" formNoValidate>SAVE</button>
+            <button className="btn btn-edit" type="submit" formNoValidate disabled={busy}>{busy ? "SAVING…" : "SAVE"}</button>
             {view === "pending" && (
-              <button className="btn btn-approve" type="submit" name="andApprove" value="1">SAVE & APPROVE</button>
+              <button className="btn btn-approve" type="submit" name="andApprove" value="1" disabled={busy}>SAVE & APPROVE</button>
             )}
           </div>
         </form>

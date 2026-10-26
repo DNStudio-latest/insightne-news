@@ -2,24 +2,7 @@
 // The "Write a story" form. Photos are made smaller on your phone before they are uploaded.
 import { useState } from "react";
 import { saveOriginal } from "../actions.js";
-
-const MAX_SIDE = 1600;
-
-async function shrinkPhoto(file) {
-  if (!file || !file.type.startsWith("image/")) return file;
-  try {
-    const bitmap = await createImageBitmap(file);
-    const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(bitmap.width * scale);
-    canvas.height = Math.round(bitmap.height * scale);
-    canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
-    return blob ? new File([blob], "photo.jpg", { type: "image/jpeg" }) : file;
-  } catch {
-    return file; // Some phones send formats the browser can't read; the server then checks the type.
-  }
-}
+import { shrinkPhoto } from "../photo.js";
 
 export default function StoryEditor({ story, regions, topics, defaultAuthor }) {
   const [preview, setPreview] = useState(story?.image_url || null);

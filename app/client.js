@@ -24,26 +24,26 @@ export function CopyLinkButton({ url }) {
 }
 
 // The main menu. "Northeast ▾" opens a row with all eight states (a row, not a pop-up, so it works well on phones).
-export function NavBar({ current, generalRegion, states, items, stateLinks }) {
+export function NavBar({ current, generalRegion, states, items, stateLinks, labels = {} }) {
   const inRegion = current === generalRegion || states.includes(current);
   const [open, setOpen] = useState(inRegion);
   return (
     <nav className="navbar" aria-label="Sections">
       <div className="container nav">
-        <a href="/" aria-current={!current ? "page" : undefined}>Home</a>
+        <a href="/" aria-current={!current ? "page" : undefined}>{labels.home || "Home"}</a>
         <button type="button" className={`nav-drop${inRegion ? " active" : ""}`} aria-expanded={open} aria-controls="states-menu" onClick={() => setOpen(!open)}>
-          {generalRegion} <span aria-hidden="true">{open ? "▴" : "▾"}</span>
+          {labels.region || generalRegion} <span aria-hidden="true">{open ? "▴" : "▾"}</span>
         </button>
-        {items.map(([label, href]) => (
-          <a key={href} href={href} aria-current={current === label ? "page" : undefined}>{label}</a>
+        {items.map(([label, href, text]) => (
+          <a key={href} href={href} aria-current={current === label ? "page" : undefined}>{text || label}</a>
         ))}
       </div>
       {open && (
         <div id="states-menu" className="subnav">
           <div className="container nav">
-            {stateLinks.map(([label, href]) => (
+            {stateLinks.map(([label, href, text]) => (
               <a key={href} href={href} aria-current={current === label ? "page" : undefined}>
-                {label === generalRegion ? `All ${generalRegion}` : label}
+                {label === generalRegion ? labels.all || `All ${generalRegion}` : text || label}
               </a>
             ))}
           </div>
@@ -81,4 +81,19 @@ export function LiveUpdates({ since }) {
 
 export function SiteAnalytics() {
   return <Analytics beforeSend={(event) => (new URL(event.url).pathname.startsWith("/admin") ? null : event)} />;
+}
+
+// English | বাংলা switch. Sends the reader back to the same page after switching.
+export function LangSwitch({ current }) {
+  const go = (to) => (e) => {
+    e.preventDefault();
+    window.location.href = `/lang/${to}?back=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+  };
+  return (
+    <span className="lang-switch">
+      <a href="/lang/en" onClick={go("en")} aria-current={current === "en" ? "true" : undefined}>English</a>
+      {" | "}
+      <a href="/lang/bn" onClick={go("bn")} aria-current={current === "bn" ? "true" : undefined} lang="bn">বাংলা</a>
+    </span>
+  );
 }

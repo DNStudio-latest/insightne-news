@@ -3,6 +3,7 @@ import { db } from "../../../lib/db.js";
 import { settings } from "../../../lib/config.js";
 import { articleBlocks, formatDate, readingMinutes, uniqueSources } from "../../../lib/format.js";
 import { AI_CREDIT } from "../../../lib/images.js";
+import { initLang, lang, pick, tr } from "../../../lib/lang.js";
 import { WhatsAppFollow, PageShell, Kicker, Byline, ShareButtons, StoryGrid, SectionHead, storyUrl, absoluteUrl } from "../../components.js";
 
 export const dynamic = "force-dynamic";
@@ -31,13 +32,14 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function StoryPage({ params }) {
+  await initLang();
   const story = await load(params);
   if (!story) notFound();
 
   const related = (await db.listStories({ status: "approved", region: story.region, limit: 7 })).filter((s) => s.id !== story.id).slice(0, 3);
   const sources = uniqueSources(story.sources);
   const isOriginal = story.kind === "original";
-  const blocks = articleBlocks(story.body);
+  const blocks = articleBlocks(pick(story, "body"));
 
   // Tells Google this is a news article (helps search and Google News).
   const jsonLd = {
@@ -58,8 +60,8 @@ export default async function StoryPage({ params }) {
       <article className="article">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
         <Kicker story={story} />
-        <h1>{story.headline}</h1>
-        <p className="standfirst">{story.summary}</p>
+        <h1>{pick(story, "headline")}</h1>
+        <p className="standfirst">{pick(story, "summary")}</p>
 
         <div className="article-meta">
           <div className="byline">
@@ -99,7 +101,7 @@ export default async function StoryPage({ params }) {
 
         {sources.length > 0 && (
           <aside className="source-box">
-            <h2>{isOriginal ? "Also reported by" : "Original reports"}</h2>
+            <h2>{tr(isOriginal ? "Also reported by" : "Original reports")}</h2>
             <ul>
               {sources.map((s) => (
                 <li key={s.url}>
@@ -109,7 +111,7 @@ export default async function StoryPage({ params }) {
             </ul>
             {!isOriginal && (
               <a className="read-full" href={sources[0].url} target="_blank" rel="noopener noreferrer">
-                Read the full story on {sources[0].source_name} →
+                {tr("Read the full story on")} {sources[0].source_name} →
               </a>
             )}
           </aside>

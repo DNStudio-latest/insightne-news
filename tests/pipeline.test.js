@@ -328,3 +328,18 @@ test("national and world news: only big stories, filed under India or World, and
   assert.equal(regions.length, 3);
   assert.ok(regions.includes("Tripura"));
 });
+
+test("Bengali: missing Bengali headlines and summaries are filled, published stories first", async () => {
+  const { fillMissingBengali } = await import("../lib/pipeline.js");
+  reset();
+  const a = await db.createStory({ headline: "Pending one", summary: "S1", region: "Tripura", score: 7, status: "pending" }, []);
+  const b = await db.createStory({ headline: "Published one", summary: "S2", region: "Assam", score: 7, status: "approved", published_at: new Date().toISOString() }, []);
+  await db.createStory({ headline: "No summary yet", summary: "", region: "Assam", score: 7, status: "pending" }, []);
+  const order = [];
+  const ai = { translate: async ({ headline }) => (order.push(headline), { headline_bn: `বাংলা ${headline}`, summary_bn: "সারাংশ" }) };
+  assert.equal(await fillMissingBengali({ db, ai, log: quiet }), 2);
+  assert.deepEqual(order, ["Published one", "Pending one"]);
+  assert.equal((await db.getStory(b)).headline_bn, "বাংলা Published one");
+  assert.equal((await db.getStory(a)).summary_bn, "সারাংশ");
+  assert.equal(await fillMissingBengali({ db, ai: {}, log: quiet }), 0, "does nothing without a translator");
+});

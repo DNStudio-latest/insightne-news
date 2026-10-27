@@ -2,6 +2,7 @@ import "./globals.css";
 import { Noto_Serif, Inter } from "next/font/google";
 import { settings } from "../lib/config.js";
 import { SiteAnalytics } from "./client.js";
+import { cookies } from "next/headers";
 
 const serif = Noto_Serif({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-serif", display: "swap" });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
@@ -19,9 +20,10 @@ export const metadata = {
 
 export const viewport = { width: "device-width", initialScale: 1, themeColor: "#0f4c5c" };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const lang = (await cookies()).get("lang")?.value === "bn" ? "bn" : "en";
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable}`}>
+    <html lang={lang} className={`${serif.variable} ${sans.variable}`}>
       <body>
         {children}
         <SiteAnalytics />

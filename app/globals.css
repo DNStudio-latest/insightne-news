@@ -304,3 +304,7 @@ main { padding: 20px 0 40px; }
 .top5 h2 { font-family: var(--serif); font-size: 1.1rem; margin: 0 0 4px; }
 .top5 p { margin: 0; color: var(--muted); font-size: 0.93rem; }
 .wa-share { display: inline-block; background: #25d366; color: #fff !important; text-decoration: none; font-weight: 800; padding: 12px 20px; border-radius: 999px; }
+.lang-switch a[aria-current="true"] { text-decoration: underline; text-underline-offset: 3px; }
+.bn-fields { border: 1px dashed var(--line); border-radius: 10px; padding: 8px 12px; display: grid; gap: 10px; }
+.bn-fields > summary { cursor: pointer; font-weight: 700; color: var(--brand); }
+.bn-fields[open] { padding-bottom: 12px; }

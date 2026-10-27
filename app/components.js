@@ -3,6 +3,8 @@ import { settings, generalRegion, states, regions, northeastRegions, widerRegion
 import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js";
 import { CopyLinkButton, NavBar } from "./client.js";
 import { AI_CREDIT } from "../lib/images.js";
+import { initLang, lang, pick, tr } from "../lib/lang.js";
+import { LangSwitch } from "./client.js";
 
 export const storyUrl = (story) => `/story/${story.slug}`;
 export const categoryUrl = (name) => `/category/${slugify(name)}`;
@@ -21,14 +23,14 @@ export function StoryImage({ story, eager = false }) {
     return (
       <div className="ai-wrap">
         {img}
-        <span className="ai-label">AI illustration</span>
+        <span className="ai-label">{tr("AI illustration")}</span>
       </div>
     );
   }
   const cat = storyCategory(story);
   return (
     <div className={`art art-${slugify(cat)}`} aria-hidden="true">
-      <span>{cat}</span>
+      <span>{tr(cat)}</span>
     </div>
   );
 }
@@ -37,8 +39,8 @@ export function Kicker({ story }) {
   const cat = storyCategory(story);
   return (
     <span className="kicker">
-      {story.kind === "original" && <span className="badge">Original</span>}
-      <a className="kicker" href={categoryUrl(cat)}>{cat}</a>
+      {story.kind === "original" && <span className="badge">{tr("Original")}</span>}
+      <a className="kicker" href={categoryUrl(cat)}>{tr(cat)}</a>
     </span>
   );
 }
@@ -51,7 +53,8 @@ export function SiteHeader({ current, ticker = [], updatedAt }) {
         <div className="container">
           <span>{formatDay()}{updatedAt ? ` · Updated ${timeAgo(updatedAt)}` : ""}</span>
           <span className="topbar-links">
-            <a href="/today">📰 Top 5 today</a>
+            <LangSwitch current={lang()} />
+            <a href="/today">📰 {tr("Top 5 today")}</a>
             {settings.whatsappChannelUrl && (
               <a href={settings.whatsappChannelUrl} target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>
             )}
@@ -70,7 +73,7 @@ export function SiteHeader({ current, ticker = [], updatedAt }) {
           </div>
           <form className="search-form" action="/search" role="search">
             <label className="sr-only" htmlFor="q">Search news</label>
-            <input id="q" name="q" type="search" placeholder="Search news" />
+            <input id="q" name="q" type="search" placeholder={tr("Search news")} />
             <button type="submit">Search</button>
           </form>
         </div>
@@ -79,17 +82,18 @@ export function SiteHeader({ current, ticker = [], updatedAt }) {
         current={current}
         generalRegion={generalRegion}
         states={states}
-        stateLinks={northeastRegions.map((r) => [r, categoryUrl(r)])}
-        items={[...[...widerRegions, ...topics].map((t) => [t, categoryUrl(t)]), ["Originals", "/originals"], ["Videos", "/videos"], ["Search", "/search"]]}
+        labels={{ home: tr("Home"), region: tr(generalRegion), all: tr(`All ${generalRegion}`) }}
+        stateLinks={northeastRegions.map((r) => [r, categoryUrl(r), tr(r)])}
+        items={[...[...widerRegions, ...topics].map((t) => [t, categoryUrl(t), tr(t)]), ["Originals", "/originals", tr("Originals")], ["Videos", "/videos", tr("Videos")], ["Search", "/search", tr("Search")]]}
       />
       {ticker.length > 0 && (
         <div className="ticker" aria-label="Latest headlines">
           <div className="container">
-            <span className="ticker-label">LATEST</span>
+            <span className="ticker-label">{tr("LATEST")}</span>
             <div className="ticker-track">
               <div className="ticker-items">
                 {ticker.map((s) => (
-                  <a key={s.id} href={storyUrl(s)}>{s.headline}</a>
+                  <a key={s.id} href={storyUrl(s)}>{pick(s, "headline")}</a>
                 ))}
               </div>
             </div>
@@ -109,9 +113,9 @@ export function LeadStory({ story }) {
       <div>
         <Kicker story={story} />
         <h2>
-          <a className="h-link" href={storyUrl(story)}>{story.headline}</a>
+          <a className="h-link" href={storyUrl(story)}>{pick(story, "headline")}</a>
         </h2>
-        <p>{story.summary}</p>
+        <p>{pick(story, "summary")}</p>
         <p className="byline" style={{ marginTop: 8 }}>
           <Byline story={story} /> · <time dateTime={story.published_at}>{timeAgo(story.published_at)}</time>
         </p>
@@ -128,9 +132,9 @@ export function Card({ story, showSummary = true }) {
       </a>
       <Kicker story={story} />
       <h3>
-        <a className="h-link" href={storyUrl(story)}>{story.headline}</a>
+        <a className="h-link" href={storyUrl(story)}>{pick(story, "headline")}</a>
       </h3>
-      {showSummary && <p>{story.summary}</p>}
+      {showSummary && <p>{pick(story, "summary")}</p>}
       <span className="byline">
         <time dateTime={story.published_at}>{timeAgo(story.published_at)}</time>
       </span>
@@ -141,12 +145,12 @@ export function Card({ story, showSummary = true }) {
 export function LatestList({ stories, title = "Latest" }) {
   return (
     <aside className="latest">
-      <h3>{title}</h3>
+      <h3>{tr(title)}</h3>
       <ol>
         {stories.map((s) => (
           <li key={s.id}>
             <time dateTime={s.published_at}>{timeAgo(s.published_at)}</time>
-            <a className="h-link" href={storyUrl(s)}>{s.headline}</a>
+            <a className="h-link" href={storyUrl(s)}>{pick(s, "headline")}</a>
           </li>
         ))}
       </ol>
@@ -157,8 +161,8 @@ export function LatestList({ stories, title = "Latest" }) {
 export function SectionHead({ title, href }) {
   return (
     <div className="section-head">
-      <h2 className="section-title">{title}</h2>
-      {href && <a className="more" href={href}>More →</a>}
+      <h2 className="section-title">{tr(title)}</h2>
+      {href && <a className="more" href={href}>{tr("More →")}</a>}
     </div>
   );
 }
@@ -175,7 +179,7 @@ export function CategoryBlock({ title, stories, href = categoryUrl(title) }) {
         <ul className="hl-list">
           {rest.map((s) => (
             <li key={s.id}>
-              <a className="h-link" href={storyUrl(s)}>{s.headline}</a>
+              <a className="h-link" href={storyUrl(s)}>{pick(s, "headline")}</a>
               <div className="byline">{timeAgo(s.published_at)}</div>
             </li>
           ))}
@@ -197,12 +201,12 @@ export function StatesBoxes({ storiesByState }) {
           <div key={state} className="state-box">
             <h3>
               <a href={categoryUrl(state)}>{state}</a>
-              <a className="more" href={categoryUrl(state)}>More →</a>
+              <a className="more" href={categoryUrl(state)}>{tr("More →")}</a>
             </h3>
             <ul className="hl-list">
               {list.map((s) => (
                 <li key={s.id}>
-                  <a className="h-link" href={storyUrl(s)}>{s.headline}</a>
+                  <a className="h-link" href={storyUrl(s)}>{pick(s, "headline")}</a>
                   <div className="byline">{timeAgo(s.published_at)}</div>
                 </li>
               ))}
@@ -230,7 +234,7 @@ export function Videos({ videos, title = `Watch ${settings.youtubeName}` }) {
   return (
     <section className="videos" aria-label="Videos">
       <div className="section-head">
-        <h2 className="section-title">{title}</h2>
+        <h2 className="section-title">{tr(title)}</h2>
         <a className="subscribe" href={settings.youtubeUrl} target="_blank" rel="noopener noreferrer">▶ Subscribe</a>
       </div>
       <div className="grid grid-4">
@@ -248,9 +252,9 @@ export function Videos({ videos, title = `Watch ${settings.youtubeName}` }) {
 }
 
 export function Byline({ story }) {
-  if (story.kind === "original") return <>By {story.author || settings.defaultAuthor}</>;
+  if (story.kind === "original") return <>{tr("By")} {story.author || settings.defaultAuthor}</>;
   const names = uniqueSources(story.sources).map((s) => s.source_name);
-  return <>{names.length ? `Brief · Source: ${names.join(", ")}` : settings.defaultAuthor}</>;
+  return <>{names.length ? `${tr("Brief · Source:")} ${names.join(", ")}` : settings.defaultAuthor}</>;
 }
 
 // "Follow us on WhatsApp" box (shown only when the channel link is filled in settings.json).
@@ -269,7 +273,7 @@ export function WhatsAppFollow() {
 
 export function ShareButtons({ story }) {
   const url = absoluteUrl(storyUrl(story));
-  const text = encodeURIComponent(`${story.headline} ${url}`);
+  const text = encodeURIComponent(`${pick(story, "headline")} ${url}`);
   return (
     <div className="share" aria-label="Share this story">
       <a className="wa" href={`https://wa.me/?text=${text}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
@@ -296,7 +300,7 @@ export function SiteFooter() {
           <h4>Sections</h4>
           <ul>
             {[...regions, ...topics].map((c) => (
-              <li key={c}><a href={categoryUrl(c)}>{c === generalRegion ? `All ${generalRegion}` : c}</a></li>
+              <li key={c}><a href={categoryUrl(c)}>{tr(c === generalRegion ? `All ${generalRegion}` : c)}</a></li>
             ))}
             <li><a href="/originals">Originals</a></li>
             <li><a href="/videos">Videos</a></li>
@@ -328,7 +332,8 @@ export function SiteFooter() {
   );
 }
 
-export function PageShell({ current, children, ticker, updatedAt }) {
+export async function PageShell({ current, children, ticker, updatedAt }) {
+  await initLang();
   return (
     <>
       <SiteHeader current={current} ticker={ticker} updatedAt={updatedAt} />

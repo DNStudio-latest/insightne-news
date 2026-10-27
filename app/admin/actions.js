@@ -35,7 +35,10 @@ function editedFields(formData) {
   const region = regions.includes(formData.get("region")) ? formData.get("region") : regions[0];
   const topic = settings.topics.includes(formData.get("topic")) ? formData.get("topic") : null;
   if (!headline || !summary) refresh(String(formData.get("view") || "pending"), "Headline and summary cannot be empty");
-  return { headline, summary, region, topic };
+  // Bengali version (optional). Empty boxes are filled by Gemini at the next run.
+  const headline_bn = String(formData.get("headline_bn") || "").trim().slice(0, 300) || null;
+  const summary_bn = String(formData.get("summary_bn") || "").trim().slice(0, 2000) || null;
+  return { headline, summary, region, topic, headline_bn, summary_bn };
 }
 
 export async function login(formData) {
@@ -135,6 +138,9 @@ export async function saveOriginal(formData) {
     region: regions.includes(formData.get("region")) ? formData.get("region") : regions[0],
     topic: settings.topics.includes(formData.get("topic")) ? formData.get("topic") : null,
     author: text(formData, "author", 120) || settings.defaultAuthor,
+    headline_bn: text(formData, "headline_bn", 300) || null,
+    summary_bn: text(formData, "summary_bn", 2000) || null,
+    body_bn: String(formData.get("body_bn") || "").trim().slice(0, 60000) || null,
   };
   if (!fields.headline) backToEditor("Please write a headline.");
   if (publish && (!fields.summary || !fields.body)) backToEditor("Please write the intro and the story text before publishing.");

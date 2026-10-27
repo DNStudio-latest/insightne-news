@@ -105,6 +105,17 @@ export default function StoryActions({ story, view, regions, topics }) {
             Summary
             <textarea name="summary" defaultValue={story.summary} required maxLength={1200} placeholder="Write 2–3 sentences in your own words. Don't copy sentences from the source." />
           </label>
+          <details className="bn-fields" open={Boolean(story.summary_bn)}>
+            <summary>বাংলা (Bengali version)</summary>
+            <label>
+              Bengali headline
+              <input name="headline_bn" lang="bn" defaultValue={story.headline_bn || ""} maxLength={300} />
+            </label>
+            <label>
+              Bengali summary
+              <textarea name="summary_bn" lang="bn" defaultValue={story.summary_bn || ""} maxLength={2000} placeholder="Leave empty and Gemini will write it at the next run." />
+            </label>
+          </details>
           <div className="edit-row">
             <label>
               State

@@ -43,6 +43,22 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor }) {
         <textarea className="body" name="body" defaultValue={story?.body || ""} placeholder="Write the full report here…" />
       </label>
 
+      <details className="bn-fields" open={Boolean(story?.headline_bn)}>
+        <summary>বাংলা (Bengali version, optional)</summary>
+        <label>
+          Bengali headline
+          <input type="text" name="headline_bn" lang="bn" defaultValue={story?.headline_bn || ""} maxLength={300} />
+        </label>
+        <label>
+          Bengali intro <span className="hint">— leave empty and Gemini will write it from the English intro</span>
+          <textarea name="summary_bn" lang="bn" defaultValue={story?.summary_bn || ""} maxLength={2000} rows={3} />
+        </label>
+        <label>
+          Bengali story text <span className="hint">— optional; without it, Bengali readers see the English text</span>
+          <textarea className="body" name="body_bn" lang="bn" defaultValue={story?.body_bn || ""} />
+        </label>
+      </details>
+
       <label>
         Photo <span className="hint">— only your own photos, or ones you have permission to use</span>
         <input

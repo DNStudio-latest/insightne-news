@@ -7,6 +7,7 @@ import { shrinkPhoto } from "../photo.js";
 export default function StoryEditor({ story, regions, topics, defaultAuthor }) {
   const [preview, setPreview] = useState(story?.image_url || null);
   const [photo, setPhoto] = useState(null);
+  const [galleryFiles, setGalleryFiles] = useState([]);
   const [removeImage, setRemoveImage] = useState(false);
   const [busy, setBusy] = useState(false);
   const isPublished = story?.status === "approved";
@@ -16,6 +17,8 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor }) {
     formData.delete("image");
     if (photo) formData.set("image", photo);
     if (removeImage) formData.set("removeImage", "1");
+    formData.delete("galleryFiles");
+    for (const f of galleryFiles) formData.append("galleryFiles", f);
     try {
       await saveOriginal(formData);
     } finally {
@@ -90,6 +93,33 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor }) {
           <input type="text" name="image_credit" defaultValue={story?.image_credit || ""} maxLength={120} placeholder="e.g. InsightNE" />
         </label>
       </div>
+
+      <label>
+        More photos (gallery) <span className="hint">— optional; choose several at once. Readers swipe through them.</span>
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          onChange={async (e) => {
+            const files = [...(e.target.files || [])].slice(0, 12);
+            setGalleryFiles(await Promise.all(files.map(shrinkPhoto)));
+          }}
+        />
+      </label>
+      {galleryFiles.length > 0 && <p className="hint">{galleryFiles.length} new photo(s) will be added when you save.</p>}
+      {story?.gallery?.length > 0 && (
+        <div>
+          <span className="hint">Photos already in the gallery: untick any you want to remove.</span>
+          <div className="gallery-edit">
+            {story.gallery.map((g) => (
+              <label key={g.url}>
+                <input type="checkbox" name="keepGallery" value={g.url} defaultChecked />
+                <img src={g.url} alt="" />
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="row">
         <label>

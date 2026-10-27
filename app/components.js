@@ -65,14 +65,17 @@ export function SiteHeader({ current, ticker = [], updatedAt, breaking }) {
       <BreakingBar story={breaking} />
       <div className="topbar">
         <div className="container">
-          <span>{formatDay()}{updatedAt ? ` · Updated ${timeAgo(updatedAt)}` : ""}</span>
+          <span>
+            {formatDay()}
+            {updatedAt && <span className="updated">{` · ${tr("Updated")} ${timeAgo(updatedAt)}`}</span>}
+          </span>
           <span className="topbar-links">
             <LangSwitch current={lang()} />
             <a href="/today">📰 {tr("Top 5 today")}</a>
             {settings.whatsappChannelUrl && (
               <a href={settings.whatsappChannelUrl} target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>
             )}
-            <a href={settings.youtubeUrl} target="_blank" rel="noopener noreferrer">▶ YouTube</a>
+            <a className="yt-link" href={settings.youtubeUrl} target="_blank" rel="noopener noreferrer">▶ YouTube</a>
           </span>
         </div>
       </div>
@@ -83,7 +86,7 @@ export function SiteHeader({ current, ticker = [], updatedAt, breaking }) {
               {first}
               {rest.length > 0 && <span> {rest.join(" ")}</span>}
             </a>
-            <p className="tagline">{settings.tagline}</p>
+            <p className="tagline">{tr(settings.tagline)}</p>
           </div>
           <form className="search-form" action="/search" role="search">
             <label className="sr-only" htmlFor="q">Search news</label>
@@ -153,6 +156,19 @@ export function Card({ story, showSummary = true }) {
         <time dateTime={story.published_at}>{timeAgo(story.published_at)}</time>
       </span>
     </article>
+  );
+}
+
+export function WeatherStrip({ weather }) {
+  if (!weather.length) return null;
+  return (
+    <div className="weather" aria-label="Weather in the state capitals">
+      {weather.map((w) => (
+        <span key={w.city} className="weather-item">
+          {w.icon} <b>{lang() === "bn" ? w.cityBn : w.city}</b> {w.temp}°
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -243,7 +259,7 @@ export function StoryGrid({ stories, columns = 3 }) {
   );
 }
 
-export function Videos({ videos, title = `Watch ${settings.youtubeName}` }) {
+export function Videos({ videos, title = lang() === "bn" ? `${settings.youtubeName} দেখুন` : `Watch ${settings.youtubeName}` }) {
   if (!videos.length) return null;
   return (
     <section className="videos" aria-label="Videos">

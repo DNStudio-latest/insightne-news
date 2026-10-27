@@ -1,7 +1,8 @@
 import { db } from "../lib/db.js";
 import { settings, generalRegion, states, northeastRegions, widerRegions, topics } from "../lib/config.js";
 import { latestVideos } from "../lib/youtube.js";
-import { PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
+import { capitalsWeather } from "../lib/weather.js";
+import { WeatherStrip, PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
 import { LiveUpdates } from "./client.js";
 
 // Always fresh: a story appears the moment you press APPROVE.
@@ -17,10 +18,11 @@ function acrossTheRegion(stories, count) {
 }
 
 export default async function HomePage() {
-  const [stories, videos, mostRead] = await Promise.all([
+  const [stories, videos, mostRead, weather] = await Promise.all([
     db.listStories({ status: "approved", limit: 100 }),
     latestVideos(4),
     db.mostRead(1, 5).catch(() => []),
+    capitalsWeather(),
   ]);
 
   if (!stories.length) {
@@ -42,6 +44,8 @@ export default async function HomePage() {
     <PageShell ticker={stories.slice(0, 10)} updatedAt={stories[0].published_at}>
       <LiveUpdates since={stories[0].published_at} />
       <h1 className="sr-only">{settings.siteName}: {settings.tagline}</h1>
+
+      <WeatherStrip weather={weather} />
 
       <div className="front-top">
         <LeadStory story={lead} />

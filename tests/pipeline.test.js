@@ -343,3 +343,12 @@ test("Bengali: missing Bengali headlines and summaries are filled, published sto
   assert.equal((await db.getStory(a)).summary_bn, "সারাংশ");
   assert.equal(await fillMissingBengali({ db, ai: {}, log: quiet }), 0, "does nothing without a translator");
 });
+
+test("YouTube links on their own line become videos in a story", async () => {
+  const { articleBlocks, youtubeId } = await import("../lib/format.js");
+  assert.equal(youtubeId("https://youtu.be/NroLEx68N-U"), "NroLEx68N-U");
+  assert.equal(youtubeId("https://www.youtube.com/watch?v=NroLEx68N-U&t=5"), "NroLEx68N-U");
+  assert.equal(youtubeId("https://youtube.com/shorts/NroLEx68N-U"), "NroLEx68N-U");
+  assert.equal(youtubeId("watch https://youtu.be/NroLEx68N-U"), null);
+  assert.deepEqual(articleBlocks("Intro.\n\nhttps://youtu.be/NroLEx68N-U\n\n## Next").map((b) => b.type), ["p", "youtube", "h2"]);
+});

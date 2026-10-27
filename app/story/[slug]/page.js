@@ -95,9 +95,38 @@ export default async function StoryPage({ params }) {
         {blocks.length > 0 && (
           <div className="article-body">
             {blocks.map((b, i) =>
-              b.type === "h2" ? <h2 key={i}>{b.text}</h2> : b.type === "quote" ? <blockquote key={i}>{b.text}</blockquote> : <p key={i}>{b.text}</p>,
+              b.type === "h2" ? (
+                <h2 key={i}>{b.text}</h2>
+              ) : b.type === "quote" ? (
+                <blockquote key={i}>{b.text}</blockquote>
+              ) : b.type === "youtube" ? (
+                <div key={i} className="video-embed">
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${b.id}`}
+                    title="Video"
+                    loading="lazy"
+                    allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <p key={i}>{b.text}</p>
+              ),
             )}
           </div>
+        )}
+
+        {story.gallery?.length > 0 && (
+          <section className="gallery" aria-label="Photo gallery">
+            <h2>{tr("Photos")} ({story.gallery.length})</h2>
+            <div className="gallery-strip">
+              {story.gallery.map((g) => (
+                <a key={g.url} href={g.url} target="_blank" rel="noopener noreferrer">
+                  <img src={g.url} alt={g.caption || pick(story, "headline")} loading="lazy" />
+                </a>
+              ))}
+            </div>
+          </section>
         )}
 
         {sources.length > 0 && (

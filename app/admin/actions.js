@@ -153,6 +153,16 @@ export async function saveOriginal(formData) {
   if (publish && (!fields.summary || !fields.body)) backToEditor("Please write the intro and the story text before publishing.");
   Object.assign(fields, await photoFields(formData, existing, backToEditor));
 
+  // Gallery: keep the ticked photos, add the new ones (at most 20 in total).
+  const keep = new Set(formData.getAll("keepGallery").map(String));
+  const gallery = (existing?.gallery || []).filter((g) => keep.has(g.url));
+  for (const file of formData.getAll("galleryFiles")) {
+    if (!file || typeof file !== "object" || !file.size || gallery.length >= 20) continue;
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 4 * 1024 * 1024) continue;
+    gallery.push({ url: await db.uploadImage(new Uint8Array(await file.arrayBuffer()), file.type), caption: null });
+  }
+  fields.gallery = gallery;
+
   if (publish) {
     // Publishing from the editor is the editor's check, so the "needs check" note is cleared.
     Object.assign(fields, { status: "approved", published_at: existing?.published_at || new Date().toISOString(), needs_check: false, check_reasons: [] });

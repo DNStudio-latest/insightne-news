@@ -97,3 +97,16 @@ export function LangSwitch({ current }) {
     </span>
   );
 }
+
+// Counts one read per story per visit (kept only in this browser tab, no cookies).
+export function ViewCounter({ id }) {
+  useEffect(() => {
+    try {
+      const key = `viewed-${id}`;
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, "1");
+    } catch {}
+    fetch("/api/view", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }), keepalive: true }).catch(() => {});
+  }, [id]);
+  return null;
+}

@@ -1,7 +1,7 @@
 "use client";
 // The APPROVE / EDIT / REJECT buttons under each story.
 import { useState } from "react";
-import { approve, reject, saveEdit, unpublish, restore, makeLead } from "./actions.js";
+import { approve, reject, saveEdit, unpublish, restore, makeLead, toggleBreaking } from "./actions.js";
 import { shrinkPhoto } from "./photo.js";
 
 export default function StoryActions({ story, view, regions, topics }) {
@@ -82,6 +82,13 @@ export default function StoryActions({ story, view, regions, topics }) {
               {id}
               {story.is_lead && <input type="hidden" name="remove" value="1" />}
               <button className="btn btn-edit" type="submit">{story.is_lead ? "UN-LEAD" : "MAKE LEAD"}</button>
+            </form>
+            <form action={toggleBreaking} style={{ gridColumn: "1 / -1" }}>
+              {id}
+              {story.is_breaking && <input type="hidden" name="remove" value="1" />}
+              <button className={`btn ${story.is_breaking ? "btn-reject" : "btn-edit"}`} type="submit">
+                {story.is_breaking ? "STOP BREAKING BANNER" : "🔴 BREAKING NEWS"}
+              </button>
             </form>
           </>
         )}

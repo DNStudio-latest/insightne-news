@@ -17,7 +17,11 @@ function acrossTheRegion(stories, count) {
 }
 
 export default async function HomePage() {
-  const [stories, videos] = await Promise.all([db.listStories({ status: "approved", limit: 100 }), latestVideos(4)]);
+  const [stories, videos, mostRead] = await Promise.all([
+    db.listStories({ status: "approved", limit: 100 }),
+    latestVideos(4),
+    db.mostRead(1, 5).catch(() => []),
+  ]);
 
   if (!stories.length) {
     return (
@@ -48,6 +52,12 @@ export default async function HomePage() {
         <section className="section">
           <SectionHead title="InsightNE Originals" href="/originals" />
           <StoryGrid stories={originals} columns={3} />
+        </section>
+      )}
+
+      {mostRead.length >= 3 && (
+        <section className="section">
+          <LatestList stories={mostRead} title="Most read today" />
         </section>
       )}
 

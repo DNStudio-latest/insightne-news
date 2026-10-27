@@ -113,6 +113,13 @@ export async function restore(formData) {
   refresh("rejected", "Moved back to Pending");
 }
 
+export async function toggleBreaking(formData) {
+  await requireLogin();
+  const on = !formData.get("remove");
+  await db.updateStory(String(formData.get("id")), { is_breaking: on });
+  refresh("published", on ? "Breaking banner is on for this story (it switches off by itself after 12 hours)" : "Breaking banner switched off");
+}
+
 export async function makeLead(formData) {
   await requireLogin();
   const id = String(formData.get("id"));

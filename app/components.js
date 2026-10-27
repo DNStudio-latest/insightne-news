@@ -1,4 +1,5 @@
 // Pieces shared by the public pages.
+import { db } from "../lib/db.js";
 import { settings, generalRegion, states, regions, northeastRegions, widerRegions, topics, slugify } from "../lib/config.js";
 import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js";
 import { CopyLinkButton, NavBar } from "./client.js";
@@ -45,10 +46,23 @@ export function Kicker({ story }) {
   );
 }
 
-export function SiteHeader({ current, ticker = [], updatedAt }) {
+const BREAKING_HOURS = 12;
+
+export function BreakingBar({ story }) {
+  if (!story || Date.now() - new Date(story.published_at).getTime() > BREAKING_HOURS * 3600000) return null;
+  return (
+    <a className="breaking" href={storyUrl(story)}>
+      <span className="breaking-label">{tr("Breaking")}</span>
+      <span className="breaking-text">{pick(story, "headline")}</span>
+    </a>
+  );
+}
+
+export function SiteHeader({ current, ticker = [], updatedAt, breaking }) {
   const [first, ...rest] = settings.siteName.split(" ");
   return (
     <header>
+      <BreakingBar story={breaking} />
       <div className="topbar">
         <div className="container">
           <span>{formatDay()}{updatedAt ? ` · Updated ${timeAgo(updatedAt)}` : ""}</span>
@@ -334,9 +348,10 @@ export function SiteFooter() {
 
 export async function PageShell({ current, children, ticker, updatedAt }) {
   await initLang();
+  const [breaking] = await db.listStories({ status: "approved", breaking: true, limit: 1 }).catch(() => []);
   return (
     <>
-      <SiteHeader current={current} ticker={ticker} updatedAt={updatedAt} />
+      <SiteHeader current={current} ticker={ticker} updatedAt={updatedAt} breaking={breaking} />
       <main className="container">{children}</main>
       <SiteFooter />
     </>

@@ -129,6 +129,7 @@ function AdminStory({ story, view }) {
       <div className="meta">
         {story.kind === "original" ? <span className="badge">Original</span> : <span className="score">Score {story.score}/10</span>}
         {story.is_lead && <span className="badge" style={{ background: "var(--accent)" }}>Lead story</span>}
+        {story.is_breaking && <span className="badge" style={{ background: "var(--danger)" }}>Breaking</span>}
         <span className="tag">{story.region}</span>
         {story.topic && <span className="tag">{story.topic}</span>}
         <span>{story.status === "approved" ? "Published" : "Reported"} {formatDate(new Date(newsTime(story)).toISOString())}</span>

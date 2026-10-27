@@ -13,6 +13,8 @@ export const metadata = {
   openGraph: { siteName: settings.siteName, type: "website", locale: "en_IN" },
   twitter: { card: "summary_large_image" },
   alternates: { canonical: "/" },
+  // Google Search Console "HTML tag" code, if you use that way of proving the site is yours.
+  ...(settings.googleSiteVerification ? { verification: { google: settings.googleSiteVerification } } : {}),
 };
 
 export const viewport = { width: "device-width", initialScale: 1, themeColor: "#0f4c5c" };

@@ -4,6 +4,6 @@ import { settings } from "../lib/config.js";
 export default function robots() {
   return {
     rules: { userAgent: "*", allow: "/", disallow: ["/admin", "/api"] },
-    sitemap: `${settings.siteUrl}/sitemap.xml`,
+    sitemap: [`${settings.siteUrl}/sitemap.xml`, `${settings.siteUrl}/news-sitemap.xml`],
   };
 }

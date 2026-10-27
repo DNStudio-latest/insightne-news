@@ -286,3 +286,7 @@ main { padding: 20px 0 40px; }
 @media (max-width: 380px) { .admin-filter .filter-row { grid-template-columns: 1fr 1fr; } .admin-filter .filter-row .btn { grid-column: 1 / -1; width: 100%; } }
 .art-india { background: linear-gradient(135deg, #b4541a, #2f7d32); }
 .art-world { background: linear-gradient(135deg, #1d3557, #457b9d); }
+
+/* "AI illustration" label on pictures */
+.ai-wrap { position: relative; }
+.ai-label { position: absolute; left: 8px; bottom: 8px; background: rgba(0,0,0,0.65); color: #fff; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; padding: 3px 7px; border-radius: 4px; }

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { db } from "../../../lib/db.js";
 import { settings } from "../../../lib/config.js";
 import { articleBlocks, formatDate, readingMinutes, uniqueSources } from "../../../lib/format.js";
+import { AI_CREDIT } from "../../../lib/images.js";
 import { PageShell, Kicker, Byline, ShareButtons, StoryGrid, SectionHead, storyUrl, absoluteUrl } from "../../components.js";
 
 export const dynamic = "force-dynamic";
@@ -75,8 +76,14 @@ export default async function StoryPage({ params }) {
             <img src={story.image_url} alt={story.image_caption || story.headline} />
             {(story.image_caption || story.image_credit) && (
               <figcaption>
-                {story.image_caption}
-                {story.image_credit && ` (Photo: ${story.image_credit})`}
+                {story.image_credit === AI_CREDIT ? (
+                  <>🎨 AI-generated illustration — not a real photo of this event.</>
+                ) : (
+                  <>
+                    {story.image_caption}
+                    {story.image_credit && ` (Photo: ${story.image_credit})`}
+                  </>
+                )}
               </figcaption>
             )}
           </figure>

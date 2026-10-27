@@ -2,6 +2,8 @@
 // What happens when you press a button on the approval page.
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
+import { addIllustration } from "../../lib/images.js";
 import { db } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
 import { isLoggedIn, passwordIsCorrect, startSession, endSession } from "../../lib/auth.js";
@@ -13,6 +15,18 @@ async function requireLogin() {
 function refresh(view = "pending", notice = "") {
   revalidatePath("/", "layout");
   redirect(`/admin?view=${view}${notice ? `&done=${encodeURIComponent(notice)}` : ""}`);
+}
+
+// After a story is published, make its AI illustration in the background (only if Cloudflare is set up).
+function illustrateLater(id) {
+  after(async () => {
+    try {
+      const story = await db.getStory(id);
+      if (story?.status === "approved" && (await addIllustration(db, story))) revalidatePath("/", "layout");
+    } catch (err) {
+      console.error("Illustration failed:", err.message);
+    }
+  });
 }
 
 function editedFields(formData) {
@@ -44,6 +58,7 @@ export async function approve(formData) {
   const story = await db.getStory(id);
   if (!story?.summary?.trim()) refresh("pending", "Write a summary before approving (tap WRITE SUMMARY)");
   await db.updateStory(id, { status: "approved", published_at: new Date().toISOString() });
+  illustrateLater(id);
   refresh("pending", "Published");
 }
 
@@ -76,6 +91,7 @@ export async function saveEdit(formData) {
   const fields = { ...editedFields(formData), ...(await photoFields(formData, await db.getStory(id), (message) => refresh(view, message))) };
   if (formData.get("andApprove")) {
     await db.updateStory(id, { ...fields, status: "approved", published_at: new Date().toISOString() });
+    illustrateLater(id);
     refresh("pending", "Saved and published");
   }
   await db.updateStory(id, fields);

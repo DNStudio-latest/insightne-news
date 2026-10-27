@@ -2,6 +2,7 @@
 import { settings, generalRegion, states, regions, northeastRegions, widerRegions, topics, slugify } from "../lib/config.js";
 import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js";
 import { CopyLinkButton, NavBar } from "./client.js";
+import { AI_CREDIT } from "../lib/images.js";
 
 export const storyUrl = (story) => `/story/${story.slug}`;
 export const categoryUrl = (name) => `/category/${slugify(name)}`;
@@ -14,7 +15,15 @@ export function storyCategory(story) {
 // Your own photo if the story has one; otherwise a category artwork (never another site's photo).
 export function StoryImage({ story, eager = false }) {
   if (story.image_url) {
-    return <img className="thumb" src={story.image_url} alt={story.image_caption || story.headline} loading={eager ? "eager" : "lazy"} />;
+    const img = <img className="thumb" src={story.image_url} alt={story.image_caption || story.headline} loading={eager ? "eager" : "lazy"} />;
+    if (story.image_credit !== AI_CREDIT) return img;
+    // AI pictures are always labelled, so no reader mistakes them for a real photo.
+    return (
+      <div className="ai-wrap">
+        {img}
+        <span className="ai-label">AI illustration</span>
+      </div>
+    );
   }
   const cat = storyCategory(story);
   return (

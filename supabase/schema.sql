@@ -95,3 +95,29 @@ where slug is null;
 insert into storage.buckets (id, name, public)
 values ('images', 'images', true)
 on conflict (id) do update set public = true;
+
+-- ===== Added for: Bengali version, breaking news, photo galleries, most read =====
+alter table stories add column if not exists headline_bn text;   -- Bengali headline
+alter table stories add column if not exists summary_bn text;    -- Bengali summary
+alter table stories add column if not exists body_bn text;       -- Bengali story text (your own reports, optional)
+alter table stories add column if not exists is_breaking boolean not null default false;
+alter table stories add column if not exists gallery jsonb not null default '[]';  -- extra photos: [{url, caption}]
+
+-- How many times each story was read, per day (for "Most read")
+create table if not exists story_views (
+  story_id uuid not null references stories(id) on delete cascade,
+  day date not null default (now() at time zone 'Asia/Kolkata')::date,
+  views int not null default 0,
+  primary key (story_id, day)
+);
+alter table story_views enable row level security;
+grant select, insert, update, delete on story_views to service_role;
+revoke all on story_views from anon, authenticated;
+
+-- Adds one view safely, even when many readers open a story at the same time
+create or replace function count_view(sid uuid) returns void language sql as $$
+  insert into story_views (story_id, day, views) values (sid, (now() at time zone 'Asia/Kolkata')::date, 1)
+  on conflict (story_id, day) do update set views = story_views.views + 1;
+$$;
+revoke all on function count_view(uuid) from public, anon, authenticated;
+grant execute on function count_view(uuid) to service_role;

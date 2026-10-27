@@ -5,6 +5,7 @@ import { createClaudeAi } from "../lib/ai.js";
 import { createGeminiAi } from "../lib/gemini.js";
 import { createRulesAi } from "../lib/rules.js";
 import { runPipeline, fillMissingSummaries } from "../lib/pipeline.js";
+import { addMissingIllustrations } from "../lib/images.js";
 import { settings, states, enabledSources, trustedSourceNames } from "../lib/config.js";
 
 // With a Claude key, Claude scores and summarizes. With a free Gemini key, simple rules score the news
@@ -30,6 +31,9 @@ const run = await runPipeline({
 
 // Stories that arrived without a summary (for example in no-AI mode) get one now.
 await fillMissingSummaries({ db, ai });
+
+// Published stories without a photo get a labelled AI illustration (only if Cloudflare is set up).
+await addMissingIllustrations({ db });
 
 console.log("Done.", JSON.stringify({ ...run, feeds_failed: run.feeds_failed.map((f) => f.name) }));
 // Feed problems are normal; only a full stop counts as a failure.

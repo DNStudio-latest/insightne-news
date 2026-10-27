@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function sitemap() {
   const base = settings.siteUrl;
-  const fixed = ["", "/originals", "/videos", "/about", "/contact", "/privacy", "/terms", "/grievance"].map((p) => ({
+  const fixed = ["", "/originals", "/videos", "/about", "/contact", "/privacy", "/terms", "/grievance", "/today"].map((p) => ({
     url: `${base}${p}`,
     changeFrequency: p === "" ? "hourly" : "monthly",
   }));

@@ -290,3 +290,17 @@ main { padding: 20px 0 40px; }
 /* "AI illustration" label on pictures */
 .ai-wrap { position: relative; }
 .ai-label { position: absolute; left: 8px; bottom: 8px; background: rgba(0,0,0,0.65); color: #fff; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; padding: 3px 7px; border-radius: 4px; }
+
+/* WhatsApp */
+.topbar-links { display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+.wa-follow { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #e7f8ee; border: 1px solid #b9ebcd; border-radius: var(--radius); padding: 14px 16px; margin: 22px 0; color: #10331f; }
+.wa-follow strong { display: block; }
+.wa-follow span { font-size: 0.88rem; }
+.wa-follow a { background: #25d366; color: #fff; text-decoration: none; font-weight: 800; padding: 9px 16px; border-radius: 999px; white-space: nowrap; }
+@media (prefers-color-scheme: dark) { .wa-follow { background: #12291c; border-color: #1f4d33; color: #d6f5e3; } }
+.top5 { list-style: none; padding: 0; margin: 0 0 20px; counter-reset: top5; }
+.top5 li { counter-increment: top5; display: grid; grid-template-columns: 40px 1fr; gap: 10px; padding: 14px 0; border-top: 1px solid var(--line); }
+.top5 li::before { content: counter(top5); font-family: var(--serif); font-size: 1.8rem; font-weight: 700; color: var(--accent); line-height: 1; }
+.top5 h2 { font-family: var(--serif); font-size: 1.1rem; margin: 0 0 4px; }
+.top5 p { margin: 0; color: var(--muted); font-size: 0.93rem; }
+.wa-share { display: inline-block; background: #25d366; color: #fff !important; text-decoration: none; font-weight: 800; padding: 12px 20px; border-radius: 999px; }

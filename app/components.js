@@ -50,7 +50,13 @@ export function SiteHeader({ current, ticker = [], updatedAt }) {
       <div className="topbar">
         <div className="container">
           <span>{formatDay()}{updatedAt ? ` · Updated ${timeAgo(updatedAt)}` : ""}</span>
-          <a href={settings.youtubeUrl} target="_blank" rel="noopener noreferrer">▶ YouTube</a>
+          <span className="topbar-links">
+            <a href="/today">📰 Top 5 today</a>
+            {settings.whatsappChannelUrl && (
+              <a href={settings.whatsappChannelUrl} target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>
+            )}
+            <a href={settings.youtubeUrl} target="_blank" rel="noopener noreferrer">▶ YouTube</a>
+          </span>
         </div>
       </div>
       <div className="masthead">
@@ -247,6 +253,20 @@ export function Byline({ story }) {
   return <>{names.length ? `Brief · Source: ${names.join(", ")}` : settings.defaultAuthor}</>;
 }
 
+// "Follow us on WhatsApp" box (shown only when the channel link is filled in settings.json).
+export function WhatsAppFollow() {
+  if (!settings.whatsappChannelUrl) return null;
+  return (
+    <aside className="wa-follow">
+      <div>
+        <strong>Get Northeast news on WhatsApp</strong>
+        <span>Follow the {settings.siteName} channel for the day's top stories.</span>
+      </div>
+      <a href={settings.whatsappChannelUrl} target="_blank" rel="noopener noreferrer">Follow</a>
+    </aside>
+  );
+}
+
 export function ShareButtons({ story }) {
   const url = absoluteUrl(storyUrl(story));
   const text = encodeURIComponent(`${story.headline} ${url}`);
@@ -291,6 +311,10 @@ export function SiteFooter() {
             <li><a href="/terms">Terms &amp; Disclaimer</a></li>
             <li><a href="/grievance">Grievance Redressal</a></li>
             <li><a href={settings.youtubeUrl} target="_blank" rel="noopener noreferrer">YouTube</a></li>
+            {settings.whatsappChannelUrl && (
+              <li><a href={settings.whatsappChannelUrl} target="_blank" rel="noopener noreferrer">WhatsApp channel</a></li>
+            )}
+            <li><a href="/today">Top 5 today</a></li>
           </ul>
         </div>
       </div>

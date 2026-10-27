@@ -3,7 +3,7 @@ import { db } from "../../../lib/db.js";
 import { settings } from "../../../lib/config.js";
 import { articleBlocks, formatDate, readingMinutes, uniqueSources } from "../../../lib/format.js";
 import { AI_CREDIT } from "../../../lib/images.js";
-import { PageShell, Kicker, Byline, ShareButtons, StoryGrid, SectionHead, storyUrl, absoluteUrl } from "../../components.js";
+import { WhatsAppFollow, PageShell, Kicker, Byline, ShareButtons, StoryGrid, SectionHead, storyUrl, absoluteUrl } from "../../components.js";
 
 export const dynamic = "force-dynamic";
 
@@ -121,6 +121,7 @@ export default async function StoryPage({ params }) {
             their website.
           </p>
         )}
+        <WhatsAppFollow />
       </article>
 
       {related.length > 0 && (

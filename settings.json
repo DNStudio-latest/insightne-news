@@ -6,6 +6,8 @@
   "youtubeUrl": "https://www.youtube.com/@InsightNE",
   "youtubeName": "InsightNE",
   "youtubeChannelId": "UClLdHZm4Pkvf2zn3zCvyxtQ",
+  "whatsappChannelUrl": "",
+  "_whatsappHelp": "Paste your WhatsApp Channel link here (it starts with https://whatsapp.com/channel/). The WhatsApp buttons appear on the site once this is filled.",
   "publisher": {
     "_help": "Shown on the About, Contact and Grievance pages. Fill in the real details before applying for ads.",
     "name": "InsightNE News",

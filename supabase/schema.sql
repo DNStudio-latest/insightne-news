@@ -121,3 +121,34 @@ create or replace function count_view(sid uuid) returns void language sql as $$
 $$;
 revoke all on function count_view(uuid) from public, anon, authenticated;
 grant execute on function count_view(uuid) to service_role;
+
+-- ===== Added for: reader polls =====
+-- A question with 2 to 4 answers. The newest open poll is shown on the front page.
+create table if not exists polls (
+  id uuid primary key default gen_random_uuid(),
+  question text not null,
+  question_bn text,
+  options jsonb not null,                -- [{"text": "Yes", "text_bn": "হ্যাঁ"}, ...]
+  is_open boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+-- One vote per reader per poll. "voter" is a scrambled code, never the reader's real address.
+create table if not exists poll_votes (
+  poll_id uuid not null references polls(id) on delete cascade,
+  voter text not null,
+  choice int not null,
+  voted_at timestamptz not null default now(),
+  primary key (poll_id, voter)
+);
+alter table polls enable row level security;
+alter table poll_votes enable row level security;
+grant select, insert, update, delete on polls, poll_votes to service_role;
+revoke all on polls, poll_votes from anon, authenticated;
+
+-- Totals for each answer
+create or replace function poll_counts(pid uuid) returns table (choice int, votes bigint) language sql stable as $$
+  select choice, count(*) from poll_votes where poll_id = pid group by choice;
+$$;
+revoke all on function poll_counts(uuid) from public, anon, authenticated;
+grant execute on function poll_counts(uuid) to service_role;

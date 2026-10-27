@@ -180,3 +180,35 @@ export async function saveOriginal(formData) {
 
   refresh(publish ? "published" : "pending", publish ? "Your story is published" : "Draft saved — find it under Pending");
 }
+
+// ---- Reader polls ----
+export async function savePoll(formData) {
+  await requireLogin();
+  const question = text(formData, "question", 200);
+  const options = [0, 1, 2, 3]
+    .map((i) => ({ text: text(formData, `option${i}`, 80), text_bn: text(formData, `option${i}_bn`, 120) || null }))
+    .filter((o) => o.text);
+  if (!question || options.length < 2) redirect(`/admin/polls?error=${encodeURIComponent("Write a question and at least two answers.")}`);
+  // Only one poll is shown at a time, so the new one closes the old ones.
+  for (const p of await db.listPolls()) if (p.is_open) await db.updatePoll(p.id, { is_open: false });
+  await db.createPoll({ question, question_bn: text(formData, "question_bn", 300) || null, options });
+  revalidatePath("/", "layout");
+  redirect(`/admin/polls?done=${encodeURIComponent("Poll is live on the front page")}`);
+}
+
+export async function togglePoll(formData) {
+  await requireLogin();
+  const id = text(formData, "id", 60);
+  const open = !formData.get("close");
+  if (open) for (const p of await db.listPolls()) if (p.is_open) await db.updatePoll(p.id, { is_open: false });
+  await db.updatePoll(id, { is_open: open });
+  revalidatePath("/", "layout");
+  redirect(`/admin/polls?done=${encodeURIComponent(open ? "Poll is back on the front page" : "Poll closed and taken off the front page")}`);
+}
+
+export async function deletePoll(formData) {
+  await requireLogin();
+  await db.deletePoll(text(formData, "id", 60));
+  revalidatePath("/", "layout");
+  redirect(`/admin/polls?done=${encodeURIComponent("Poll deleted")}`);
+}

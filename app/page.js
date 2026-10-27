@@ -3,7 +3,8 @@ import { settings, generalRegion, states, northeastRegions, widerRegions, topics
 import { latestVideos } from "../lib/youtube.js";
 import { capitalsWeather } from "../lib/weather.js";
 import { WeatherStrip, PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
-import { LiveUpdates } from "./client.js";
+import { LiveUpdates, PollBox } from "./client.js";
+import { initLang, lang } from "../lib/lang.js";
 
 // Always fresh: a story appears the moment you press APPROVE.
 export const dynamic = "force-dynamic";
@@ -17,12 +18,32 @@ function acrossTheRegion(stories, count) {
   return picked;
 }
 
+// The current reader poll, in the reader's language, with its vote totals.
+async function readerPoll() {
+  try {
+    await initLang();
+    const poll = await db.openPoll();
+    if (!poll) return null;
+    const bn = lang() === "bn";
+    return {
+      poll: { id: poll.id, question: (bn && poll.question_bn) || poll.question, options: poll.options.map((o) => (bn && o.text_bn) || o.text) },
+      initialCounts: await db.pollCounts(poll.id, poll.options.length),
+      labels: bn
+        ? { title: "পাঠকের মত", votes: "ভোট", note: "এটি পাঠকদের মতামত, বৈজ্ঞানিক সমীক্ষা নয়।", failed: "ভোট দেওয়া যায়নি। আবার চেষ্টা করুন।" }
+        : { title: "Readers' poll", votes: "votes", note: "Readers' opinions, not a scientific survey.", failed: "Your vote could not be saved. Please try again." },
+    };
+  } catch {
+    return null; // If the poll tables are not set up yet, the page simply shows no poll.
+  }
+}
+
 export default async function HomePage() {
-  const [stories, videos, mostRead, weather] = await Promise.all([
+  const [stories, videos, mostRead, weather, poll] = await Promise.all([
     db.listStories({ status: "approved", limit: 100 }),
     latestVideos(4),
     db.mostRead(1, 5).catch(() => []),
     capitalsWeather(),
+    readerPoll(),
   ]);
 
   if (!stories.length) {
@@ -58,6 +79,8 @@ export default async function HomePage() {
           <StoryGrid stories={originals} columns={3} />
         </section>
       )}
+
+      {poll && <PollBox {...poll} />}
 
       {mostRead.length >= 3 && (
         <section className="section">

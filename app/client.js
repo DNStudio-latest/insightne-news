@@ -110,3 +110,66 @@ export function ViewCounter({ id }) {
   }, [id]);
   return null;
 }
+
+// The front-page poll. Remembers in this browser that you voted, then shows the results.
+export function PollBox({ poll, initialCounts, labels }) {
+  const key = `poll-${poll.id}`;
+  const [mine, setMine] = useState(null);
+  const [counts, setCounts] = useState(initialCounts);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved !== null) setMine(Number(saved));
+    } catch {}
+  }, [key]);
+
+  const vote = async (choice) => {
+    setBusy(true);
+    setFailed(false);
+    try {
+      let reader = localStorage.getItem("reader-code");
+      if (!reader) localStorage.setItem("reader-code", (reader = crypto.randomUUID()));
+      const res = await fetch("/api/poll", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: poll.id, choice, reader }) });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setCounts(data.counts);
+      localStorage.setItem(key, String(choice));
+      setMine(choice);
+    } catch {
+      setFailed(true);
+    }
+    setBusy(false);
+  };
+
+  const total = counts.reduce((a, b) => a + b, 0);
+  return (
+    <section className="poll" aria-label={labels.title}>
+      <p className="poll-label">📊 {labels.title}</p>
+      <h2 className="poll-question">{poll.question}</h2>
+      {mine === null ? (
+        <div className="poll-options">
+          {poll.options.map((o, i) => (
+            <button key={i} type="button" disabled={busy} onClick={() => vote(i)}>{o}</button>
+          ))}
+        </div>
+      ) : (
+        <ul className="poll-bars">
+          {poll.options.map((o, i) => {
+            const pct = total ? Math.round((counts[i] / total) * 100) : 0;
+            return (
+              <li key={i} className={i === mine ? "mine" : undefined}>
+                <span className="poll-bar" style={{ width: `${pct}%` }} />
+                <span className="poll-text">{o}{i === mine && " ✓"}</span>
+                <b>{pct}%</b>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {failed && <p className="poll-note">{labels.failed}</p>}
+      <p className="poll-note">{mine === null ? labels.note : `${total} ${labels.votes} · ${labels.note}`}</p>
+    </section>
+  );
+}

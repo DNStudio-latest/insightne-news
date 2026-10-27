@@ -173,3 +173,50 @@ export function PollBox({ poll, initialCounts, labels }) {
     </section>
   );
 }
+
+// "🔔 Alerts" button: asks the browser for permission and signs this phone up for breaking-news alerts.
+const toKey = (base64) => {
+  const raw = atob((base64 + "=".repeat((4 - (base64.length % 4)) % 4)).replace(/-/g, "+").replace(/_/g, "/"));
+  return Uint8Array.from(raw, (c) => c.charCodeAt(0));
+};
+
+export function AlertsButton({ publicKey, lang, labels }) {
+  const [state, setState] = useState("hidden"); // hidden | off | on | busy | blocked | iphone
+  useEffect(() => {
+    if (!publicKey) return;
+    const iphone = /iPhone|iPad/.test(navigator.userAgent) && !window.matchMedia("(display-mode: standalone)").matches;
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return setState(iphone ? "iphone" : "hidden");
+    if (Notification.permission === "denied") return setState("blocked");
+    navigator.serviceWorker.register("/sw.js").then(async (reg) => setState((await reg.pushManager.getSubscription()) ? "on" : "off")).catch(() => {});
+  }, [publicKey]);
+
+  const toggle = async () => {
+    if (state === "iphone") return alert(labels.iphone);
+    if (state === "blocked") return alert(labels.blocked);
+    setState("busy");
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const current = await reg.pushManager.getSubscription();
+      if (current) {
+        await fetch("/api/push", { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ endpoint: current.endpoint }) });
+        await current.unsubscribe();
+        return setState("off");
+      }
+      if ((await Notification.requestPermission()) !== "granted") return setState("blocked");
+      const subscription = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: toKey(publicKey) });
+      const res = await fetch("/api/push", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ subscription, lang }) });
+      if (!res.ok) throw new Error();
+      setState("on");
+    } catch {
+      setState("off");
+      alert(labels.failed);
+    }
+  };
+
+  if (state === "hidden") return null;
+  return (
+    <button type="button" className={`alerts-btn${state === "on" ? " on" : ""}`} onClick={toggle} disabled={state === "busy"} title={state === "on" ? labels.stop : labels.start}>
+      {state === "on" ? `🔔 ${labels.on}` : `🔕 ${labels.start}`}
+    </button>
+  );
+}

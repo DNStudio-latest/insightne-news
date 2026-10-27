@@ -5,7 +5,23 @@ import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js"
 import { CopyLinkButton, NavBar } from "./client.js";
 import { AI_CREDIT } from "../lib/images.js";
 import { initLang, lang, pick, tr } from "../lib/lang.js";
-import { LangSwitch } from "./client.js";
+import { LangSwitch, AlertsButton } from "./client.js";
+import { pushPublicKey } from "../lib/push.js";
+
+const ALERT_LABELS = {
+  en: {
+    start: "Get alerts", on: "Alerts on", stop: "Tap to stop alerts",
+    blocked: "Alerts are blocked for this site. To allow them, tap the lock icon next to the web address, then Permissions → Notifications → Allow.",
+    iphone: "On iPhone: tap the Share button, then \"Add to Home Screen\". Open InsightNE from your home screen and tap \"Get alerts\" there.",
+    failed: "Could not switch on alerts. Please try again.",
+  },
+  bn: {
+    start: "খবরের নোটিফিকেশন", on: "নোটিফিকেশন চালু", stop: "বন্ধ করতে চাপুন",
+    blocked: "এই সাইটের নোটিফিকেশন বন্ধ করা আছে। চালু করতে ওয়েব ঠিকানার পাশে তালা চিহ্নে চাপুন, তারপর Permissions → Notifications → Allow।",
+    iphone: "আইফোনে: Share বোতাম চাপুন, তারপর \"Add to Home Screen\"। হোম স্ক্রিন থেকে InsightNE খুলে সেখানে নোটিফিকেশন চালু করুন।",
+    failed: "নোটিফিকেশন চালু করা যায়নি। আবার চেষ্টা করুন।",
+  },
+};
 
 export const storyUrl = (story) => `/story/${story.slug}`;
 export const categoryUrl = (name) => `/category/${slugify(name)}`;
@@ -71,6 +87,7 @@ export function SiteHeader({ current, ticker = [], updatedAt, breaking }) {
           </span>
           <span className="topbar-links">
             <LangSwitch current={lang()} />
+            <AlertsButton publicKey={pushPublicKey()} lang={lang()} labels={ALERT_LABELS[lang()] || ALERT_LABELS.en} />
             <a href="/today">📰 {tr("Top 5 today")}</a>
             {settings.whatsappChannelUrl && (
               <a href={settings.whatsappChannelUrl} target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>

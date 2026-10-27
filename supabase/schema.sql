@@ -152,3 +152,16 @@ create or replace function poll_counts(pid uuid) returns table (choice int, vote
 $$;
 revoke all on function poll_counts(uuid) from public, anon, authenticated;
 grant execute on function poll_counts(uuid) to service_role;
+
+-- ===== Added for: breaking-news alerts on readers' phones =====
+-- Each row is one phone or computer that tapped "Get alerts". It holds only the browser's delivery address, no name.
+create table if not exists push_subscriptions (
+  endpoint text primary key,
+  keys jsonb not null,
+  lang text not null default 'en',
+  created_at timestamptz not null default now()
+);
+alter table push_subscriptions enable row level security;
+grant select, insert, update, delete on push_subscriptions to service_role;
+revoke all on push_subscriptions from anon, authenticated;
+alter table stories add column if not exists notified_at timestamptz;  -- when readers were alerted about this story

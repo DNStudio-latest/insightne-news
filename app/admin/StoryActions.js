@@ -1,7 +1,7 @@
 "use client";
 // The APPROVE / EDIT / REJECT buttons under each story.
 import { useState } from "react";
-import { approve, reject, saveEdit, unpublish, restore, makeLead, toggleBreaking } from "./actions.js";
+import { approve, reject, saveEdit, unpublish, restore, makeLead, toggleBreaking, notifyReaders } from "./actions.js";
 import { shrinkPhoto } from "./photo.js";
 
 export default function StoryActions({ story, view, regions, topics }) {
@@ -89,6 +89,17 @@ export default function StoryActions({ story, view, regions, topics }) {
               <button className={`btn ${story.is_breaking ? "btn-reject" : "btn-edit"}`} type="submit">
                 {story.is_breaking ? "STOP BREAKING BANNER" : "🔴 BREAKING NEWS"}
               </button>
+            </form>
+            <form
+              action={notifyReaders}
+              style={{ gridColumn: "1 / -1" }}
+              onSubmit={(e) => {
+                if (!window.confirm("Send this headline as an alert to every reader who switched on alerts? Use this only for big news.")) e.preventDefault();
+              }}
+            >
+              {id}
+              {story.notified_at && <input type="hidden" name="again" value="1" />}
+              <button className="btn btn-plain" type="submit">{story.notified_at ? "🔔 ALERT SENT · SEND AGAIN" : "🔔 SEND ALERT TO PHONES"}</button>
             </form>
           </>
         )}

@@ -18,6 +18,10 @@ export default function PrivacyPage() {
           If you vote in a readers' poll, your browser keeps a random code so you cannot vote twice. We store only a scrambled
           version of that code with your answer, never your name or address.
         </li>
+        <li>
+          If you switch on news alerts, your browser gives us a delivery address for those alerts (it does not include your
+          name or phone number). You can switch alerts off at any time with the same button, and the address is deleted.
+        </li>
         <li>We count visits with Vercel Web Analytics, which does not use cookies and does not identify you. It tells us things like how many people read a page and which country or state they read from.</li>
       </ul>
       <h2>Cookies</h2>

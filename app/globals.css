@@ -358,3 +358,8 @@ main { padding: 20px 0 40px; }
 .poll-note { margin: 10px 0 0; font-size: 0.8rem; color: var(--muted); }
 .poll-results { margin: 0 0 12px; padding-left: 18px; }
 .poll-results li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; }
+
+/* Breaking-news alerts button */
+.alerts-btn { font: inherit; font-size: 0.78rem; font-weight: 600; color: #fff; background: transparent; border: 1px solid rgba(255,255,255,0.45); border-radius: 999px; padding: 1px 9px; cursor: pointer; }
+.alerts-btn.on { background: rgba(255,255,255,0.15); }
+.alerts-btn:disabled { opacity: 0.6; }

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { addIllustration } from "../../lib/images.js";
+import { sendAlert } from "../../lib/push.js";
 import { db } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
 import { isLoggedIn, passwordIsCorrect, startSession, endSession } from "../../lib/auth.js";
@@ -211,4 +212,21 @@ export async function deletePoll(formData) {
   await db.deletePoll(text(formData, "id", 60));
   revalidatePath("/", "layout");
   redirect(`/admin/polls?done=${encodeURIComponent("Poll deleted")}`);
+}
+
+// ---- Phone alerts ----
+export async function notifyReaders(formData) {
+  await requireLogin();
+  const id = text(formData, "id", 60);
+  const story = await db.getStory(id);
+  if (story?.status !== "approved") refresh("published", "Only published stories can be sent as alerts");
+  if (story.notified_at && !formData.get("again")) refresh("published", "Readers were already alerted about this story");
+  let result;
+  try {
+    result = await sendAlert(db, { title: story.headline, title_bn: story.headline_bn, url: `${settings.siteUrl}/story/${story.slug}` });
+  } catch (err) {
+    refresh("published", err.message);
+  }
+  await db.updateStory(id, { notified_at: new Date().toISOString() });
+  refresh("published", `Alert sent to ${result.sent} of ${result.total} phones/computers`);
 }

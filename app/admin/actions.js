@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { addIllustration } from "../../lib/images.js";
 import { sendAlert } from "../../lib/push.js";
+import { shareOnFacebook, facebookAutoPost } from "../../lib/facebook.js";
 import { sendEmail, dailyEmail, FREE_DAILY_LIMIT } from "../../lib/newsletter.js";
 import { topStories } from "../../lib/top.js";
 import { formatDay } from "../../lib/format.js";
@@ -21,7 +22,8 @@ function refresh(view = "pending", notice = "") {
   redirect(`/admin?view=${view}${notice ? `&done=${encodeURIComponent(notice)}` : ""}`);
 }
 
-// After a story is published, make its AI illustration in the background (only if Cloudflare is set up).
+// After a story is published, in the background: make its AI illustration (only if Cloudflare is set up),
+// then post it to Facebook if "autoPost" is switched on in settings.json.
 function illustrateLater(id) {
   after(async () => {
     try {
@@ -29,6 +31,12 @@ function illustrateLater(id) {
       if (story?.status === "approved" && (await addIllustration(db, story))) revalidatePath("/", "layout");
     } catch (err) {
       console.error("Illustration failed:", err.message);
+    }
+    try {
+      const story = await db.getStory(id);
+      if (facebookAutoPost() && story?.status === "approved") await shareOnFacebook(db, story);
+    } catch (err) {
+      console.error("Facebook post failed:", err.message);
     }
   });
 }
@@ -180,6 +188,7 @@ export async function saveOriginal(formData) {
 
   const wantsLead = Boolean(formData.get("is_lead"));
   if (publish && wantsLead) await db.setLead(storyId);
+  if (publish && !existing?.published_at) illustrateLater(storyId);
   else if (existing?.is_lead && (!wantsLead || !publish)) await db.setLead(null);
 
   refresh(publish ? "published" : "pending", publish ? "Your story is published" : "Draft saved — find it under Pending");
@@ -264,4 +273,18 @@ export async function sendNewsletter(formData) {
   }
   await db.logNewsletter({ subject: dailyEmail(stories, { lang: "en", token: "", day }).subject.slice(0, 300), recipients: sent });
   back(`Daily email sent to ${sent} of ${subscribers.length} readers${failures.length ? `. Problem: ${failures[0]}` : ""}`);
+}
+
+// ---- Facebook ----
+export async function postFacebook(formData) {
+  await requireLogin();
+  const story = await db.getStory(text(formData, "id", 60));
+  if (story?.status !== "approved") refresh("published", "Only published stories can be posted to Facebook");
+  if (story.facebook_post_id) refresh("published", "This story is already on your Facebook page");
+  try {
+    await shareOnFacebook(db, story);
+  } catch (err) {
+    refresh("published", err.message);
+  }
+  refresh("published", "Posted on your Facebook page");
 }

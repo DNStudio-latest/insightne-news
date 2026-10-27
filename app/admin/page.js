@@ -5,6 +5,7 @@ import { isLoggedIn } from "../../lib/auth.js";
 import { formatDate } from "../../lib/format.js";
 import { logout } from "./actions.js";
 import StoryActions from "./StoryActions.js";
+import { facebookReady } from "../../lib/facebook.js";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Approval page", robots: { index: false, follow: false } };
@@ -172,7 +173,7 @@ function AdminStory({ story, view }) {
         ))}
       </ul>
 
-      <StoryActions story={story} view={view} regions={regions} topics={settings.topics} />
+      <StoryActions story={story} view={view} regions={regions} topics={settings.topics} facebook={facebookReady()} />
     </article>
   );
 }

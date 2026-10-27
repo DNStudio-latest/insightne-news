@@ -1,10 +1,10 @@
 "use client";
 // The APPROVE / EDIT / REJECT buttons under each story.
 import { useState } from "react";
-import { approve, reject, saveEdit, unpublish, restore, makeLead, toggleBreaking, notifyReaders } from "./actions.js";
+import { approve, reject, saveEdit, unpublish, restore, makeLead, toggleBreaking, notifyReaders, postFacebook } from "./actions.js";
 import { shrinkPhoto } from "./photo.js";
 
-export default function StoryActions({ story, view, regions, topics }) {
+export default function StoryActions({ story, view, regions, topics, facebook = false }) {
   // In no-AI mode a story arrives without a summary; WRITE SUMMARY opens the writing box.
   const needsSummary = !story.summary?.trim();
   const [editing, setEditing] = useState(false);
@@ -101,6 +101,19 @@ export default function StoryActions({ story, view, regions, topics }) {
               {story.notified_at && <input type="hidden" name="again" value="1" />}
               <button className="btn btn-plain" type="submit">{story.notified_at ? "🔔 ALERT SENT · SEND AGAIN" : "🔔 SEND ALERT TO PHONES"}</button>
             </form>
+            {facebook && !story.facebook_post_id && (
+              <form
+                action={postFacebook}
+                style={{ gridColumn: "1 / -1" }}
+                onSubmit={(e) => {
+                  if (!window.confirm("Post this story on your Facebook page now?")) e.preventDefault();
+                }}
+              >
+                {id}
+                <button className="btn btn-plain" type="submit">📘 POST TO FACEBOOK</button>
+              </form>
+            )}
+            {story.facebook_post_id && <p className="note" style={{ gridColumn: "1 / -1", margin: 0 }}>📘 Posted on Facebook</p>}
           </>
         )}
         {view === "rejected" && (

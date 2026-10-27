@@ -190,3 +190,7 @@ create table if not exists newsletter_sends (
 alter table newsletter_sends enable row level security;
 grant select, insert, update, delete on newsletter_sends to service_role;
 revoke all on newsletter_sends from anon, authenticated;
+
+-- ===== Added for: posting stories to your Facebook page =====
+alter table stories add column if not exists facebook_post_id text;      -- the Facebook post made for this story
+alter table stories add column if not exists facebook_posted_at timestamptz;

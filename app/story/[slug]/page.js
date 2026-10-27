@@ -5,7 +5,7 @@ import { articleBlocks, formatDate, readingMinutes, uniqueSources } from "../../
 import { AI_CREDIT } from "../../../lib/images.js";
 import { ViewCounter } from "../../client.js";
 import { initLang, lang, pick, tr } from "../../../lib/lang.js";
-import { WhatsAppFollow, PageShell, Kicker, Byline, ShareButtons, StoryGrid, SectionHead, storyUrl, absoluteUrl } from "../../components.js";
+import { WhatsAppFollow, EmailSignup, PageShell, Kicker, Byline, ShareButtons, StoryGrid, SectionHead, storyUrl, absoluteUrl } from "../../components.js";
 
 export const dynamic = "force-dynamic";
 
@@ -154,6 +154,7 @@ export default async function StoryPage({ params }) {
           </p>
         )}
         <WhatsAppFollow />
+        <EmailSignup />
         <ViewCounter id={story.id} />
       </article>
 

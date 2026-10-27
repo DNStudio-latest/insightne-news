@@ -363,3 +363,20 @@ main { padding: 20px 0 40px; }
 .alerts-btn { font: inherit; font-size: 0.78rem; font-weight: 600; color: #fff; background: transparent; border: 1px solid rgba(255,255,255,0.45); border-radius: 999px; padding: 1px 9px; cursor: pointer; }
 .alerts-btn.on { background: rgba(255,255,255,0.15); }
 .alerts-btn:disabled { opacity: 0.6; }
+
+/* Daily email sign-up */
+.nl-box { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin: 22px 0; }
+.nl-form { display: grid; gap: 8px; }
+.nl-form strong { font-size: 1.02rem; }
+.nl-row { display: flex; gap: 8px; }
+.nl-row input[type=email] { flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+.nl-row button { font: inherit; font-weight: 800; padding: 10px 16px; border-radius: 10px; border: 0; background: var(--accent); color: #fff; cursor: pointer; }
+.nl-row button:disabled { opacity: 0.6; }
+.nl-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.nl-small { font-size: 0.78rem; color: var(--muted); }
+.nl-error { font-size: 0.85rem; color: var(--danger); }
+.nl-done { font-weight: 700; margin: 0; }
+.site-footer .footer-nl { display: block; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.15); }
+.footer-nl .nl-form { max-width: 560px; }
+.footer-nl strong { color: #fff; }
+.footer-nl .nl-small { color: inherit; opacity: 0.75; }

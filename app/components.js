@@ -5,7 +5,8 @@ import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js"
 import { CopyLinkButton, NavBar } from "./client.js";
 import { AI_CREDIT } from "../lib/images.js";
 import { initLang, lang, pick, tr } from "../lib/lang.js";
-import { LangSwitch, AlertsButton } from "./client.js";
+import { LangSwitch, AlertsButton, NewsletterSignup } from "./client.js";
+import { newsletterReady } from "../lib/newsletter.js";
 import { pushPublicKey } from "../lib/push.js";
 
 const ALERT_LABELS = {
@@ -331,10 +332,25 @@ export function ShareButtons({ story }) {
   );
 }
 
+// Daily-email sign-up box (shown only once the email service is set up).
+export function EmailSignup() {
+  if (!newsletterReady()) return null;
+  return (
+    <aside className="nl-box">
+      <NewsletterSignup lang={lang()} />
+    </aside>
+  );
+}
+
 export function SiteFooter() {
   const [first, ...rest] = settings.siteName.split(" ");
   return (
     <footer className="site-footer">
+      {newsletterReady() && (
+        <div className="container footer-nl">
+          <NewsletterSignup lang={lang()} />
+        </div>
+      )}
       <div className="container">
         <div>
           <a href="/" className="logo">
@@ -366,6 +382,7 @@ export function SiteFooter() {
               <li><a href={settings.whatsappChannelUrl} target="_blank" rel="noopener noreferrer">WhatsApp channel</a></li>
             )}
             <li><a href="/today">Top 5 today</a></li>
+            {newsletterReady() && <li><a href="/newsletter">Daily email</a></li>}
           </ul>
         </div>
       </div>

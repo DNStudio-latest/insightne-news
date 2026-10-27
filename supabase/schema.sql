@@ -165,3 +165,28 @@ alter table push_subscriptions enable row level security;
 grant select, insert, update, delete on push_subscriptions to service_role;
 revoke all on push_subscriptions from anon, authenticated;
 alter table stories add column if not exists notified_at timestamptz;  -- when readers were alerted about this story
+
+-- ===== Added for: daily email newsletter =====
+-- Readers who asked for the daily email. Nobody gets emails until they click the link in the confirmation email.
+create table if not exists newsletter_subscribers (
+  email text primary key,
+  token text not null unique,          -- secret code used in the confirm and unsubscribe links
+  lang text not null default 'en',
+  confirmed boolean not null default false,
+  created_at timestamptz not null default now(),
+  confirmed_at timestamptz
+);
+alter table newsletter_subscribers enable row level security;
+grant select, insert, update, delete on newsletter_subscribers to service_role;
+revoke all on newsletter_subscribers from anon, authenticated;
+
+-- A record of each newsletter you sent (so the same day is not sent twice by accident)
+create table if not exists newsletter_sends (
+  id bigint generated always as identity primary key,
+  sent_at timestamptz not null default now(),
+  subject text not null,
+  recipients int not null default 0
+);
+alter table newsletter_sends enable row level security;
+grant select, insert, update, delete on newsletter_sends to service_role;
+revoke all on newsletter_sends from anon, authenticated;

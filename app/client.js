@@ -220,3 +220,41 @@ export function AlertsButton({ publicKey, lang, labels }) {
     </button>
   );
 }
+
+// "Get the daily email" box: sends the address; the reader then confirms from their inbox.
+export function NewsletterSignup({ lang = "en" }) {
+  const bn = lang === "bn";
+  const [state, setState] = useState("idle"); // idle | busy | sent | already | bad | failed
+  const submit = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    setState("busy");
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: form.get("email"), website: form.get("website"), lang }),
+      });
+      const data = await res.json().catch(() => ({}));
+      setState(res.ok ? (data.already ? "already" : "sent") : res.status === 400 ? "bad" : "failed");
+    } catch {
+      setState("failed");
+    }
+  };
+  const messages = bn
+    ? { sent: "✓ প্রায় হয়ে গেছে! আপনার ইনবক্সে আমাদের ইমেলের লিংকে চাপুন।", already: "✓ আপনি ইতিমধ্যে সাইন আপ করেছেন।", bad: "সঠিক ইমেল ঠিকানা লিখুন।", failed: "কিছু ভুল হয়েছে। আবার চেষ্টা করুন।" }
+    : { sent: "✓ Almost done! Check your inbox and tap the link in our email.", already: "✓ You are already signed up.", bad: "Please type a correct email address.", failed: "Something went wrong. Please try again." };
+  if (state === "sent" || state === "already") return <p className="nl-done">{messages[state]}</p>;
+  return (
+    <form className="nl-form" onSubmit={submit}>
+      <strong>{bn ? "প্রতিদিনের সেরা ৫টি খবর, আপনার ইমেলে" : "Top 5 stories every day, in your inbox"}</strong>
+      <div className="nl-row">
+        <input name="email" type="email" required aria-label="Email address" placeholder={bn ? "আপনার ইমেল" : "Your email"} autoComplete="email" />
+        <input name="website" tabIndex={-1} autoComplete="off" className="nl-trap" aria-hidden="true" />
+        <button type="submit" disabled={state === "busy"}>{bn ? "সাইন আপ" : "Sign up"}</button>
+      </div>
+      {messages[state] && <span className="nl-error">{messages[state]}</span>}
+      <span className="nl-small">{bn ? "বিনামূল্যে। যেকোনো সময় বন্ধ করা যায়।" : "Free. Unsubscribe any time."}</span>
+    </form>
+  );
+}

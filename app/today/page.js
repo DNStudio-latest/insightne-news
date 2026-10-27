@@ -2,7 +2,8 @@
 import { db } from "../../lib/db.js";
 import { settings } from "../../lib/config.js";
 import { formatDay } from "../../lib/format.js";
-import { PageShell, SectionHead, Kicker, WhatsAppFollow, storyUrl, absoluteUrl } from "../components.js";
+import { topStories } from "../../lib/top.js";
+import { PageShell, SectionHead, Kicker, WhatsAppFollow, EmailSignup, storyUrl, absoluteUrl } from "../components.js";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -11,19 +12,8 @@ export const metadata = {
   alternates: { canonical: "/today" },
 };
 
-// Most read today first, then the most important and newest stories of the last 24 hours.
-async function topFive() {
-  const since = Date.now() - 24 * 3600 * 1000;
-  const [popular, recent] = await Promise.all([db.mostRead(1, 5), db.listStories({ status: "approved", limit: 60 })]);
-  const fresh = recent.filter((s) => new Date(s.published_at).getTime() >= since);
-  const ranked = [...fresh].sort((a, b) => (b.kind === "original") - (a.kind === "original") || (b.score ?? 9) - (a.score ?? 9));
-  const picked = [];
-  for (const s of [...popular, ...ranked, ...recent]) if (!picked.some((p) => p.id === s.id) && picked.length < 5) picked.push(s);
-  return picked;
-}
-
 export default async function TodayPage() {
-  const stories = await topFive();
+  const stories = await topStories(db);
   const message = [
     `*${settings.siteName} — Top ${stories.length} today*`,
     formatDay(),
@@ -61,6 +51,7 @@ export default async function TodayPage() {
           </a>
         )}
         <WhatsAppFollow />
+        <EmailSignup />
       </div>
     </PageShell>
   );

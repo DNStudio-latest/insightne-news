@@ -5,6 +5,9 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { addIllustration } from "../../lib/images.js";
 import { sendAlert } from "../../lib/push.js";
+import { sendEmail, dailyEmail, FREE_DAILY_LIMIT } from "../../lib/newsletter.js";
+import { topStories } from "../../lib/top.js";
+import { formatDay } from "../../lib/format.js";
 import { db } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
 import { isLoggedIn, passwordIsCorrect, startSession, endSession } from "../../lib/auth.js";
@@ -229,4 +232,36 @@ export async function notifyReaders(formData) {
   }
   await db.updateStory(id, { notified_at: new Date().toISOString() });
   refresh("published", `Alert sent to ${result.sent} of ${result.total} phones/computers`);
+}
+
+// ---- Daily email ----
+export async function sendNewsletter(formData) {
+  await requireLogin();
+  const back = (message) => redirect(`/admin/newsletter?done=${encodeURIComponent(message)}`);
+  const [last] = await db.lastNewsletters(1);
+  if (last && Date.now() - new Date(last.sent_at).getTime() < 20 * 3600000 && !formData.get("again")) {
+    back("Today's email was already sent. Tick “send again” if you really want to send another.");
+  }
+  const subscribers = await db.listSubscribers({ confirmed: true });
+  if (!subscribers.length) back("Nobody has confirmed the daily email yet, so nothing was sent.");
+  if (subscribers.length > FREE_DAILY_LIMIT) back(`You have ${subscribers.length} subscribers, more than the free ${FREE_DAILY_LIMIT} emails a day. Nothing was sent — ask Claude about a paid plan first.`);
+  const stories = await topStories(db, 5);
+  if (!stories.length) back("There are no published stories to send.");
+  const day = formatDay();
+  let sent = 0;
+  const failures = [];
+  for (let i = 0; i < subscribers.length; i += 5) {
+    await Promise.all(
+      subscribers.slice(i, i + 5).map(async (sub) => {
+        try {
+          await sendEmail({ to: sub.email, unsubscribe: sub.token, ...dailyEmail(stories, { lang: sub.lang, token: sub.token, day }) });
+          sent++;
+        } catch (err) {
+          failures.push(err.message);
+        }
+      }),
+    );
+  }
+  await db.logNewsletter({ subject: dailyEmail(stories, { lang: "en", token: "", day }).subject.slice(0, 300), recipients: sent });
+  back(`Daily email sent to ${sent} of ${subscribers.length} readers${failures.length ? `. Problem: ${failures[0]}` : ""}`);
 }

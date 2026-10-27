@@ -22,6 +22,11 @@ export default function PrivacyPage() {
           If you switch on news alerts, your browser gives us a delivery address for those alerts (it does not include your
           name or phone number). You can switch alerts off at any time with the same button, and the address is deleted.
         </li>
+        <li>
+          If you sign up for our daily email, we keep your email address and your language choice only to send you that email.
+          The emails are delivered by our email provider, Brevo. Every email has an unsubscribe link; when you unsubscribe, your
+          address is deleted.
+        </li>
         <li>We count visits with Vercel Web Analytics, which does not use cookies and does not identify you. It tells us things like how many people read a page and which country or state they read from.</li>
       </ul>
       <h2>Cookies</h2>

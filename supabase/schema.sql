@@ -212,3 +212,14 @@ create table if not exists editors (
 alter table editors enable row level security;
 grant select, insert, update, delete on editors to service_role;
 revoke all on editors from anon, authenticated;
+
+-- ===== Added for: live broadcasts (and other small site switches) =====
+-- One row per setting, e.g. key "live" = {"youtubeId": "...", "title": "...", "source": "...", "startedAt": "..."}
+create table if not exists site_settings (
+  key text primary key,
+  value jsonb not null default '{}',
+  updated_at timestamptz not null default now()
+);
+alter table site_settings enable row level security;
+grant select, insert, update, delete on site_settings to service_role;
+revoke all on site_settings from anon, authenticated;

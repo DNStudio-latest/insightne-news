@@ -61,6 +61,7 @@ export default async function AdminPage({ searchParams }) {
         <a href="/admin/write">✍ Write story</a>
         {admin && (
           <>
+            <a href="/admin/live">🔴 Live</a>
             <a href="/admin/whatsapp">📲 WhatsApp posts</a>
             <a href="/admin/polls">📊 Polls</a>
             <a href="/admin/newsletter">✉ Daily email</a>

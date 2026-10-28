@@ -9,6 +9,7 @@ import { LangSwitch, AlertsButton, NewsletterSignup } from "./client.js";
 import { newsletterReady } from "../lib/newsletter.js";
 import { pushPublicKey } from "../lib/push.js";
 import { indiaMatch } from "../lib/cricket.js";
+import { currentLive } from "../lib/live.js";
 
 const ALERT_LABELS = {
   en: {
@@ -84,6 +85,44 @@ export function Kicker({ story }) {
 
 const BREAKING_HOURS = 12;
 
+// Live government broadcast: a red strip on every page, and the player on the front page and /live.
+const liveTitle = (live) => (lang() === "bn" && live.title_bn) || live.title;
+
+export function LiveBar({ live }) {
+  if (!live) return null;
+  return (
+    <a className="live-bar" href="/live">
+      <span className="live-label">● {tr("LIVE")}</span>
+      <span className="live-text">{liveTitle(live)}</span>
+      <span className="live-watch">{tr("Watch")} →</span>
+    </a>
+  );
+}
+
+export function LivePlayer({ live, big = false }) {
+  if (!live) return null;
+  return (
+    <section className={`live-box${big ? " big" : ""}`} aria-label="Live broadcast">
+      <div className="live-head">
+        <span className="live-pill">● {tr("LIVE")}</span>
+        <h2>{liveTitle(live)}</h2>
+      </div>
+      <div className="video-embed">
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${live.youtubeId}`}
+          title={liveTitle(live)}
+          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
+      </div>
+      <p className="live-note">
+        {tr("Source")}: {live.source} ·{" "}
+        <a href={`https://www.youtube.com/watch?v=${live.youtubeId}`} target="_blank" rel="noopener noreferrer">{tr("Watch on YouTube")} ↗</a>
+      </p>
+    </section>
+  );
+}
+
 // India men's live cricket score.
 const scoreText = (i) => `${i.runs ?? 0}${i.wickets === 10 || i.wickets == null ? "" : `/${i.wickets}`}${i.overs != null ? ` (${i.overs})` : ""}`;
 const teamScore = (match, team) =>
@@ -141,10 +180,11 @@ export function BreakingBar({ story }) {
   );
 }
 
-export function SiteHeader({ current, ticker = [], updatedAt, breaking, cricket }) {
+export function SiteHeader({ current, ticker = [], updatedAt, breaking, cricket, live }) {
   const [first, ...rest] = settings.siteName.split(" ");
   return (
     <header>
+      <LiveBar live={live} />
       <BreakingBar story={breaking} />
       <CricketBar match={cricket} />
       <div className="topbar">
@@ -186,7 +226,7 @@ export function SiteHeader({ current, ticker = [], updatedAt, breaking, cricket 
         states={states}
         labels={{ home: tr("Home"), region: tr(generalRegion), all: tr(`All ${generalRegion}`) }}
         stateLinks={northeastRegions.map((r) => [r, categoryUrl(r), tr(r)])}
-        items={[...[...widerRegions, ...topics].map((t) => [t, categoryUrl(t), tr(t)]), ["Originals", "/originals", tr("Originals")], ["Videos", "/videos", tr("Videos")], ["Search", "/search", tr("Search")]]}
+        items={[...[...widerRegions, ...topics].map((t) => [t, categoryUrl(t), tr(t)]), ["Originals", "/originals", tr("Originals")], ["Live", "/live", tr("Live TV")], ["Videos", "/videos", tr("Videos")], ["Search", "/search", tr("Search")]]}
       />
       {ticker.length > 0 && (
         <div className="ticker" aria-label="Latest headlines">
@@ -459,6 +499,7 @@ export function SiteFooter() {
             ))}
             <li><a href="/originals">Originals</a></li>
             <li><a href="/videos">Videos</a></li>
+            <li><a href="/live">Live TV</a></li>
           </ul>
         </div>
         <div>
@@ -499,10 +540,10 @@ export function SiteFooter() {
 
 export async function PageShell({ current, children, ticker, updatedAt }) {
   await initLang();
-  const [[breaking], cricket] = await Promise.all([db.listStories({ status: "approved", breaking: true, limit: 1 }).catch(() => []), indiaMatch()]);
+  const [[breaking], cricket, live] = await Promise.all([db.listStories({ status: "approved", breaking: true, limit: 1 }).catch(() => []), indiaMatch(), currentLive(db)]);
   return (
     <>
-      <SiteHeader current={current} ticker={ticker} updatedAt={updatedAt} breaking={breaking} cricket={cricket} />
+      <SiteHeader current={current} ticker={ticker} updatedAt={updatedAt} breaking={breaking} cricket={cricket} live={live} />
       <main className="container">{children}</main>
       <SiteFooter />
     </>

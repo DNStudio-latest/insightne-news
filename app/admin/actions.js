@@ -8,7 +8,7 @@ import { sendAlert } from "../../lib/push.js";
 import { shareOnFacebook, facebookAutoPost } from "../../lib/facebook.js";
 import { sendEmail, dailyEmail, FREE_DAILY_LIMIT } from "../../lib/newsletter.js";
 import { topStories } from "../../lib/top.js";
-import { formatDay } from "../../lib/format.js";
+import { formatDay, youtubeId } from "../../lib/format.js";
 import { db } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
 import { currentRole, currentUser, userForPassword, hashPassword, startSession, endSession } from "../../lib/auth.js";
@@ -352,4 +352,30 @@ export async function changeEditor(formData) {
     backToEditors(`Name changed to ${name}. New stories will show this byline.`);
   }
   backToEditors("Nothing changed.");
+}
+
+// ---- Live broadcast (admin only) ----
+export async function goLive(formData) {
+  await requireAdmin();
+  const back = (message) => redirect(`/admin/live?done=${encodeURIComponent(message)}`);
+  const videoId = youtubeId(text(formData, "link", 300));
+  const title = text(formData, "title", 150);
+  if (!videoId) back("That is not a YouTube video or live link. Copy the link from the YouTube Share button.");
+  if (!title) back("Please write a title, e.g. “Chief Minister's address on Statehood Day”.");
+  await db.setSetting("live", {
+    youtubeId: videoId,
+    title,
+    title_bn: text(formData, "title_bn", 200) || null,
+    source: text(formData, "source", 80) || "YouTube",
+    startedAt: new Date().toISOString(),
+  });
+  revalidatePath("/", "layout");
+  back("You are live: the broadcast is now on the front page and every page shows the LIVE strip.");
+}
+
+export async function endLive() {
+  await requireAdmin();
+  await db.setSetting("live", null);
+  revalidatePath("/", "layout");
+  redirect(`/admin/live?done=${encodeURIComponent("Live broadcast ended and removed from the website.")}`);
 }

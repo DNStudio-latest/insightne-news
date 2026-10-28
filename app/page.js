@@ -3,7 +3,8 @@ import { settings, generalRegion, states, northeastRegions, widerRegions, topics
 import { latestVideos } from "../lib/youtube.js";
 import { capitalsWeather } from "../lib/weather.js";
 import { indiaMatch } from "../lib/cricket.js";
-import { CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
+import { currentLive } from "../lib/live.js";
+import { LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
 import { LiveUpdates, PollBox } from "./client.js";
 import { initLang, lang } from "../lib/lang.js";
 
@@ -56,13 +57,14 @@ async function readerPoll() {
 }
 
 export default async function HomePage() {
-  const [stories, videos, mostRead, weather, poll, cricket] = await Promise.all([
+  const [stories, videos, mostRead, weather, poll, cricket, live] = await Promise.all([
     db.listStories({ status: "approved", limit: 100 }),
     latestVideos(4),
     db.mostRead(1, 5).catch(() => []),
     capitalsWeather(),
     readerPoll(),
     indiaMatch(),
+    currentLive(db),
   ]);
 
   if (!stories.length) {
@@ -86,6 +88,7 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteInfo).replace(/</g, "\\u003c") }} />
       <h1 className="sr-only">{settings.siteName}: {settings.tagline}</h1>
 
+      <LivePlayer live={live} />
       <WeatherStrip weather={weather} />
       <CricketBox match={cricket} />
 

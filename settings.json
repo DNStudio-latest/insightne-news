@@ -10,6 +10,14 @@
   "_whatsappHelp": "Paste your WhatsApp Channel link here (it starts with https://whatsapp.com/channel/). The WhatsApp buttons appear on the site once this is filled.",
   "googleSiteVerification": "dH126ToS-wpfJjbQx2zuwKMJ_cYiEQGFMgJfnrQLews",
   "_googleHelp": "Only needed if Google Search Console asks for an 'HTML tag': paste just the code inside content=\"...\" here.",
+  "liveChannels": {
+    "_help": "Official government channels listed on the Live page (name and YouTube link). Add more the same way; check each link is the real, official channel first.",
+    "list": [
+      { "name": "PM Narendra Modi", "url": "https://www.youtube.com/@NarendraModi/streams" },
+      { "name": "Sansad TV (Parliament)", "url": "https://www.youtube.com/channel/UCISgnSNwqQ2i8lhCun3KtQg/streams" },
+      { "name": "DD India", "url": "https://www.youtube.com/@DDIndia/streams" }
+    ]
+  },
   "social": {
     "_help": "Links to your social media pages. Leave empty (\"\") to hide one. They appear as a row of buttons in the footer.",
     "facebook": "",

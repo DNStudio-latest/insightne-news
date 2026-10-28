@@ -4,7 +4,7 @@ import { settings } from "../../lib/config.js";
 import { formatDay } from "../../lib/format.js";
 import { topStories } from "../../lib/top.js";
 import { CopyTextButton } from "../client.js";
-import { PageShell, SectionHead, Kicker, WhatsAppFollow, EmailSignup, storyUrl, absoluteUrl } from "../components.js";
+import { PageShell, SectionHead, Kicker, WhatsAppFollow, EmailSignup, storyUrl } from "../components.js";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -13,16 +13,22 @@ export const metadata = {
   alternates: { canonical: "/today" },
 };
 
+const NUMBERS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"];
+
 export default async function TodayPage() {
   const stories = await topStories(db);
-  const message = [
-    `*${settings.siteName} — Top ${stories.length} today*`,
-    formatDay(),
-    "",
-    ...stories.map((s, i) => `${i + 1}. ${s.headline}\n${absoluteUrl(storyUrl(s))}`),
-    "",
-    settings.whatsappChannelUrl ? `Follow us on WhatsApp: ${settings.whatsappChannelUrl}` : `More news: ${settings.siteUrl}`,
-  ].join("\n");
+  // Short, tidy WhatsApp messages: one for chats and groups, one for your own channel.
+  const site = settings.siteUrl.replace(/^https?:\/\/(www\.)?/, "");
+  const lines = (forChannel) =>
+    [
+      `📰 *${settings.siteName} | Top ${stories.length} today*`,
+      `🗓️ ${formatDay()}`,
+      "",
+      ...stories.map((s, i) => `${NUMBERS[i]} *${s.headline}*\n👉 ${site}/s/${s.slug.split("-").pop()}\n`),
+      forChannel || !settings.whatsappChannelUrl ? `🌐 More news: ${site}` : `🔔 Follow our WhatsApp channel: ${settings.whatsappChannelUrl}`,
+    ].join("\n");
+  const message = lines(false);
+  const channelMessage = lines(true);
 
   return (
     <PageShell current="Top 5">
@@ -52,7 +58,7 @@ export default async function TodayPage() {
           </a>
         )}
         {stories.length > 0 && (
-          <CopyTextButton className="wa-share wa-copy" text={message} label={`Copy Top ${stories.length} for the WhatsApp channel`} />
+          <CopyTextButton className="wa-share wa-copy" text={channelMessage} label={`Copy Top ${stories.length} for the WhatsApp channel`} />
         )}
         <WhatsAppFollow />
         <EmailSignup />

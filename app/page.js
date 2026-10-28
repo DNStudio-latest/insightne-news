@@ -73,7 +73,7 @@ export default async function HomePage() {
   return (
     <PageShell ticker={stories.slice(0, 10)} updatedAt={stories[0].published_at}>
       <LiveUpdates since={stories[0].published_at} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteInfo).replace(/</g, "\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteInfo).replace(/</g, "\\u003c") }} />
       <h1 className="sr-only">{settings.siteName}: {settings.tagline}</h1>
 
       <WeatherStrip weather={weather} />

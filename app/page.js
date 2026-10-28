@@ -23,7 +23,7 @@ function acrossTheRegion(stories, count) {
 const siteInfo = {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "NewsMediaOrganization", "@id": `${settings.siteUrl}/#org`, name: settings.siteName, url: settings.siteUrl, logo: { "@type": "ImageObject", url: `${settings.siteUrl}/icon`, width: 192, height: 192 }, sameAs: [settings.youtubeUrl, settings.whatsappChannelUrl].filter(Boolean), publishingPrinciples: `${settings.siteUrl}/about` },
+    { "@type": "NewsMediaOrganization", "@id": `${settings.siteUrl}/#org`, name: settings.siteName, url: settings.siteUrl, logo: { "@type": "ImageObject", url: `${settings.siteUrl}/icon`, width: 192, height: 192 }, sameAs: [settings.youtubeUrl, settings.whatsappChannelUrl, ...Object.entries(settings.social || {}).filter(([k]) => !k.startsWith("_")).map(([, v]) => v)].filter(Boolean), publishingPrinciples: `${settings.siteUrl}/about` },
     { "@type": "WebSite", name: settings.siteName, url: settings.siteUrl, publisher: { "@id": `${settings.siteUrl}/#org` }, potentialAction: { "@type": "SearchAction", target: `${settings.siteUrl}/search?q={q}`, "query-input": "required name=q" } },
   ],
 };

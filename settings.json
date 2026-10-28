@@ -10,9 +10,17 @@
   "_whatsappHelp": "Paste your WhatsApp Channel link here (it starts with https://whatsapp.com/channel/). The WhatsApp buttons appear on the site once this is filled.",
   "googleSiteVerification": "dH126ToS-wpfJjbQx2zuwKMJ_cYiEQGFMgJfnrQLews",
   "_googleHelp": "Only needed if Google Search Console asks for an 'HTML tag': paste just the code inside content=\"...\" here.",
+  "social": {
+    "_help": "Links to your social media pages. Leave empty (\"\") to hide one. They appear as a row of buttons in the footer.",
+    "facebook": "",
+    "instagram": "",
+    "x": "",
+    "telegram": ""
+  },
   "publisher": {
     "_help": "Shown on the About, Contact and Grievance pages. Fill in the real details before applying for ads.",
     "name": "InsightNE News",
+    "owner": "Prasenjit Debnath",
     "editor": "Prasenjit Debnath",
     "email": "insightnenews@gmail.com",
     "phone": "",

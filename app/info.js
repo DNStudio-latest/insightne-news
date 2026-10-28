@@ -2,7 +2,7 @@
 import { settings } from "../lib/config.js";
 import { PageShell } from "./components.js";
 
-export const UPDATED = "26 October 2026";
+export const UPDATED = "29 October 2026";
 export const publisher = settings.publisher;
 
 export function InfoPage({ title, children }) {

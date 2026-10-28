@@ -366,8 +366,12 @@ export function Videos({ videos, title = lang() === "en" ? `Watch ${settings.you
   );
 }
 
-export function Byline({ story }) {
-  if (story.kind === "original") return <>{tr("By")} {story.author || settings.defaultAuthor}</>;
+// "By Rina Das" (linked to the reporter's page when link is set), or the sources of a brief.
+export function Byline({ story, link = false }) {
+  if (story.kind === "original") {
+    const name = story.author || settings.defaultAuthor;
+    return <>{tr("By")} {link ? <a href={`/author/${slugify(name)}`}>{name}</a> : name}</>;
+  }
   const names = uniqueSources(story.sources).map((s) => s.source_name);
   return <>{names.length ? `${tr("Brief · Source:")} ${names.join(", ")}` : settings.defaultAuthor}</>;
 }
@@ -409,6 +413,27 @@ export function EmailSignup() {
   );
 }
 
+// Buttons to our pages on other platforms (only the ones filled in settings.json).
+function SocialLinks() {
+  const s = settings.social || {};
+  const links = [
+    ["YouTube", settings.youtubeUrl],
+    ["WhatsApp", settings.whatsappChannelUrl],
+    ["Facebook", s.facebook],
+    ["Instagram", s.instagram],
+    ["X", s.x],
+    ["Telegram", s.telegram],
+    ["RSS", "/feed.xml"],
+  ].filter(([, url]) => url);
+  return (
+    <div className="social">
+      {links.map(([name, url]) => (
+        <a key={name} href={url} target={url.startsWith("/") ? undefined : "_blank"} rel="noopener noreferrer">{name}</a>
+      ))}
+    </div>
+  );
+}
+
 export function SiteFooter() {
   const [first, ...rest] = settings.siteName.split(" ");
   return (
@@ -440,8 +465,14 @@ export function SiteFooter() {
           <h4>About us</h4>
           <ul>
             <li><a href="/about">About</a></li>
+            <li><a href="/team">Ownership &amp; team</a></li>
             <li><a href="/contact">Contact</a></li>
+            <li><a href="/advertise">Advertise with us</a></li>
+            <li><a href="/tips">Send a news tip</a></li>
             <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/editorial-policy">Editorial policy</a></li>
+            <li><a href="/ethics">Ethics &amp; fact-checking</a></li>
+            <li><a href="/corrections">Corrections</a></li>
             <li><a href="/terms">Terms &amp; Disclaimer</a></li>
             <li><a href="/grievance">Grievance Redressal</a></li>
             <li><a href={settings.youtubeUrl} target="_blank" rel="noopener noreferrer">YouTube</a></li>
@@ -452,6 +483,9 @@ export function SiteFooter() {
             {newsletterReady() && <li><a href="/newsletter">Daily email</a></li>}
           </ul>
         </div>
+      </div>
+      <div className="container footer-social">
+        <SocialLinks />
       </div>
       <div className="footnote">
         <div className="container">

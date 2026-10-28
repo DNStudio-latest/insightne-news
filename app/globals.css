@@ -417,3 +417,10 @@ main { padding: 20px 0 40px; }
 .cricket-status { margin: 4px 0 0; font-weight: 700; color: #1565c0; }
 .cricket-note { margin: 6px 0 0; font-size: 0.75rem; color: var(--muted); }
 @media (prefers-color-scheme: dark) { .cricket-status { color: #90caf9; } }
+
+/* Social media row in the footer */
+.site-footer .footer-social { display: block; padding-top: 0; padding-bottom: 18px; }
+.social { display: flex; flex-wrap: wrap; gap: 8px; }
+.social a { border: 1px solid rgba(255,255,255,0.35); border-radius: 999px; padding: 6px 14px; font-size: 0.85rem; font-weight: 700; }
+.social a:hover { background: rgba(255,255,255,0.12); text-decoration: none; }
+.byline a { text-decoration: underline; text-underline-offset: 2px; }

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/db.js";
-import { settings } from "../../../lib/config.js";
+import { settings, slugify } from "../../../lib/config.js";
 import { articleBlocks, formatDate, readingMinutes, uniqueSources } from "../../../lib/format.js";
 import { AI_CREDIT } from "../../../lib/images.js";
 import { ViewCounter } from "../../client.js";
@@ -52,7 +52,7 @@ export default async function StoryPage({ params }) {
     dateModified: story.updated_at,
     mainEntityOfPage: absoluteUrl(storyUrl(story)),
     ...(story.image_url ? { image: [story.image_url] } : {}),
-    author: isOriginal ? { "@type": "Person", name: story.author || settings.defaultAuthor } : { "@type": "Organization", name: settings.siteName },
+    author: isOriginal ? { "@type": "Person", name: story.author || settings.defaultAuthor, url: `${settings.siteUrl}/author/${slugify(story.author || settings.defaultAuthor)}` } : { "@type": "Organization", name: settings.siteName },
     publisher: { "@type": "Organization", name: settings.siteName, url: settings.siteUrl, logo: { "@type": "ImageObject", url: `${settings.siteUrl}/icon`, width: 192, height: 192 } },
   };
 
@@ -67,7 +67,7 @@ export default async function StoryPage({ params }) {
 
         <div className="article-meta">
           <div className="byline">
-            <Byline story={story} />
+            <Byline story={story} link />
             <br />
             <time dateTime={story.published_at}>{formatDate(story.published_at)}</time>
             {isOriginal && blocks.length > 0 && ` · ${readingMinutes(story.body)} min read`}

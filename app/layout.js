@@ -14,7 +14,7 @@ export const metadata = {
   description: `${settings.tagline}. Latest news, original reports and videos from the eight states of Northeast India.`,
   openGraph: { siteName: settings.siteName, type: "website", locale: "en_IN" },
   twitter: { card: "summary_large_image" },
-  alternates: { canonical: "/" },
+  alternates: { canonical: "/", types: { "application/rss+xml": [{ url: "/feed.xml", title: settings.siteName }] } },
   // Google Search Console "HTML tag" code, if you use that way of proving the site is yours.
   ...(settings.googleSiteVerification ? { verification: { google: settings.googleSiteVerification } } : {}),
 };

@@ -1,10 +1,9 @@
-# Runs the news collector every 3 hours, for free, on GitHub.
+# Runs the news collector, for free, on GitHub.
+# The Supabase timer (supabase/timer.sql) starts it every 3 hours, because GitHub's own timer often skipped runs.
 # You can also run it by hand: GitHub > Actions > "Collect news" > "Run workflow".
 name: Collect news
 
 on:
-  schedule:
-    - cron: "15 */3 * * *" # every 3 hours, at 15 minutes past (times are UTC)
   workflow_dispatch:
 
 concurrency:

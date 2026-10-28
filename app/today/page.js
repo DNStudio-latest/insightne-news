@@ -3,6 +3,7 @@ import { db } from "../../lib/db.js";
 import { settings } from "../../lib/config.js";
 import { formatDay } from "../../lib/format.js";
 import { topStories } from "../../lib/top.js";
+import { CopyTextButton } from "../client.js";
 import { PageShell, SectionHead, Kicker, WhatsAppFollow, EmailSignup, storyUrl, absoluteUrl } from "../components.js";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +50,9 @@ export default async function TodayPage() {
           <a className="wa-share" href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer">
             Share today's Top {stories.length} on WhatsApp
           </a>
+        )}
+        {stories.length > 0 && (
+          <CopyTextButton className="wa-share wa-copy" text={message} label={`Copy Top ${stories.length} for the WhatsApp channel`} />
         )}
         <WhatsAppFollow />
         <EmailSignup />

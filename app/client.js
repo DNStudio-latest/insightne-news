@@ -3,6 +3,28 @@
 import { useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
 
+// Copies any text (e.g. the Top 5 message) so it can be pasted into your WhatsApp channel.
+export function CopyTextButton({ text, label, className }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      className={className}
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 4000);
+        } catch {
+          window.prompt("Copy this text:", text);
+        }
+      }}
+    >
+      {copied ? "✓ Copied — now paste it in your channel" : label}
+    </button>
+  );
+}
+
 export function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false);
   return (

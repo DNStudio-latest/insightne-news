@@ -72,8 +72,8 @@ export default async function AdminPage({ searchParams }) {
       {params.done && <div className="notice">✓ {params.done}</div>}
       {!admin && (
         <p className="note">
-          You are signed in as an <b>editor</b>: you can write stories, upload photos and edit. New stories you send go to
-          Pending, and the admin publishes them.
+          You are signed in as an <b>editor</b>: you can write stories, upload photos and edit.{" "}
+          {settings.editors?.canPublish === true ? "Stories you publish go live straight away." : "New stories you send go to Pending, and the admin publishes them."}
         </p>
       )}
       <RunBox run={lastRun} />

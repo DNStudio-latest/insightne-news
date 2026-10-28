@@ -46,6 +46,10 @@
   "maxOutsideNortheastPerRun": 15,
   "onlyArticlesNewerThanHours": 48,
   "maxArticlesPerRun": 200,
+  "editors": {
+    "_help": "People who sign in with EDITOR_PASSWORD. If canPublish is true, the stories they write go live straight away; if false, they wait in Pending for the admin.",
+    "canPublish": true
+  },
   "facebook": {
     "_help": "Posting to your Facebook page. Needs FACEBOOK_PAGE_ID and FACEBOOK_PAGE_TOKEN in Vercel (see docs/5-FACEBOOK.md). If autoPost is true, every story you APPROVE is also posted to Facebook. If false, use the POST TO FACEBOOK button.",
     "autoPost": false

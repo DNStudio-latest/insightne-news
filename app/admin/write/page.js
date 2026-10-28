@@ -36,6 +36,7 @@ export default async function WritePage({ searchParams }) {
         topics={settings.topics}
         defaultAuthor={settings.defaultAuthor}
         role={role}
+        editorsPublish={settings.editors?.canPublish === true}
       />
     </div>
   );

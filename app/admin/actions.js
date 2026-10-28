@@ -159,9 +159,11 @@ export async function saveOriginal(formData) {
   const role = await requireLogin();
   const id = text(formData, "id", 60);
   const existing = id ? await db.getStory(id) : null;
-  // An editor can update a story that is already published, but a new story goes to Pending for your approval.
-  const editorSends = role === "editor" && formData.get("intent") === "publish" && existing?.status !== "approved";
-  const publish = role === "admin" ? formData.get("intent") === "publish" : existing?.status === "approved";
+  // Editors publish their own stories directly when "editors.canPublish" is true in settings.json;
+  // otherwise a new story from an editor waits in Pending for your approval.
+  const canPublish = role === "admin" || settings.editors?.canPublish === true;
+  const editorSends = !canPublish && formData.get("intent") === "publish" && existing?.status !== "approved";
+  const publish = canPublish ? formData.get("intent") === "publish" || (role === "editor" && existing?.status === "approved") : existing?.status === "approved";
   const backToEditor = (message) => redirect(`/admin/write?${id ? `id=${id}&` : ""}error=${encodeURIComponent(message)}`);
 
   const fields = {

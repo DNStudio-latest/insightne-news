@@ -4,7 +4,7 @@ import { useState } from "react";
 import { saveOriginal } from "../actions.js";
 import { shrinkPhoto } from "../photo.js";
 
-export default function StoryEditor({ story, regions, topics, defaultAuthor, role = "admin" }) {
+export default function StoryEditor({ story, regions, topics, defaultAuthor, role = "admin", editorsPublish = false }) {
   const admin = role === "admin";
   const [preview, setPreview] = useState(story?.image_url || null);
   const [photo, setPhoto] = useState(null);
@@ -183,7 +183,7 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor, rol
             }
           }}
         >
-          {busy ? "SAVING…" : isPublished ? "UPDATE" : admin ? "PUBLISH" : "SEND FOR APPROVAL"}
+          {busy ? "SAVING…" : isPublished ? "UPDATE" : admin || editorsPublish ? "PUBLISH" : "SEND FOR APPROVAL"}
         </button>
       </div>
     </form>

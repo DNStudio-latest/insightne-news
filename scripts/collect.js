@@ -4,7 +4,7 @@ import { db, usingSupabase } from "../lib/db.js";
 import { createClaudeAi } from "../lib/ai.js";
 import { createGeminiAi } from "../lib/gemini.js";
 import { createRulesAi } from "../lib/rules.js";
-import { runPipeline, fillMissingSummaries, fillMissingBengali } from "../lib/pipeline.js";
+import { runPipeline, fillMissingSummaries, fillMissingTranslations } from "../lib/pipeline.js";
 import { addMissingIllustrations } from "../lib/images.js";
 import { settings, states, enabledSources, trustedSourceNames } from "../lib/config.js";
 
@@ -33,7 +33,7 @@ const run = await runPipeline({
 await fillMissingSummaries({ db, ai });
 
 // Bengali headline and summary for each story (only with Gemini).
-await fillMissingBengali({ db, ai });
+await fillMissingTranslations({ db, ai });
 
 // Published stories without a photo get a labelled AI illustration (only if Cloudflare is set up).
 await addMissingIllustrations({ db });

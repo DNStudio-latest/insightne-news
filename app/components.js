@@ -22,6 +22,24 @@ const ALERT_LABELS = {
     iphone: "আইফোনে: Share বোতাম চাপুন, তারপর \"Add to Home Screen\"। হোম স্ক্রিন থেকে InsightNE খুলে সেখানে নোটিফিকেশন চালু করুন।",
     failed: "নোটিফিকেশন চালু করা যায়নি। আবার চেষ্টা করুন।",
   },
+  hi: {
+    start: "खबरों की सूचना", on: "सूचना चालू", stop: "बंद करने के लिए दबाएँ",
+    blocked: "इस साइट की सूचनाएँ बंद हैं। चालू करने के लिए वेब पते के पास ताले के चिह्न पर दबाएँ, फिर Permissions → Notifications → Allow।",
+    iphone: "आईफ़ोन पर: Share बटन दबाएँ, फिर \"Add to Home Screen\"। होम स्क्रीन से InsightNE खोलकर वहाँ सूचना चालू करें।",
+    failed: "सूचना चालू नहीं हो सकी। फिर से कोशिश करें।",
+  },
+  as: {
+    start: "বাতৰিৰ জাননী", on: "জাননী চালু", stop: "বন্ধ কৰিবলৈ টিপক",
+    blocked: "এই চাইটৰ জাননী বন্ধ কৰা আছে। চালু কৰিবলৈ ৱেব ঠিকনাৰ কাষৰ তলাৰ চিহ্নত টিপক, তাৰ পিছত Permissions → Notifications → Allow।",
+    iphone: "আইফোনত: Share বুটামত টিপক, তাৰ পিছত \"Add to Home Screen\"। হোম স্ক্ৰীনৰ পৰা InsightNE খুলি তাত জাননী চালু কৰক।",
+    failed: "জাননী চালু কৰিব পৰা নগ'ল। পুনৰ চেষ্টা কৰক।",
+  },
+  ne: {
+    start: "समाचार सूचना", on: "सूचना सक्रिय", stop: "बन्द गर्न थिच्नुहोस्",
+    blocked: "यस साइटका सूचनाहरू बन्द छन्। खोल्न वेब ठेगानाछेउको तालाको चिन्हमा थिच्नुहोस्, त्यसपछि Permissions → Notifications → Allow।",
+    iphone: "आईफोनमा: Share बटन थिच्नुहोस्, त्यसपछि \"Add to Home Screen\"। होम स्क्रिनबाट InsightNE खोलेर त्यहाँ सूचना सक्रिय गर्नुहोस्।",
+    failed: "सूचना सक्रिय गर्न सकिएन। फेरि प्रयास गर्नुहोस्।",
+  },
 };
 
 export const storyUrl = (story) => `/story/${story.slug}`;
@@ -87,7 +105,7 @@ export function SiteHeader({ current, ticker = [], updatedAt, breaking }) {
             {updatedAt && <span className="updated">{` · ${tr("Updated")} ${timeAgo(updatedAt)}`}</span>}
           </span>
           <span className="topbar-links">
-            <LangSwitch current={lang()} />
+            <LangSwitch current={lang()} label={tr("Language")} />
             <AlertsButton publicKey={pushPublicKey()} lang={lang()} labels={ALERT_LABELS[lang()] || ALERT_LABELS.en} />
             <a href="/today">📰 {tr("Top 5 today")}</a>
             {settings.whatsappChannelUrl && (
@@ -183,7 +201,7 @@ export function WeatherStrip({ weather }) {
     <div className="weather" aria-label="Weather in the state capitals">
       {weather.map((w) => (
         <span key={w.city} className="weather-item">
-          {w.icon} <b>{lang() === "bn" ? w.cityBn : w.city}</b> {w.temp}°
+          {w.icon} <b>{w.names?.[lang()] || w.city}</b> {w.temp}°
         </span>
       ))}
     </div>
@@ -277,7 +295,7 @@ export function StoryGrid({ stories, columns = 3 }) {
   );
 }
 
-export function Videos({ videos, title = lang() === "bn" ? `${settings.youtubeName} দেখুন` : `Watch ${settings.youtubeName}` }) {
+export function Videos({ videos, title = lang() === "en" ? `Watch ${settings.youtubeName}` : `${settings.youtubeName} ${tr("Watch")}` }) {
   if (!videos.length) return null;
   return (
     <section className="videos" aria-label="Videos">

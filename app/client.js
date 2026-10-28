@@ -2,6 +2,7 @@
 // Small pieces that run in the reader's browser.
 import { useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
+import { LANGUAGES } from "../lib/languages.js";
 
 // Copies any text (e.g. the Top 5 message) so it can be pasted into your WhatsApp channel.
 export function CopyTextButton({ text, label, className }) {
@@ -105,18 +106,23 @@ export function SiteAnalytics() {
   return <Analytics beforeSend={(event) => (new URL(event.url).pathname.startsWith("/admin") ? null : event)} />;
 }
 
-// English | বাংলা switch. Sends the reader back to the same page after switching.
-export function LangSwitch({ current }) {
-  const go = (to) => (e) => {
-    e.preventDefault();
-    window.location.href = `/lang/${to}?back=${encodeURIComponent(window.location.pathname + window.location.search)}`;
-  };
+// Language menu (English, বাংলা, हिन्दी, অসমীয়া, नेपाली). Sends the reader back to the same page after switching.
+export function LangSwitch({ current, label = "Language" }) {
   return (
-    <span className="lang-switch">
-      <a href="/lang/en" onClick={go("en")} aria-current={current === "en" ? "true" : undefined}>English</a>
-      {" | "}
-      <a href="/lang/bn" onClick={go("bn")} aria-current={current === "bn" ? "true" : undefined} lang="bn">বাংলা</a>
-    </span>
+    <label className="lang-switch">
+      <span className="sr-only">{label}</span>
+      <span aria-hidden="true">🌐</span>
+      <select
+        value={current}
+        onChange={(e) => {
+          window.location.href = `/lang/${e.target.value}?back=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+        }}
+      >
+        {LANGUAGES.map((l) => (
+          <option key={l.code} value={l.code} lang={l.code}>{l.name}</option>
+        ))}
+      </select>
+    </label>
   );
 }
 

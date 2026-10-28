@@ -306,7 +306,6 @@ main { padding: 20px 0 40px; }
 .wa-share { display: inline-block; background: #25d366; color: #fff !important; text-decoration: none; font-weight: 800; padding: 12px 20px; border-radius: 999px; }
 .wa-copy { font: inherit; font-weight: 800; border: 0; cursor: pointer; background: var(--brand-dark); margin-top: 10px; }
 .top5 ~ .wa-share { display: block; width: 100%; max-width: 420px; text-align: center; box-sizing: border-box; }
-.lang-switch a[aria-current="true"] { text-decoration: underline; text-underline-offset: 3px; }
 .bn-fields { border: 1px dashed var(--line); border-radius: 10px; padding: 8px 12px; display: grid; gap: 10px; }
 .bn-fields > summary { cursor: pointer; font-weight: 700; color: var(--brand); }
 .bn-fields[open] { padding-bottom: 12px; }
@@ -396,3 +395,9 @@ main { padding: 20px 0 40px; }
 .wa-done { color: #1f8a70; font-weight: 800; font-size: 0.85rem; margin-left: auto; }
 .wa-caption { white-space: pre-line; font-size: 0.88rem; color: var(--muted); background: var(--bg); border-radius: 8px; padding: 10px; }
 .wa-send { width: 100%; background: #25d366; }
+
+/* Language menu in the top strip */
+.lang-switch { display: inline-flex; align-items: center; gap: 4px; }
+.lang-switch select { font: inherit; font-size: 0.78rem; font-weight: 700; color: #fff; background: transparent; border: 1px solid rgba(255,255,255,0.45); border-radius: 999px; padding: 1px 6px; cursor: pointer; }
+.lang-switch option { color: #1d2124; background: #fff; }
+.translated-note { font-size: 0.8rem; color: var(--muted); margin: 6px 0 0; }

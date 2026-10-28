@@ -4,7 +4,7 @@ import { settings } from "../../../lib/config.js";
 import { articleBlocks, formatDate, readingMinutes, uniqueSources } from "../../../lib/format.js";
 import { AI_CREDIT } from "../../../lib/images.js";
 import { ViewCounter } from "../../client.js";
-import { initLang, lang, pick, tr } from "../../../lib/lang.js";
+import { initLang, lang, pick, tr, isTranslated } from "../../../lib/lang.js";
 import { WhatsAppFollow, EmailSignup, PageShell, Kicker, Byline, ShareButtons, StoryGrid, SectionHead, storyUrl, absoluteUrl } from "../../components.js";
 
 export const dynamic = "force-dynamic";
@@ -63,6 +63,7 @@ export default async function StoryPage({ params }) {
         <Kicker story={story} />
         <h1>{pick(story, "headline")}</h1>
         <p className="standfirst">{pick(story, "summary")}</p>
+        {isTranslated(story) && <p className="translated-note">🌐 {tr("Translated automatically from English")}</p>}
 
         <div className="article-meta">
           <div className="byline">

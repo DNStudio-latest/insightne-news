@@ -103,7 +103,10 @@ export async function saveEdit(formData) {
   await requireLogin();
   const id = String(formData.get("id"));
   const view = String(formData.get("view") || "pending");
-  const fields = { ...editedFields(formData), ...(await photoFields(formData, await db.getStory(id), (message) => refresh(view, message))) };
+  const existing = await db.getStory(id);
+  const fields = { ...editedFields(formData), ...(await photoFields(formData, existing, (message) => refresh(view, message))) };
+  // If the English text changed, the Hindi/Assamese/Nepali versions are made again at the next collector run.
+  if (fields.headline !== existing?.headline || fields.summary !== existing?.summary) fields.translations = {};
   if (formData.get("andApprove")) {
     await db.updateStory(id, { ...fields, status: "approved", published_at: new Date().toISOString() });
     illustrateLater(id);
@@ -162,6 +165,7 @@ export async function saveOriginal(formData) {
     body_bn: String(formData.get("body_bn") || "").trim().slice(0, 60000) || null,
   };
   if (!fields.headline) backToEditor("Please write a headline.");
+  if (existing && (fields.headline !== existing.headline || fields.summary !== existing.summary)) fields.translations = {};
   if (publish && (!fields.summary || !fields.body)) backToEditor("Please write the intro and the story text before publishing.");
   Object.assign(fields, await photoFields(formData, existing, backToEditor));
 
@@ -235,7 +239,7 @@ export async function notifyReaders(formData) {
   if (story.notified_at && !formData.get("again")) refresh("published", "Readers were already alerted about this story");
   let result;
   try {
-    result = await sendAlert(db, { title: story.headline, title_bn: story.headline_bn, url: `${settings.siteUrl}/story/${story.slug}` });
+    result = await sendAlert(db, { story, url: `${settings.siteUrl}/story/${story.slug}` });
   } catch (err) {
     refresh("published", err.message);
   }

@@ -329,19 +329,28 @@ test("national and world news: only big stories, filed under India or World, and
   assert.ok(regions.includes("Tripura"));
 });
 
-test("Bengali: missing Bengali headlines and summaries are filled, published stories first", async () => {
-  const { fillMissingBengali } = await import("../lib/pipeline.js");
+test("Translations: missing languages are filled in one request, published stories first", async () => {
+  const { fillMissingTranslations } = await import("../lib/pipeline.js");
   reset();
   const a = await db.createStory({ headline: "Pending one", summary: "S1", region: "Tripura", score: 7, status: "pending" }, []);
   const b = await db.createStory({ headline: "Published one", summary: "S2", region: "Assam", score: 7, status: "approved", published_at: new Date().toISOString() }, []);
+  const c = await db.createStory({ headline: "Has Bengali", summary: "S3", headline_bn: "আছে", summary_bn: "আছে", region: "Assam", score: 7, status: "pending" }, []);
   await db.createStory({ headline: "No summary yet", summary: "", region: "Assam", score: 7, status: "pending" }, []);
-  const order = [];
-  const ai = { translate: async ({ headline }) => (order.push(headline), { headline_bn: `বাংলা ${headline}`, summary_bn: "সারাংশ" }) };
-  assert.equal(await fillMissingBengali({ db, ai, log: quiet }), 2);
-  assert.deepEqual(order, ["Published one", "Pending one"]);
-  assert.equal((await db.getStory(b)).headline_bn, "বাংলা Published one");
-  assert.equal((await db.getStory(a)).summary_bn, "সারাংশ");
-  assert.equal(await fillMissingBengali({ db, ai: {}, log: quiet }), 0, "does nothing without a translator");
+  const asked = [];
+  const ai = {
+    translate: async ({ headline }, codes) => (asked.push([headline, codes.join(",")]), Object.fromEntries(codes.map((code) => [code, { headline: `${code} ${headline}`, summary: `${code} summary` }]))),
+  };
+  assert.equal(await fillMissingTranslations({ db, ai, log: quiet }), 3);
+  assert.deepEqual(asked[0], ["Published one", "bn,hi,as,ne"], "published stories first");
+  assert.deepEqual(asked.slice(1).sort(), [["Has Bengali", "hi,as,ne"], ["Pending one", "bn,hi,as,ne"]], "only the missing languages are asked for");
+  const pub = await db.getStory(b);
+  assert.equal(pub.headline_bn, "bn Published one");
+  assert.equal(pub.translations.hi.headline, "hi Published one");
+  assert.equal(pub.translations.ne.summary, "ne summary");
+  assert.equal((await db.getStory(c)).headline_bn, "আছে", "a hand-written Bengali version is kept");
+  assert.equal((await db.getStory(a)).translations.as.headline, "as Pending one");
+  assert.equal(await fillMissingTranslations({ db, ai, log: quiet }), 0, "nothing left to translate");
+  assert.equal(await fillMissingTranslations({ db, ai: {}, log: quiet }), 0, "does nothing without a translator");
 });
 
 test("YouTube links on their own line become videos in a story", async () => {

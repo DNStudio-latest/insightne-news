@@ -194,3 +194,7 @@ revoke all on newsletter_sends from anon, authenticated;
 -- ===== Added for: posting stories to your Facebook page =====
 alter table stories add column if not exists facebook_post_id text;      -- the Facebook post made for this story
 alter table stories add column if not exists facebook_posted_at timestamptz;
+
+-- ===== Added for: Hindi, Assamese and Nepali versions =====
+-- {"hi": {"headline": "...", "summary": "..."}, "as": {...}, "ne": {...}}  (Bengali keeps its own columns)
+alter table stories add column if not exists translations jsonb not null default '{}';

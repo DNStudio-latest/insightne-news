@@ -27,6 +27,14 @@ const siteInfo = {
   ],
 };
 
+const POLL_LABELS = {
+  en: { title: "Readers' poll", votes: "votes", note: "Readers' opinions, not a scientific survey.", failed: "Your vote could not be saved. Please try again." },
+  bn: { title: "পাঠকের মত", votes: "ভোট", note: "এটি পাঠকদের মতামত, বৈজ্ঞানিক সমীক্ষা নয়।", failed: "ভোট দেওয়া যায়নি। আবার চেষ্টা করুন।" },
+  hi: { title: "पाठकों की राय", votes: "वोट", note: "यह पाठकों की राय है, वैज्ञानिक सर्वेक्षण नहीं।", failed: "आपका वोट सेव नहीं हो सका। फिर से कोशिश करें।" },
+  as: { title: "পাঠকৰ মত", votes: "ভোট", note: "এয়া পাঠকৰ মতামত, বৈজ্ঞানিক সমীক্ষা নহয়।", failed: "আপোনাৰ ভোট সংৰক্ষণ কৰিব পৰা নগ'ল। পুনৰ চেষ্টা কৰক।" },
+  ne: { title: "पाठकको राय", votes: "मत", note: "यो पाठकहरूको राय हो, वैज्ञानिक सर्वेक्षण होइन।", failed: "तपाईंको मत सुरक्षित हुन सकेन। फेरि प्रयास गर्नुहोस्।" },
+};
+
 // The current reader poll, in the reader's language, with its vote totals.
 async function readerPoll() {
   try {
@@ -38,8 +46,8 @@ async function readerPoll() {
       poll: { id: poll.id, question: (bn && poll.question_bn) || poll.question, options: poll.options.map((o) => (bn && o.text_bn) || o.text) },
       initialCounts: await db.pollCounts(poll.id, poll.options.length),
       labels: bn
-        ? { title: "পাঠকের মত", votes: "ভোট", note: "এটি পাঠকদের মতামত, বৈজ্ঞানিক সমীক্ষা নয়।", failed: "ভোট দেওয়া যায়নি। আবার চেষ্টা করুন।" }
-        : { title: "Readers' poll", votes: "votes", note: "Readers' opinions, not a scientific survey.", failed: "Your vote could not be saved. Please try again." },
+        ? POLL_LABELS.bn
+        : POLL_LABELS[lang()] || POLL_LABELS.en,
     };
   } catch {
     return null; // If the poll tables are not set up yet, the page simply shows no poll.

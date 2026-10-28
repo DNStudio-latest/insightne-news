@@ -1,5 +1,6 @@
 // A reader's browser signs up for (POST) or stops (DELETE) breaking-news alerts.
 import { db } from "../../../lib/db.js";
+import { validLang } from "../../../lib/languages.js";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,7 @@ export async function POST(request) {
     if (!validEndpoint(subscription?.endpoint) || typeof keys?.p256dh !== "string" || typeof keys?.auth !== "string") {
       return Response.json({ error: "bad subscription" }, { status: 400 });
     }
-    await db.savePushSubscription({ endpoint: subscription.endpoint, keys: { p256dh: keys.p256dh.slice(0, 200), auth: keys.auth.slice(0, 100) }, lang: lang === "bn" ? "bn" : "en" });
+    await db.savePushSubscription({ endpoint: subscription.endpoint, keys: { p256dh: keys.p256dh.slice(0, 200), auth: keys.auth.slice(0, 100) }, lang: validLang(lang) });
     return Response.json({ ok: true });
   } catch {
     return Response.json({ error: "failed" }, { status: 500 });

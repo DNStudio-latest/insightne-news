@@ -198,3 +198,17 @@ alter table stories add column if not exists facebook_posted_at timestamptz;
 -- ===== Added for: Hindi, Assamese and Nepali versions =====
 -- {"hi": {"headline": "...", "summary": "..."}, "as": {...}, "ne": {...}}  (Bengali keeps its own columns)
 alter table stories add column if not exists translations jsonb not null default '{}';
+
+-- ===== Added for: named editors / reporters =====
+-- Each person who may write for the site. Their name appears as the byline ("By …") on stories they write.
+-- Passwords are stored only as a scrambled check value, never as the real password.
+create table if not exists editors (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  password_hash text not null,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+alter table editors enable row level security;
+grant select, insert, update, delete on editors to service_role;
+revoke all on editors from anon, authenticated;

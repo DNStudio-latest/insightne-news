@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { db, cleanSearch } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
-import { currentRole } from "../../lib/auth.js";
+import { currentUser } from "../../lib/auth.js";
 import { formatDate } from "../../lib/format.js";
 import { logout } from "./actions.js";
 import StoryActions from "./StoryActions.js";
@@ -26,9 +26,9 @@ const SORTS = {
 };
 
 export default async function AdminPage({ searchParams }) {
-  const role = await currentRole();
-  if (!role) redirect("/admin/login");
-  const admin = role === "admin";
+  const user = await currentUser();
+  if (!user) redirect("/admin/login");
+  const admin = user.role === "admin";
   const params = await searchParams;
   const view = VIEWS[params.view] && (admin || params.view !== "rejected") ? params.view : "pending";
   const q = cleanSearch(params.q);
@@ -64,6 +64,7 @@ export default async function AdminPage({ searchParams }) {
             <a href="/admin/whatsapp">📲 WhatsApp posts</a>
             <a href="/admin/polls">📊 Polls</a>
             <a href="/admin/newsletter">✉ Daily email</a>
+            <a href="/admin/editors">👥 Editors</a>
           </>
         )}
         <a href="/" target="_blank">View website ↗</a>
@@ -72,7 +73,7 @@ export default async function AdminPage({ searchParams }) {
       {params.done && <div className="notice">✓ {params.done}</div>}
       {!admin && (
         <p className="note">
-          You are signed in as an <b>editor</b>: you can write stories, upload photos and edit.{" "}
+          Signed in as <b>{user.name}</b> (editor): you can write stories, upload photos and edit. Your name appears as the byline on stories you write.{" "}
           {settings.editors?.canPublish === true ? "Stories you publish go live straight away." : "New stories you send go to Pending, and the admin publishes them."}
         </p>
       )}

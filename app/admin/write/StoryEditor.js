@@ -143,8 +143,8 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor, rol
       </div>
 
       <label>
-        Written by
-        <input type="text" name="author" defaultValue={story?.author || defaultAuthor} maxLength={120} />
+        Written by <span className="hint">— shown on the story as “By …”{admin ? "; use “InsightNE News Desk” for desk reports" : ""}</span>
+        <input type="text" name="author" defaultValue={story?.author || defaultAuthor} maxLength={120} readOnly={!admin} />
       </label>
 
       {admin && (

@@ -11,7 +11,7 @@ import { topStories } from "../../lib/top.js";
 import { formatDay } from "../../lib/format.js";
 import { db } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
-import { currentRole, roleForPassword, startSession, endSession } from "../../lib/auth.js";
+import { currentRole, currentUser, userForPassword, hashPassword, startSession, endSession } from "../../lib/auth.js";
 
 // Any signed-in person (admin or editor). Returns "admin" or "editor".
 async function requireLogin() {
@@ -65,9 +65,9 @@ function editedFields(formData) {
 export async function login(formData) {
   // A short pause makes guessing passwords very slow.
   await new Promise((r) => setTimeout(r, 800));
-  const role = roleForPassword(String(formData.get("password") || ""));
-  if (!role) redirect("/admin/login?wrong=1");
-  await startSession(role);
+  const user = await userForPassword(String(formData.get("password") || ""));
+  if (!user) redirect("/admin/login?wrong=1");
+  await startSession(user);
   redirect("/admin");
 }
 
@@ -157,6 +157,7 @@ const text = (formData, name, max) => String(formData.get(name) || "").trim().sl
 // Your own reports, written in the "Write a story" editor.
 export async function saveOriginal(formData) {
   const role = await requireLogin();
+  const user = await currentUser();
   const id = text(formData, "id", 60);
   const existing = id ? await db.getStory(id) : null;
   // Editors publish their own stories directly when "editors.canPublish" is true in settings.json;
@@ -173,7 +174,9 @@ export async function saveOriginal(formData) {
     body: String(formData.get("body") || "").trim().slice(0, 60000),
     region: regions.includes(formData.get("region")) ? formData.get("region") : regions[0],
     topic: settings.topics.includes(formData.get("topic")) ? formData.get("topic") : null,
-    author: text(formData, "author", 120) || settings.defaultAuthor,
+    // The byline. Editors: their own name on new stories; editing someone else's story keeps that writer's name.
+    // Admin: what you typed in "Written by" (your name is filled in for you).
+    author: role === "editor" ? existing?.author || user.name : text(formData, "author", 120) || user.name || settings.defaultAuthor,
     headline_bn: text(formData, "headline_bn", 300) || null,
     summary_bn: text(formData, "summary_bn", 2000) || null,
     body_bn: String(formData.get("body_bn") || "").trim().slice(0, 60000) || null,
@@ -306,4 +309,47 @@ export async function postFacebook(formData) {
     refresh("published", err.message);
   }
   refresh("published", "Posted on your Facebook page");
+}
+
+// ---- Editors / reporters (admin only) ----
+const backToEditors = (message) => redirect(`/admin/editors?done=${encodeURIComponent(message)}`);
+
+export async function addEditor(formData) {
+  await requireAdmin();
+  const name = text(formData, "name", 80);
+  const password = String(formData.get("password") || "");
+  if (!name) backToEditors("Please write the person's name.");
+  if (password.length < 8) backToEditors("The password must have at least 8 characters.");
+  if (password === process.env.ADMIN_PASSWORD) backToEditors("Please choose a password different from your own.");
+  await db.createEditor({ name, password_hash: hashPassword(password) });
+  backToEditors(`${name} can now sign in. Give them the password in person or by phone.`);
+}
+
+export async function changeEditor(formData) {
+  await requireAdmin();
+  const id = text(formData, "id", 60);
+  const editor = await db.getEditor(id);
+  if (!editor) backToEditors("That editor was not found.");
+  const what = String(formData.get("what") || "");
+  if (what === "remove") {
+    await db.deleteEditor(id);
+    backToEditors(`${editor.name} was removed and is signed out. Their stories stay on the website.`);
+  }
+  if (what === "toggle") {
+    await db.updateEditor(id, { active: !editor.active });
+    backToEditors(editor.active ? `${editor.name} is paused and signed out.` : `${editor.name} can sign in again.`);
+  }
+  if (what === "password") {
+    const password = String(formData.get("password") || "");
+    if (password.length < 8) backToEditors("The new password must have at least 8 characters.");
+    await db.updateEditor(id, { password_hash: hashPassword(password) });
+    backToEditors(`New password saved for ${editor.name}.`);
+  }
+  if (what === "rename") {
+    const name = text(formData, "name", 80);
+    if (!name) backToEditors("Please write a name.");
+    await db.updateEditor(id, { name });
+    backToEditors(`Name changed to ${name}. New stories will show this byline.`);
+  }
+  backToEditors("Nothing changed.");
 }

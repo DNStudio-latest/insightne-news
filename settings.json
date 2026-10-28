@@ -20,7 +20,7 @@
   },
   "social": {
     "_help": "Links to your social media pages. Leave empty (\"\") to hide one. They appear as a row of buttons in the footer.",
-    "facebook": "",
+    "facebook": "https://www.facebook.com/InsightNENews",
     "instagram": "https://www.instagram.com/insightne/",
     "x": "",
     "telegram": ""

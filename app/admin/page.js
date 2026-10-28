@@ -57,6 +57,7 @@ export default async function AdminPage({ searchParams }) {
         <a href="/admin?view=published" aria-current={view === "published" ? "page" : undefined}>Published</a>
         <a href="/admin?view=rejected" aria-current={view === "rejected" ? "page" : undefined}>Rejected</a>
         <a href="/admin/write">✍ Write story</a>
+        <a href="/admin/whatsapp">📲 WhatsApp posts</a>
         <a href="/admin/polls">📊 Polls</a>
         <a href="/admin/newsletter">✉ Daily email</a>
         <a href="/" target="_blank">View website ↗</a>

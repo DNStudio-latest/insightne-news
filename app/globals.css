@@ -386,3 +386,13 @@ main { padding: 20px 0 40px; }
 /* WhatsApp card links on the approval page */
 .card-links { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 0.85rem; font-weight: 700; color: var(--muted); }
 .card-links a, .card-links button { font: inherit; font-size: 0.82rem; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--text); text-decoration: none; cursor: pointer; }
+
+/* WhatsApp posts page */
+.wa-post img { width: 100%; max-width: 420px; display: block; margin: 10px auto; border-radius: 10px; border: 1px solid var(--line); aspect-ratio: 1080 / 1350; background: #0a3540; }
+.wa-post.posted { opacity: 0.7; }
+.wa-types { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.wa-types button { font: inherit; font-size: 0.8rem; font-weight: 700; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; }
+.wa-types button[aria-pressed="true"] { background: var(--text); color: var(--card); }
+.wa-done { color: #1f8a70; font-weight: 800; font-size: 0.85rem; margin-left: auto; }
+.wa-caption { white-space: pre-line; font-size: 0.88rem; color: var(--muted); background: var(--bg); border-radius: 8px; padding: 10px; }
+.wa-send { width: 100%; background: #25d366; }

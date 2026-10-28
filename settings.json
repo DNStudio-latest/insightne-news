@@ -12,7 +12,7 @@
   "_googleHelp": "Only needed if Google Search Console asks for an 'HTML tag': paste just the code inside content=\"...\" here.",
   "social": {
     "_help": "Links to your social media pages. Leave empty (\"\") to hide one. They appear as a row of buttons in the footer.",
-    "facebook": "https://www.facebook.com/dnprasenjit",
+    "facebook": "",
     "instagram": "https://www.instagram.com/insightne/",
     "x": "",
     "telegram": ""

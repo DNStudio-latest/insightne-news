@@ -53,7 +53,7 @@ export default async function StoryPage({ params }) {
     mainEntityOfPage: absoluteUrl(storyUrl(story)),
     ...(story.image_url ? { image: [story.image_url] } : {}),
     author: isOriginal ? { "@type": "Person", name: story.author || settings.defaultAuthor } : { "@type": "Organization", name: settings.siteName },
-    publisher: { "@type": "Organization", name: settings.siteName },
+    publisher: { "@type": "Organization", name: settings.siteName, url: settings.siteUrl, logo: { "@type": "ImageObject", url: `${settings.siteUrl}/icon`, width: 192, height: 192 } },
   };
 
   return (

@@ -18,6 +18,15 @@ function acrossTheRegion(stories, count) {
   return picked;
 }
 
+// Tells Google the site's name, logo and social pages (shown in Google Search and Google News).
+const siteInfo = {
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@type": "NewsMediaOrganization", "@id": `${settings.siteUrl}/#org`, name: settings.siteName, url: settings.siteUrl, logo: { "@type": "ImageObject", url: `${settings.siteUrl}/icon`, width: 192, height: 192 }, sameAs: [settings.youtubeUrl, settings.whatsappChannelUrl].filter(Boolean), publishingPrinciples: `${settings.siteUrl}/about` },
+    { "@type": "WebSite", name: settings.siteName, url: settings.siteUrl, publisher: { "@id": `${settings.siteUrl}/#org` }, potentialAction: { "@type": "SearchAction", target: `${settings.siteUrl}/search?q={q}`, "query-input": "required name=q" } },
+  ],
+};
+
 // The current reader poll, in the reader's language, with its vote totals.
 async function readerPoll() {
   try {
@@ -64,6 +73,7 @@ export default async function HomePage() {
   return (
     <PageShell ticker={stories.slice(0, 10)} updatedAt={stories[0].published_at}>
       <LiveUpdates since={stories[0].published_at} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteInfo).replace(/</g, "\u003c") }} />
       <h1 className="sr-only">{settings.siteName}: {settings.tagline}</h1>
 
       <WeatherStrip weather={weather} />

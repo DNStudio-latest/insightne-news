@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { db } from "../../../lib/db.js";
-import { isLoggedIn } from "../../../lib/auth.js";
+import { currentRole } from "../../../lib/auth.js";
 import { topStories } from "../../../lib/top.js";
 import WhatsAppPosts from "./WhatsAppPosts.js";
 
@@ -9,7 +9,9 @@ export const metadata = { title: "WhatsApp posts", robots: { index: false, follo
 
 // Today's posts for the WhatsApp channel, made automatically: breaking stories of the last 24 hours first, then the Top 5.
 export default async function WhatsAppPage() {
-  if (!(await isLoggedIn())) redirect("/admin/login");
+  const role = await currentRole();
+  if (!role) redirect("/admin/login");
+  if (role !== "admin") redirect("/admin"); // admin only
   const since = Date.now() - 24 * 3600 * 1000;
   const [breaking, top] = await Promise.all([db.listStories({ status: "approved", breaking: true, limit: 5 }), topStories(db, 5)]);
   const stories = [];

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { db } from "../../../lib/db.js";
-import { isLoggedIn } from "../../../lib/auth.js";
+import { currentRole } from "../../../lib/auth.js";
 import { formatDate } from "../../../lib/format.js";
 import { savePoll, togglePoll, deletePoll } from "../actions.js";
 
@@ -8,7 +8,9 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Reader polls", robots: { index: false, follow: false } };
 
 export default async function PollsPage({ searchParams }) {
-  if (!(await isLoggedIn())) redirect("/admin/login");
+  const role = await currentRole();
+  if (!role) redirect("/admin/login");
+  if (role !== "admin") redirect("/admin"); // admin only
   const { done, error } = await searchParams;
   const polls = await db.listPolls();
   const counts = await Promise.all(polls.map((p) => db.pollCounts(p.id, p.options.length)));

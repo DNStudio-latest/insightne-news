@@ -4,7 +4,8 @@ import { useState } from "react";
 import { saveOriginal } from "../actions.js";
 import { shrinkPhoto } from "../photo.js";
 
-export default function StoryEditor({ story, regions, topics, defaultAuthor }) {
+export default function StoryEditor({ story, regions, topics, defaultAuthor, role = "admin" }) {
+  const admin = role === "admin";
   const [preview, setPreview] = useState(story?.image_url || null);
   const [photo, setPhoto] = useState(null);
   const [galleryFiles, setGalleryFiles] = useState([]);
@@ -146,9 +147,11 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor }) {
         <input type="text" name="author" defaultValue={story?.author || defaultAuthor} maxLength={120} />
       </label>
 
-      <label className="check">
-        <input type="checkbox" name="is_lead" defaultChecked={Boolean(story?.is_lead)} /> Make this the lead story on the front page
-      </label>
+      {admin && (
+        <label className="check">
+          <input type="checkbox" name="is_lead" defaultChecked={Boolean(story?.is_lead)} /> Make this the lead story on the front page
+        </label>
+      )}
 
       {story?.needs_check && (
         <label className="confirm">
@@ -157,9 +160,11 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor }) {
       )}
 
       <div className="editor-actions">
-        <button className="btn btn-edit" type="submit" name="intent" value="draft" disabled={busy} formNoValidate>
-          {isPublished ? "MOVE TO DRAFTS" : "SAVE DRAFT"}
-        </button>
+        {(admin || !isPublished) && (
+          <button className="btn btn-edit" type="submit" name="intent" value="draft" disabled={busy} formNoValidate>
+            {isPublished ? "MOVE TO DRAFTS" : "SAVE DRAFT"}
+          </button>
+        )}
         <button
           className="btn btn-approve"
           type="submit"
@@ -178,7 +183,7 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor }) {
             }
           }}
         >
-          {busy ? "SAVING…" : isPublished ? "UPDATE" : "PUBLISH"}
+          {busy ? "SAVING…" : isPublished ? "UPDATE" : admin ? "PUBLISH" : "SEND FOR APPROVAL"}
         </button>
       </div>
     </form>

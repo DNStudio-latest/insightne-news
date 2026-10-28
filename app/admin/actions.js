@@ -11,10 +11,19 @@ import { topStories } from "../../lib/top.js";
 import { formatDay } from "../../lib/format.js";
 import { db } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
-import { isLoggedIn, passwordIsCorrect, startSession, endSession } from "../../lib/auth.js";
+import { currentRole, roleForPassword, startSession, endSession } from "../../lib/auth.js";
 
+// Any signed-in person (admin or editor). Returns "admin" or "editor".
 async function requireLogin() {
-  if (!(await isLoggedIn())) redirect("/admin/login");
+  const role = await currentRole();
+  if (!role) redirect("/admin/login");
+  return role;
+}
+
+// Only you (the admin): publishing, rejecting, polls, alerts, Facebook, email.
+async function requireAdmin() {
+  const role = await requireLogin();
+  if (role !== "admin") redirect(`/admin?done=${encodeURIComponent("Only the admin can do that.")}`);
 }
 
 function refresh(view = "pending", notice = "") {
@@ -56,8 +65,9 @@ function editedFields(formData) {
 export async function login(formData) {
   // A short pause makes guessing passwords very slow.
   await new Promise((r) => setTimeout(r, 800));
-  if (!passwordIsCorrect(String(formData.get("password") || ""))) redirect("/admin/login?wrong=1");
-  await startSession();
+  const role = roleForPassword(String(formData.get("password") || ""));
+  if (!role) redirect("/admin/login?wrong=1");
+  await startSession(role);
   redirect("/admin");
 }
 
@@ -67,7 +77,7 @@ export async function logout() {
 }
 
 export async function approve(formData) {
-  await requireLogin();
+  await requireAdmin();
   const id = String(formData.get("id"));
   // Nothing goes on the website without a summary.
   const story = await db.getStory(id);
@@ -78,7 +88,7 @@ export async function approve(formData) {
 }
 
 export async function reject(formData) {
-  await requireLogin();
+  await requireAdmin();
   await db.updateStory(String(formData.get("id")), { status: "rejected", published_at: null });
   refresh("pending", "Rejected");
 }
@@ -100,14 +110,14 @@ async function photoFields(formData, existing, onError) {
 }
 
 export async function saveEdit(formData) {
-  await requireLogin();
+  const role = await requireLogin();
   const id = String(formData.get("id"));
   const view = String(formData.get("view") || "pending");
   const existing = await db.getStory(id);
   const fields = { ...editedFields(formData), ...(await photoFields(formData, existing, (message) => refresh(view, message))) };
   // If the English text changed, the Hindi/Assamese/Nepali versions are made again at the next collector run.
   if (fields.headline !== existing?.headline || fields.summary !== existing?.summary) fields.translations = {};
-  if (formData.get("andApprove")) {
+  if (formData.get("andApprove") && role === "admin") {
     await db.updateStory(id, { ...fields, status: "approved", published_at: new Date().toISOString() });
     illustrateLater(id);
     refresh("pending", "Saved and published");
@@ -117,26 +127,26 @@ export async function saveEdit(formData) {
 }
 
 export async function unpublish(formData) {
-  await requireLogin();
+  await requireAdmin();
   await db.updateStory(String(formData.get("id")), { status: "pending", published_at: null });
   refresh("published", "Taken off the website and moved back to Pending");
 }
 
 export async function restore(formData) {
-  await requireLogin();
+  await requireAdmin();
   await db.updateStory(String(formData.get("id")), { status: "pending" });
   refresh("rejected", "Moved back to Pending");
 }
 
 export async function toggleBreaking(formData) {
-  await requireLogin();
+  await requireAdmin();
   const on = !formData.get("remove");
   await db.updateStory(String(formData.get("id")), { is_breaking: on });
   refresh("published", on ? "Breaking banner is on for this story (it switches off by itself after 12 hours)" : "Breaking banner switched off");
 }
 
 export async function makeLead(formData) {
-  await requireLogin();
+  await requireAdmin();
   const id = String(formData.get("id"));
   await db.setLead(formData.get("remove") ? null : id);
   refresh("published", formData.get("remove") ? "Removed as lead story" : "This is now the lead story on the front page");
@@ -146,10 +156,12 @@ const text = (formData, name, max) => String(formData.get(name) || "").trim().sl
 
 // Your own reports, written in the "Write a story" editor.
 export async function saveOriginal(formData) {
-  await requireLogin();
+  const role = await requireLogin();
   const id = text(formData, "id", 60);
   const existing = id ? await db.getStory(id) : null;
-  const publish = formData.get("intent") === "publish";
+  // An editor can update a story that is already published, but a new story goes to Pending for your approval.
+  const editorSends = role === "editor" && formData.get("intent") === "publish" && existing?.status !== "approved";
+  const publish = role === "admin" ? formData.get("intent") === "publish" : existing?.status === "approved";
   const backToEditor = (message) => redirect(`/admin/write?${id ? `id=${id}&` : ""}error=${encodeURIComponent(message)}`);
 
   const fields = {
@@ -190,17 +202,18 @@ export async function saveOriginal(formData) {
   if (existing) await db.updateStory(id, fields);
   else storyId = await db.createStory({ ...fields, score: null, needs_check: false, check_reasons: [] });
 
-  const wantsLead = Boolean(formData.get("is_lead"));
+  const wantsLead = role === "admin" ? Boolean(formData.get("is_lead")) : Boolean(existing?.is_lead);
   if (publish && wantsLead) await db.setLead(storyId);
   if (publish && !existing?.published_at) illustrateLater(storyId);
   else if (existing?.is_lead && (!wantsLead || !publish)) await db.setLead(null);
 
+  if (editorSends) refresh("pending", "Sent for approval — the admin will publish it");
   refresh(publish ? "published" : "pending", publish ? "Your story is published" : "Draft saved — find it under Pending");
 }
 
 // ---- Reader polls ----
 export async function savePoll(formData) {
-  await requireLogin();
+  await requireAdmin();
   const question = text(formData, "question", 200);
   const options = [0, 1, 2, 3]
     .map((i) => ({ text: text(formData, `option${i}`, 80), text_bn: text(formData, `option${i}_bn`, 120) || null }))
@@ -214,7 +227,7 @@ export async function savePoll(formData) {
 }
 
 export async function togglePoll(formData) {
-  await requireLogin();
+  await requireAdmin();
   const id = text(formData, "id", 60);
   const open = !formData.get("close");
   if (open) for (const p of await db.listPolls()) if (p.is_open) await db.updatePoll(p.id, { is_open: false });
@@ -224,7 +237,7 @@ export async function togglePoll(formData) {
 }
 
 export async function deletePoll(formData) {
-  await requireLogin();
+  await requireAdmin();
   await db.deletePoll(text(formData, "id", 60));
   revalidatePath("/", "layout");
   redirect(`/admin/polls?done=${encodeURIComponent("Poll deleted")}`);
@@ -232,7 +245,7 @@ export async function deletePoll(formData) {
 
 // ---- Phone alerts ----
 export async function notifyReaders(formData) {
-  await requireLogin();
+  await requireAdmin();
   const id = text(formData, "id", 60);
   const story = await db.getStory(id);
   if (story?.status !== "approved") refresh("published", "Only published stories can be sent as alerts");
@@ -249,7 +262,7 @@ export async function notifyReaders(formData) {
 
 // ---- Daily email ----
 export async function sendNewsletter(formData) {
-  await requireLogin();
+  await requireAdmin();
   const back = (message) => redirect(`/admin/newsletter?done=${encodeURIComponent(message)}`);
   const [last] = await db.lastNewsletters(1);
   if (last && Date.now() - new Date(last.sent_at).getTime() < 20 * 3600000 && !formData.get("again")) {
@@ -281,7 +294,7 @@ export async function sendNewsletter(formData) {
 
 // ---- Facebook ----
 export async function postFacebook(formData) {
-  await requireLogin();
+  await requireAdmin();
   const story = await db.getStory(text(formData, "id", 60));
   if (story?.status !== "approved") refresh("published", "Only published stories can be posted to Facebook");
   if (story.facebook_post_id) refresh("published", "This story is already on your Facebook page");

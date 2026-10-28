@@ -4,7 +4,7 @@ import { useState } from "react";
 import { approve, reject, saveEdit, unpublish, restore, makeLead, toggleBreaking, notifyReaders, postFacebook } from "./actions.js";
 import { shrinkPhoto } from "./photo.js";
 
-export default function StoryActions({ story, view, regions, topics, facebook = false }) {
+export default function StoryActions({ story, view, regions, topics, facebook = false, admin = true }) {
   // In no-AI mode a story arrives without a summary; WRITE SUMMARY opens the writing box.
   const needsSummary = !story.summary?.trim();
   const [editing, setEditing] = useState(false);
@@ -40,13 +40,26 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
 
   return (
     <>
-      {view === "pending" && story.needs_check && !needsSummary && (
+      {admin && view === "pending" && story.needs_check && !needsSummary && (
         <label className="confirm">
           <input type="checkbox" form={approveFormId} required /> I have checked this story before approving
         </label>
       )}
       <div className="actions">
-        {view === "pending" && (
+        {/* Editors can only write and edit; publishing and everything else is for the admin. */}
+        {!admin &&
+          (needsSummary && story.kind === "original" ? (
+            <a className="btn btn-approve" href={`/admin/write?id=${story.id}`} style={{ gridColumn: "span 2", textDecoration: "none" }}>
+              CONTINUE WRITING
+            </a>
+          ) : needsSummary ? (
+            <button className="btn btn-approve" type="button" style={{ gridColumn: "span 2" }} onClick={() => setEditing(!editing)} aria-expanded={editing}>
+              {editing ? "CLOSE" : "WRITE SUMMARY"}
+            </button>
+          ) : (
+            editButton
+          ))}
+        {admin && view === "pending" && (
           <>
             {needsSummary && story.kind === "original" ? (
               <a className="btn btn-approve" href={`/admin/write?id=${story.id}`} style={{ gridColumn: "span 2", textDecoration: "none" }}>
@@ -71,7 +84,7 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
             </form>
           </>
         )}
-        {view === "published" && (
+        {admin && view === "published" && (
           <>
             <form action={unpublish}>
               {id}
@@ -124,7 +137,7 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
             </div>
           </>
         )}
-        {view === "rejected" && (
+        {admin && view === "rejected" && (
           <form action={restore}>
             {id}
             <button className="btn btn-edit" type="submit">TO PENDING</button>
@@ -212,7 +225,7 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
           )}
           <div className="edit-buttons">
             <button className="btn btn-edit" type="submit" formNoValidate disabled={busy}>{busy ? "SAVING…" : "SAVE"}</button>
-            {view === "pending" && (
+            {admin && view === "pending" && (
               <button className="btn btn-approve" type="submit" name="andApprove" value="1" disabled={busy}>SAVE & APPROVE</button>
             )}
           </div>

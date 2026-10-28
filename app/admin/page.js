@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { db, cleanSearch } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
-import { isLoggedIn } from "../../lib/auth.js";
+import { currentRole } from "../../lib/auth.js";
 import { formatDate } from "../../lib/format.js";
 import { logout } from "./actions.js";
 import StoryActions from "./StoryActions.js";
@@ -26,9 +26,11 @@ const SORTS = {
 };
 
 export default async function AdminPage({ searchParams }) {
-  if (!(await isLoggedIn())) redirect("/admin/login");
+  const role = await currentRole();
+  if (!role) redirect("/admin/login");
+  const admin = role === "admin";
   const params = await searchParams;
-  const view = VIEWS[params.view] ? params.view : "pending";
+  const view = VIEWS[params.view] && (admin || params.view !== "rejected") ? params.view : "pending";
   const q = cleanSearch(params.q);
   const state = regions.includes(params.state) ? params.state : "";
   const sort = SORTS[params.sort] ? params.sort : "newest";
@@ -46,7 +48,7 @@ export default async function AdminPage({ searchParams }) {
   return (
     <div className="wrap">
       <div className="admin-bar">
-        <h1>{settings.siteName} · Approvals</h1>
+        <h1>{settings.siteName} · {admin ? "Approvals" : "Editor"}</h1>
         <form action={logout}>
           <button className="btn btn-plain" type="submit">Sign out</button>
         </form>
@@ -55,15 +57,25 @@ export default async function AdminPage({ searchParams }) {
       <nav className="tabs">
         <a href="/admin?view=pending" aria-current={view === "pending" ? "page" : undefined}>Pending ({pendingCount})</a>
         <a href="/admin?view=published" aria-current={view === "published" ? "page" : undefined}>Published</a>
-        <a href="/admin?view=rejected" aria-current={view === "rejected" ? "page" : undefined}>Rejected</a>
+        {admin && <a href="/admin?view=rejected" aria-current={view === "rejected" ? "page" : undefined}>Rejected</a>}
         <a href="/admin/write">✍ Write story</a>
-        <a href="/admin/whatsapp">📲 WhatsApp posts</a>
-        <a href="/admin/polls">📊 Polls</a>
-        <a href="/admin/newsletter">✉ Daily email</a>
+        {admin && (
+          <>
+            <a href="/admin/whatsapp">📲 WhatsApp posts</a>
+            <a href="/admin/polls">📊 Polls</a>
+            <a href="/admin/newsletter">✉ Daily email</a>
+          </>
+        )}
         <a href="/" target="_blank">View website ↗</a>
       </nav>
 
       {params.done && <div className="notice">✓ {params.done}</div>}
+      {!admin && (
+        <p className="note">
+          You are signed in as an <b>editor</b>: you can write stories, upload photos and edit. New stories you send go to
+          Pending, and the admin publishes them.
+        </p>
+      )}
       <RunBox run={lastRun} />
 
       <form className="admin-filter" action="/admin" role="search">
@@ -102,7 +114,7 @@ export default async function AdminPage({ searchParams }) {
           </div>
         )}
         {stories.map((story) => (
-          <AdminStory key={story.id} story={story} view={view} />
+          <AdminStory key={story.id} story={story} view={view} admin={admin} />
         ))}
       </div>
     </div>
@@ -127,7 +139,7 @@ function RunBox({ run }) {
   );
 }
 
-function AdminStory({ story, view }) {
+function AdminStory({ story, view, admin }) {
   return (
     <article className="story">
       <div className="meta">
@@ -174,7 +186,7 @@ function AdminStory({ story, view }) {
         ))}
       </ul>
 
-      <StoryActions story={story} view={view} regions={regions} topics={settings.topics} facebook={facebookReady()} />
+      <StoryActions story={story} view={view} regions={regions} topics={settings.topics} facebook={facebookReady()} admin={admin} />
     </article>
   );
 }

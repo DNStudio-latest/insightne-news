@@ -114,6 +114,14 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
               </form>
             )}
             {story.facebook_post_id && <p className="note" style={{ gridColumn: "1 / -1", margin: 0 }}>📘 Posted on Facebook</p>}
+            {/* Big picture cards for the WhatsApp channel: open, save the picture, post it with the caption. */}
+            <div className="card-links">
+              <span>🖼 WhatsApp card:</span>
+              <a href={`/card/${story.slug}?type=live`} target="_blank" rel="noopener">🔴 LIVE</a>
+              <a href={`/card/${story.slug}?type=breaking`} target="_blank" rel="noopener">BREAKING</a>
+              <a href={`/card/${story.slug}?type=news`} target="_blank" rel="noopener">NEWS</a>
+              <CopyCaption story={story} />
+            </div>
           </>
         )}
         {view === "rejected" && (
@@ -211,5 +219,27 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
         </form>
       )}
     </>
+  );
+}
+
+// The words to post under the card picture: headline, short summary and the short link.
+function CopyCaption({ story }) {
+  const [copied, setCopied] = useState(false);
+  const caption = `*${story.headline}*\n\n${story.summary || ""}\n\n👉 Read more: insightnenews.in/s/${story.slug.split("-").pop()}`;
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(caption);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 3000);
+        } catch {
+          window.prompt("Copy this caption:", caption);
+        }
+      }}
+    >
+      {copied ? "✓ Caption copied" : "📋 Copy caption"}
+    </button>
   );
 }

@@ -382,3 +382,7 @@ main { padding: 20px 0 40px; }
 .footer-nl .nl-form { max-width: 560px; }
 .footer-nl strong { color: #fff; }
 .footer-nl .nl-small { color: inherit; opacity: 0.75; }
+
+/* WhatsApp card links on the approval page */
+.card-links { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+.card-links a, .card-links button { font: inherit; font-size: 0.82rem; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--text); text-decoration: none; cursor: pointer; }

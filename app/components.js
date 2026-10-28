@@ -8,6 +8,7 @@ import { initLang, lang, pick, tr } from "../lib/lang.js";
 import { LangSwitch, AlertsButton, NewsletterSignup } from "./client.js";
 import { newsletterReady } from "../lib/newsletter.js";
 import { pushPublicKey } from "../lib/push.js";
+import { indiaMatch } from "../lib/cricket.js";
 
 const ALERT_LABELS = {
   en: {
@@ -83,6 +84,53 @@ export function Kicker({ story }) {
 
 const BREAKING_HOURS = 12;
 
+// India men's live cricket score.
+const scoreText = (i) => `${i.runs ?? 0}${i.wickets === 10 || i.wickets == null ? "" : `/${i.wickets}`}${i.overs != null ? ` (${i.overs})` : ""}`;
+const teamScore = (match, team) =>
+  match.innings
+    .filter((i) => i.team === team.name)
+    .map(scoreText)
+    .join(" & ");
+
+// A thin strip at the top of every page, only while India is playing.
+export function CricketBar({ match }) {
+  if (!match?.live) return null;
+  return (
+    <a className="cricket-bar" href="/#cricket">
+      <span className="cricket-label">🏏 LIVE</span>
+      <span className="cricket-text">
+        {match.teams.map((t) => `${t.short} ${teamScore(match, t) || "–"}`).join("  ·  ")}
+      </span>
+    </a>
+  );
+}
+
+// The bigger score box on the front page (live, today's result, or the next India match).
+export function CricketBox({ match }) {
+  if (!match) return null;
+  return (
+    <section className="cricket" id="cricket" aria-label="India cricket score">
+      <div className="cricket-head">
+        <span className={`cricket-pill${match.live ? " live" : ""}`}>{match.live ? "● LIVE" : match.ended ? "RESULT" : "UPCOMING"}</span>
+        <span>🏏 {match.type ? `${match.type} · ` : ""}{match.name}</span>
+      </div>
+      <div className="cricket-teams">
+        {match.teams.map((t) => (
+          <div key={t.name} className="cricket-team">
+            {t.img && <img src={t.img} alt="" width={28} height={28} loading="lazy" />}
+            <b>{t.name}</b>
+            <span>{teamScore(match, t) || (match.live ? "Yet to bat" : "")}</span>
+          </div>
+        ))}
+      </div>
+      {match.status && <p className="cricket-status">{match.status}</p>}
+      <p className="cricket-note">
+        {match.venue && `${match.venue} · `}Score updates every 15 minutes · Data: CricketData.org
+      </p>
+    </section>
+  );
+}
+
 export function BreakingBar({ story }) {
   if (!story || Date.now() - new Date(story.published_at).getTime() > BREAKING_HOURS * 3600000) return null;
   return (
@@ -93,11 +141,12 @@ export function BreakingBar({ story }) {
   );
 }
 
-export function SiteHeader({ current, ticker = [], updatedAt, breaking }) {
+export function SiteHeader({ current, ticker = [], updatedAt, breaking, cricket }) {
   const [first, ...rest] = settings.siteName.split(" ");
   return (
     <header>
       <BreakingBar story={breaking} />
+      <CricketBar match={cricket} />
       <div className="topbar">
         <div className="container">
           <span>
@@ -416,10 +465,10 @@ export function SiteFooter() {
 
 export async function PageShell({ current, children, ticker, updatedAt }) {
   await initLang();
-  const [breaking] = await db.listStories({ status: "approved", breaking: true, limit: 1 }).catch(() => []);
+  const [[breaking], cricket] = await Promise.all([db.listStories({ status: "approved", breaking: true, limit: 1 }).catch(() => []), indiaMatch()]);
   return (
     <>
-      <SiteHeader current={current} ticker={ticker} updatedAt={updatedAt} breaking={breaking} />
+      <SiteHeader current={current} ticker={ticker} updatedAt={updatedAt} breaking={breaking} cricket={cricket} />
       <main className="container">{children}</main>
       <SiteFooter />
     </>

@@ -2,7 +2,8 @@ import { db } from "../lib/db.js";
 import { settings, generalRegion, states, northeastRegions, widerRegions, topics } from "../lib/config.js";
 import { latestVideos } from "../lib/youtube.js";
 import { capitalsWeather } from "../lib/weather.js";
-import { WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
+import { indiaMatch } from "../lib/cricket.js";
+import { CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
 import { LiveUpdates, PollBox } from "./client.js";
 import { initLang, lang } from "../lib/lang.js";
 
@@ -55,12 +56,13 @@ async function readerPoll() {
 }
 
 export default async function HomePage() {
-  const [stories, videos, mostRead, weather, poll] = await Promise.all([
+  const [stories, videos, mostRead, weather, poll, cricket] = await Promise.all([
     db.listStories({ status: "approved", limit: 100 }),
     latestVideos(4),
     db.mostRead(1, 5).catch(() => []),
     capitalsWeather(),
     readerPoll(),
+    indiaMatch(),
   ]);
 
   if (!stories.length) {
@@ -85,6 +87,7 @@ export default async function HomePage() {
       <h1 className="sr-only">{settings.siteName}: {settings.tagline}</h1>
 
       <WeatherStrip weather={weather} />
+      <CricketBox match={cricket} />
 
       <div className="front-top">
         <LeadStory story={lead} />

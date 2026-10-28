@@ -2,7 +2,7 @@ import { db } from "../lib/db.js";
 import { settings, generalRegion, states, northeastRegions, widerRegions, topics } from "../lib/config.js";
 import { latestVideos } from "../lib/youtube.js";
 import { capitalsWeather } from "../lib/weather.js";
-import { WeatherStrip, PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
+import { WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
 import { LiveUpdates, PollBox } from "./client.js";
 import { initLang, lang } from "../lib/lang.js";
 
@@ -89,6 +89,8 @@ export default async function HomePage() {
           <StoryGrid stories={originals} columns={3} />
         </section>
       )}
+
+      <WhatsAppFollow />
 
       {poll && <PollBox {...poll} />}
 

@@ -183,6 +183,11 @@ main { padding: 20px 0 40px; }
 .site-footer { background: var(--brand-dark); color: #cfe2e6; font-size: 0.88rem; margin-top: 20px; }
 .site-footer .container { padding-top: 28px; padding-bottom: 28px; display: grid; gap: 22px; grid-template-columns: 1fr; }
 @media (min-width: 760px) { .site-footer .container { grid-template-columns: 2fr 1fr 1fr; } }
+/* On phones the footer links sit in two neat columns instead of one long list. */
+@media (max-width: 759px) {
+  .site-footer .footer-links { grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  .site-footer .footer-links li { min-width: 0; }
+}
 .site-footer h4 { color: #fff; margin: 0 0 8px; font-size: 0.95rem; }
 .site-footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
 .site-footer a { color: #fff; text-decoration: none; }

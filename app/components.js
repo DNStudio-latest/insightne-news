@@ -492,7 +492,7 @@ export function SiteFooter() {
         </div>
         <div>
           <h4>Sections</h4>
-          <ul>
+          <ul className="footer-links">
             {[...regions, ...topics].map((c) => (
               <li key={c}><a href={categoryUrl(c)}>{tr(c === generalRegion ? `All ${generalRegion}` : c)}</a></li>
             ))}
@@ -503,7 +503,7 @@ export function SiteFooter() {
         </div>
         <div>
           <h4>About us</h4>
-          <ul>
+          <ul className="footer-links">
             <li><a href="/about">About</a></li>
             <li><a href="/team">Ownership &amp; team</a></li>
             <li><a href="/contact">Contact</a></li>

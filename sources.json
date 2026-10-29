@@ -162,6 +162,14 @@
       "enabled": false,
       "autoPublish": false,
       "_note": "OFF: the feed has not updated since August 2026."
+    },
+    {
+      "name": "Aguli",
+      "website": "https://aguli.in",
+      "feed": "https://aguli.in/index.php/feed/",
+      "region": "Tripura",
+      "enabled": true,
+      "autoPublish": false
     }
   ]
 }

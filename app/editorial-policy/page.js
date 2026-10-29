@@ -1,4 +1,4 @@
-import { settings } from "../../lib/config.js";
+import { settings, editorName } from "../../lib/config.js";
 import { InfoPage, publisher } from "../info.js";
 
 export const metadata = { title: "Editorial policy", alternates: { canonical: "/editorial-policy" } };
@@ -7,7 +7,7 @@ export default function EditorialPolicyPage() {
   return (
     <InfoPage title="Editorial policy">
       <p>
-        This page explains how {settings.siteName} chooses, checks and publishes news. Our editor, {publisher.editor}, is
+        This page explains how {settings.siteName} chooses, checks and publishes news. Our editor, {editorName}, is
         responsible for everything we publish.
       </p>
       <h2>Independence</h2>

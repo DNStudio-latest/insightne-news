@@ -1,5 +1,5 @@
 import { db } from "../../lib/db.js";
-import { settings, slugify } from "../../lib/config.js";
+import { settings, slugify, editorName } from "../../lib/config.js";
 import { InfoPage, Email, publisher } from "../info.js";
 
 export const dynamic = "force-dynamic";
@@ -13,11 +13,11 @@ export default async function TeamPage() {
       <h2>Ownership</h2>
       <p>
         {settings.siteName} is an independent digital news platform based in {publisher.address}, owned by{" "}
-        {publisher.owner || publisher.editor}.
+        {publisher.owner || editorName}.
       </p>
       <h2>Editor</h2>
       <p>
-        <a href={`/author/${slugify(publisher.editor)}`}>{publisher.editor}</a>, Editor. Responsible for all content
+        <a href={`/author/${slugify(editorName)}`}>{editorName}</a>, Editor. Responsible for all content
         published on {settings.siteName}.
       </p>
       <p>Grievance Officer: {publisher.grievanceOfficer}. See <a href="/grievance">Grievance Redressal</a>.</p>

@@ -1,4 +1,4 @@
-import { settings } from "../../lib/config.js";
+import { settings, editorName } from "../../lib/config.js";
 import { InfoPage, publisher } from "../info.js";
 
 export const metadata = { title: "About us", alternates: { canonical: "/about" } };
@@ -24,7 +24,7 @@ export default function AboutPage() {
         a mistake, we correct it and note the correction.
       </p>
       <h2>Editorial team</h2>
-      <p>Editor: {publisher.editor}</p>
+      <p>Editor: {editorName}</p>
       <p>Based in {publisher.address}.</p>
       <p>
         Questions, news tips or corrections: see our <a href="/contact">Contact page</a>. Complaints: see{" "}

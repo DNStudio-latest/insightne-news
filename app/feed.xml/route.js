@@ -1,6 +1,6 @@
 // RSS feed: the 50 newest published stories, for news apps and feed readers (served at /feed.xml).
 import { db } from "../../lib/db.js";
-import { settings } from "../../lib/config.js";
+import { settings, bylineName } from "../../lib/config.js";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +17,7 @@ export async function GET() {
       <guid isPermaLink="true">${esc(url)}</guid>
       <pubDate>${new Date(s.published_at).toUTCString()}</pubDate>
       <category>${esc(s.region)}</category>
-      ${s.kind === "original" && s.author ? `<dc:creator>${esc(s.author)}</dc:creator>` : ""}
+      ${s.kind === "original" && s.author ? `<dc:creator>${esc(bylineName(s.author))}</dc:creator>` : ""}
       <description>${esc(s.summary)}</description>
     </item>`;
     })

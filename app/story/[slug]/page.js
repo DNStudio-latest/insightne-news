@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/db.js";
 import { site } from "../../../lib/site-cache.js";
-import { settings, slugify } from "../../../lib/config.js";
+import { settings, slugify, bylineName } from "../../../lib/config.js";
 import { articleBlocks, formatDate, readingMinutes, uniqueSources } from "../../../lib/format.js";
 import { AI_CREDIT } from "../../../lib/images.js";
 import { ViewCounter } from "../../client.js";
@@ -53,7 +53,7 @@ export default async function StoryPage({ params }) {
     dateModified: story.updated_at,
     mainEntityOfPage: absoluteUrl(storyUrl(story)),
     ...(story.image_url ? { image: [story.image_url] } : {}),
-    author: isOriginal ? { "@type": "Person", name: story.author || settings.defaultAuthor, url: `${settings.siteUrl}/author/${slugify(story.author || settings.defaultAuthor)}` } : { "@type": "Organization", name: settings.siteName },
+    author: isOriginal ? { "@type": "Person", name: bylineName(story.author), url: `${settings.siteUrl}/author/${slugify(bylineName(story.author))}` } : { "@type": "Organization", name: settings.siteName },
     publisher: { "@type": "Organization", name: settings.siteName, url: settings.siteUrl, logo: { "@type": "ImageObject", url: `${settings.siteUrl}/icon`, width: 192, height: 192 } },
   };
 

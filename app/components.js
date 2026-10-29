@@ -1,6 +1,6 @@
 // Pieces shared by the public pages.
 import { site } from "../lib/site-cache.js";
-import { settings, generalRegion, states, regions, northeastRegions, widerRegions, topics, slugify } from "../lib/config.js";
+import { settings, generalRegion, states, regions, northeastRegions, widerRegions, topics, slugify, bylineName } from "../lib/config.js";
 import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js";
 import { CopyLinkButton, NavBar } from "./client.js";
 import { AI_CREDIT } from "../lib/images.js";
@@ -408,7 +408,7 @@ export function Videos({ videos, title = lang() === "en" ? `Watch ${settings.you
 // "By Rina Das" (linked to the reporter's page when link is set), or the sources of a brief.
 export function Byline({ story, link = false }) {
   if (story.kind === "original") {
-    const name = story.author || settings.defaultAuthor;
+    const name = bylineName(story.author);
     return <>{tr("By")} {link ? <a href={`/author/${slugify(name)}`}>{name}</a> : name}</>;
   }
   const names = uniqueSources(story.sources).map((s) => s.source_name);

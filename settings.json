@@ -30,6 +30,8 @@
     "name": "InsightNE News",
     "owner": "Prasenjit Debnath",
     "editor": "Prasenjit Debnath",
+    "showEditorName": false,
+    "_showEditorNameHelp": "false = the editor's name is hidden on the website: the About, Team and Editorial policy pages and your story bylines show the defaultAuthor (InsightNE News Desk) instead. Change to true to show the name again.",
     "email": "insightnenews@gmail.com",
     "phone": "",
     "address": "Agartala, Tripura, India",

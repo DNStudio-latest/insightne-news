@@ -2,6 +2,7 @@
 // What happens when you press a button on the approval page.
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { refreshSite } from "../../lib/site-cache.js";
 import { after } from "next/server";
 import { addIllustration } from "../../lib/images.js";
 import { sendAlert } from "../../lib/push.js";
@@ -27,8 +28,14 @@ async function requireAdmin() {
   if (role !== "admin") redirect(`/admin?done=${encodeURIComponent("Only the admin can do that.")}`);
 }
 
-function refresh(view = "pending", notice = "") {
+// Shows the change on the website straight away.
+function refreshPages() {
   revalidatePath("/", "layout");
+  refreshSite();
+}
+
+function refresh(view = "pending", notice = "") {
+  refreshPages();
   redirect(`/admin?view=${view}${notice ? `&done=${encodeURIComponent(notice)}` : ""}`);
 }
 
@@ -38,7 +45,7 @@ function illustrateLater(id) {
   after(async () => {
     try {
       const story = await db.getStory(id);
-      if (story?.status === "approved" && (await addIllustration(db, story))) revalidatePath("/", "layout");
+      if (story?.status === "approved" && (await addIllustration(db, story))) refreshPages();
     } catch (err) {
       console.error("Illustration failed:", err.message);
     }
@@ -234,7 +241,7 @@ export async function savePoll(formData) {
   // Only one poll is shown at a time, so the new one closes the old ones.
   for (const p of await db.listPolls()) if (p.is_open) await db.updatePoll(p.id, { is_open: false });
   await db.createPoll({ question, question_bn: text(formData, "question_bn", 300) || null, options });
-  revalidatePath("/", "layout");
+  refreshPages();
   redirect(`/admin/polls?done=${encodeURIComponent("Poll is live on the front page")}`);
 }
 
@@ -244,14 +251,14 @@ export async function togglePoll(formData) {
   const open = !formData.get("close");
   if (open) for (const p of await db.listPolls()) if (p.is_open) await db.updatePoll(p.id, { is_open: false });
   await db.updatePoll(id, { is_open: open });
-  revalidatePath("/", "layout");
+  refreshPages();
   redirect(`/admin/polls?done=${encodeURIComponent(open ? "Poll is back on the front page" : "Poll closed and taken off the front page")}`);
 }
 
 export async function deletePoll(formData) {
   await requireAdmin();
   await db.deletePoll(text(formData, "id", 60));
-  revalidatePath("/", "layout");
+  refreshPages();
   redirect(`/admin/polls?done=${encodeURIComponent("Poll deleted")}`);
 }
 
@@ -376,14 +383,14 @@ export async function goLive(formData) {
     source: text(formData, "source", 80) || "YouTube",
     startedAt: new Date().toISOString(),
   });
-  revalidatePath("/", "layout");
+  refreshPages();
   back("You are live: the broadcast is now on the front page and every page shows the LIVE strip.");
 }
 
 export async function endLive() {
   await requireAdmin();
   await db.setSetting("live", null);
-  revalidatePath("/", "layout");
+  refreshPages();
   redirect(`/admin/live?done=${encodeURIComponent("Live broadcast ended and removed from the website.")}`);
 }
 

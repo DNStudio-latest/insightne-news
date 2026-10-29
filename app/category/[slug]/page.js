@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { db } from "../../../lib/db.js";
+import { site } from "../../../lib/site-cache.js";
 import { settings, generalRegion, categoryFromSlug, sectionFilter, slugify } from "../../../lib/config.js";
 import { PageShell, SectionHead, StoryGrid } from "../../components.js";
 import { initLang, tr } from "../../../lib/lang.js";
@@ -23,7 +23,7 @@ export default async function CategoryPage({ params, searchParams }) {
   if (!category) notFound();
   const page = Math.max(1, Number((await searchParams).page) || 1);
 
-  const stories = await db.listStories({ status: "approved", ...sectionFilter(category), limit: PER_PAGE + 1, offset: (page - 1) * PER_PAGE });
+  const stories = await site.listStories({ status: "approved", ...sectionFilter(category), limit: PER_PAGE + 1, offset: (page - 1) * PER_PAGE });
   const title = category === generalRegion ? tr(`All ${generalRegion}`) : `${tr(category)} ${tr("news")}`;
 
   return (

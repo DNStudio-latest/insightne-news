@@ -1,7 +1,6 @@
 // Live TV: the official broadcast that is live now (chosen by the editor), and links to official government channels.
-import { db } from "../../lib/db.js";
+import { site } from "../../lib/site-cache.js";
 import { settings } from "../../lib/config.js";
-import { currentLive } from "../../lib/live.js";
 import { PageShell, SectionHead, LivePlayer } from "../components.js";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +11,7 @@ export const metadata = {
 };
 
 export default async function LivePage() {
-  const live = await currentLive(db);
+  const live = await site.live();
   return (
     <PageShell current="Live">
       <SectionHead title="Live TV" />

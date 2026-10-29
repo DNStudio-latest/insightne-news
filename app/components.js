@@ -1,5 +1,5 @@
 // Pieces shared by the public pages.
-import { db } from "../lib/db.js";
+import { site } from "../lib/site-cache.js";
 import { settings, generalRegion, states, regions, northeastRegions, widerRegions, topics, slugify } from "../lib/config.js";
 import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js";
 import { CopyLinkButton, NavBar } from "./client.js";
@@ -9,7 +9,6 @@ import { LangSwitch, AlertsButton, NewsletterSignup, LanguageWelcome } from "./c
 import { newsletterReady } from "../lib/newsletter.js";
 import { pushPublicKey } from "../lib/push.js";
 import { indiaMatch } from "../lib/cricket.js";
-import { currentLive } from "../lib/live.js";
 
 const ALERT_LABELS = {
   en: {
@@ -540,7 +539,7 @@ export function SiteFooter() {
 
 export async function PageShell({ current, children, ticker, updatedAt }) {
   await initLang();
-  const [[breaking], cricket, live] = await Promise.all([db.listStories({ status: "approved", breaking: true, limit: 1 }).catch(() => []), indiaMatch(), currentLive(db)]);
+  const [[breaking], cricket, live] = await Promise.all([site.listStories({ status: "approved", breaking: true, limit: 1 }).catch(() => []), indiaMatch(), site.live()]);
   return (
     <>
       <SiteHeader current={current} ticker={ticker} updatedAt={updatedAt} breaking={breaking} cricket={cricket} live={live} />

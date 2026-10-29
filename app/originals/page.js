@@ -1,4 +1,4 @@
-import { db } from "../../lib/db.js";
+import { site } from "../../lib/site-cache.js";
 import { settings } from "../../lib/config.js";
 import { PageShell, SectionHead, StoryGrid } from "../components.js";
 
@@ -12,7 +12,7 @@ const PER_PAGE = 18;
 
 export default async function OriginalsPage({ searchParams }) {
   const page = Math.max(1, Number((await searchParams).page) || 1);
-  const stories = await db.listStories({ status: "approved", kind: "original", limit: PER_PAGE + 1, offset: (page - 1) * PER_PAGE });
+  const stories = await site.listStories({ status: "approved", kind: "original", limit: PER_PAGE + 1, offset: (page - 1) * PER_PAGE });
   return (
     <PageShell current="Originals">
       <SectionHead title="InsightNE Originals" />

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/db.js";
+import { site } from "../../../lib/site-cache.js";
 import { settings, slugify } from "../../../lib/config.js";
 import { articleBlocks, formatDate, readingMinutes, uniqueSources } from "../../../lib/format.js";
 import { AI_CREDIT } from "../../../lib/images.js";
@@ -37,7 +38,7 @@ export default async function StoryPage({ params }) {
   const story = await load(params);
   if (!story) notFound();
 
-  const related = (await db.listStories({ status: "approved", region: story.region, limit: 7 })).filter((s) => s.id !== story.id).slice(0, 3);
+  const related = (await site.listStories({ status: "approved", region: story.region, limit: 7 })).filter((s) => s.id !== story.id).slice(0, 3);
   const sources = uniqueSources(story.sources);
   const isOriginal = story.kind === "original";
   const blocks = articleBlocks(pick(story, "body"));

@@ -1,14 +1,12 @@
-import { db } from "../lib/db.js";
+import { site } from "../lib/site-cache.js";
 import { settings, generalRegion, states, northeastRegions, widerRegions, topics } from "../lib/config.js";
-import { latestVideos } from "../lib/youtube.js";
 import { capitalsWeather } from "../lib/weather.js";
 import { indiaMatch } from "../lib/cricket.js";
-import { currentLive } from "../lib/live.js";
 import { LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
 import { LiveUpdates, PollBox } from "./client.js";
 import { initLang, lang } from "../lib/lang.js";
 
-// Always fresh: a story appears the moment you press APPROVE.
+// A story appears the moment you press APPROVE (the approval page empties the one-minute memory in lib/site-cache.js).
 export const dynamic = "force-dynamic";
 
 // The newest story from each different state first, so no single state fills the section.
@@ -41,12 +39,13 @@ const POLL_LABELS = {
 async function readerPoll() {
   try {
     await initLang();
-    const poll = await db.openPoll();
-    if (!poll) return null;
+    const open = await site.poll();
+    if (!open) return null;
+    const { poll } = open;
     const bn = lang() === "bn";
     return {
       poll: { id: poll.id, question: (bn && poll.question_bn) || poll.question, options: poll.options.map((o) => (bn && o.text_bn) || o.text) },
-      initialCounts: await db.pollCounts(poll.id, poll.options.length),
+      initialCounts: open.counts,
       labels: bn
         ? POLL_LABELS.bn
         : POLL_LABELS[lang()] || POLL_LABELS.en,
@@ -58,13 +57,13 @@ async function readerPoll() {
 
 export default async function HomePage() {
   const [stories, videos, mostRead, weather, poll, cricket, live] = await Promise.all([
-    db.listStories({ status: "approved", limit: 100 }),
-    latestVideos(4),
-    db.mostRead(1, 5).catch(() => []),
+    site.listStories({ status: "approved", limit: 100 }),
+    site.videos(4),
+    site.mostRead(1, 5).catch(() => []),
     capitalsWeather(),
     readerPoll(),
     indiaMatch(),
-    currentLive(db),
+    site.live(),
   ]);
 
   if (!stories.length) {

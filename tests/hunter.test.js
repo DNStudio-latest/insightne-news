@@ -126,3 +126,12 @@ test("on GitHub, government pages go through the website's Mumbai server; only w
     globalThis.fetch = realFetch;
   }
 });
+
+test("dates: the first date written is the publishing date; '10,' in a date is the number 10", () => {
+  assert.equal(findDate("Naga News October 27 2026 · Mokokchung. A hearing on 10th November, 2026."), "2026-10-27T06:30:00.000Z");
+  const src = "The hearing is on 10th November, 2026. Summary published on 8th October, 2026.\n29 October 2026";
+  const ok = checkDraft("The hearing is on November 10, 2026, after a summary on October 8, 2026. Posted on October 29, 2026.", [src]);
+  assert.deepEqual(ok.problems, []);
+  const bad = checkDraft("The hearing is on November 12, 2026.", [src]);
+  assert.equal(bad.text, "The hearing is on November 12 [CHECK], 2026.");
+});

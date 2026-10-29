@@ -373,3 +373,14 @@ test("auto-publish: only briefs scoring 8+ with a summary and no extra check go 
   assert.equal(shouldAutoPublish({ ...good, kind: "original" }, on), false, "own reports are published by their writer");
   assert.equal(shouldAutoPublish(good, { autoPublish: { enabled: false, minScore: 8 } }), false, "switched off");
 });
+
+test("a state paper's local stories go to its own state, even when the headline doesn't name it", async () => {
+  const { ruleRegion, ruleScore } = await import("../lib/rules.js");
+  const local = { title: "Wangki Lowang flags off mini fire tender for Deomali forest division", snippet: "", sourceRegion: "Arunachal Pradesh" };
+  assert.equal(ruleRegion([local]), "Arunachal Pradesh");
+  assert.equal(ruleScore(local), 6);
+  assert.equal(ruleRegion([{ title: "Melli police seize brown sugar, cash", sourceRegion: "Sikkim" }]), "Sikkim");
+  assert.equal(ruleRegion([{ title: "Sikkim paper reports Assam flood relief", sourceRegion: "Sikkim" }]), "Northeast", "names two states");
+  assert.equal(ruleRegion([{ title: "Delhi court hears case", sourceRegion: "Sikkim" }]), "India", "clearly elsewhere");
+  assert.equal(ruleRegion([{ title: "Usha Bazar market reopens", sourceRegion: "Tripura" }]), "Tripura", "Tripura papers work as before");
+});

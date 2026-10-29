@@ -170,6 +170,22 @@
       "region": "Tripura",
       "enabled": true,
       "autoPublish": false
+    },
+    {
+      "name": "Voice of Sikkim",
+      "website": "https://voiceofsikkim.com",
+      "feed": "https://voiceofsikkim.com/feed/",
+      "region": "Sikkim",
+      "enabled": true,
+      "autoPublish": false
+    },
+    {
+      "name": "Arunachal24",
+      "website": "https://arunachal24.in",
+      "feed": "https://arunachal24.in/feed/",
+      "region": "Arunachal Pradesh",
+      "enabled": true,
+      "autoPublish": false
     }
   ]
 }

@@ -223,3 +223,7 @@ create table if not exists site_settings (
 alter table site_settings enable row level security;
 grant select, insert, update, delete on site_settings to service_role;
 revoke all on site_settings from anon, authenticated;
+
+-- ===== Added for: posting stories to Instagram =====
+alter table stories add column if not exists instagram_post_id text;
+alter table stories add column if not exists instagram_posted_at timestamptz;

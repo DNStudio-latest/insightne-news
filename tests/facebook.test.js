@@ -40,3 +40,29 @@ test("only your own published reports are posted automatically", async () => {
   delete process.env.FACEBOOK_PAGE_TOKEN;
   assert.equal(facebookAutoPost({ status: "approved", kind: "original" }), false, "nothing happens without the page key");
 });
+
+test("Instagram: caption says link in bio; a story is posted once with the JPEG news card", async () => {
+  const { instagramCaption, shareOnInstagram } = await import("../lib/instagram.js");
+  process.env.FACEBOOK_PAGE_ID = "123";
+  process.env.FACEBOOK_PAGE_TOKEN = "test-token";
+  assert.match(instagramCaption(story), /^Roads open\n\nTwo roads reopened\.\n\n📰 Full story: link in bio · insightnenews\.in\n\n#ArunachalPradesh/);
+  const realFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, options = {}) => {
+    calls.push({ url: String(url), body: options.body });
+    if (String(url).includes("fields=instagram_business_account")) return Response.json({ instagram_business_account: { id: "ig1" } });
+    if (String(url).endsWith("/ig1/media")) return Response.json({ id: "c1" });
+    if (String(url).includes("/c1?")) return Response.json({ status_code: "FINISHED" });
+    if (String(url).endsWith("/ig1/media_publish")) return Response.json({ id: "post9" });
+    return Response.json({ error: { message: "unexpected" } }, { status: 400 });
+  };
+  const saved = {};
+  try {
+    assert.equal(await shareOnInstagram({ updateStory: async (id, f) => Object.assign(saved, f) }, { ...story, status: "approved" }), "post9");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+  const create = calls.find((c) => c.url.endsWith("/ig1/media"));
+  assert.equal(create.body.get("image_url"), "https://www.insightnenews.in/card/roads-open-abc123?type=news&format=jpg");
+  assert.equal(saved.instagram_post_id, "post9");
+});

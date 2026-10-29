@@ -70,6 +70,11 @@
     "_help": "Posting to your Facebook page. Needs FACEBOOK_PAGE_ID and FACEBOOK_PAGE_TOKEN in Vercel (see docs/5-FACEBOOK.md). autoPost: \"originals\" = your own reports are posted automatically when published; true = every story you approve; false = only with the POST TO FACEBOOK button.",
     "autoPost": "originals"
   },
+  "instagram": {
+    "_help": "Posting the news-card picture to the Instagram account linked to your Facebook page (same page key as Facebook, with Instagram permissions added). autoPost: \"originals\" = your own reports automatically; true = every story you approve; false = only with the POST TO INSTAGRAM button. enabled: false hides Instagram completely.",
+    "enabled": true,
+    "autoPost": "originals"
+  },
   "autoPublish": {
     "_help": "News briefs from other sites go live WITHOUT your approval when enabled is true, the story scores minScore or more out of 10, it has a summary, and it is NOT marked NEEDS EXTRA CHECK (crime, violence, religion, communities, rumours, copied words). Everything else waits for you. Set enabled to false to approve everything yourself again.",
     "enabled": true,

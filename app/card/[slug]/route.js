@@ -1,8 +1,10 @@
 // A big news-card picture (1080 × 1350) to post in the WhatsApp channel, Facebook or Instagram.
 // /card/<story>?type=live | breaking | news   (English only: Bengali letters don't join correctly in these pictures)
+// Add &format=jpg for a JPEG (Instagram only accepts JPEG pictures).
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
+import sharp from "sharp";
 import { db } from "../../../lib/db.js";
 import { settings } from "../../../lib/config.js";
 import { formatDate } from "../../../lib/format.js";
@@ -50,7 +52,7 @@ export async function GET(request, { params }) {
   const site = settings.siteUrl.replace(/^https?:\/\/(www\.)?/, "");
   const headline = story.headline.length > 170 ? `${story.headline.slice(0, 167)}…` : story.headline;
 
-  return new ImageResponse(
+  const picture = new ImageResponse(
     (
       <div style={{ width: W, height: H, display: "flex", flexDirection: "column", background: "#0a3540", color: "#fff", fontFamily: "Sans" }}>
         {/* Top bar: name + label */}
@@ -107,4 +109,7 @@ export async function GET(request, { params }) {
       headers: { "Cache-Control": "no-store" },
     },
   );
+  if (new URL(request.url).searchParams.get("format") !== "jpg") return picture;
+  const jpeg = await sharp(Buffer.from(await picture.arrayBuffer())).jpeg({ quality: 88, mozjpeg: true }).toBuffer();
+  return new Response(jpeg, { headers: { "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=3600" } });
 }

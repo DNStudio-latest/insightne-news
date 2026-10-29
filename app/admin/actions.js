@@ -6,6 +6,7 @@ import { after } from "next/server";
 import { addIllustration } from "../../lib/images.js";
 import { sendAlert } from "../../lib/push.js";
 import { shareOnFacebook, facebookAutoPost } from "../../lib/facebook.js";
+import { shareOnInstagram, instagramAutoPost } from "../../lib/instagram.js";
 import { sendEmail, dailyEmail, FREE_DAILY_LIMIT } from "../../lib/newsletter.js";
 import { topStories } from "../../lib/top.js";
 import { formatDay, youtubeId } from "../../lib/format.js";
@@ -46,6 +47,12 @@ function illustrateLater(id) {
       if (facebookAutoPost(story)) await shareOnFacebook(db, story);
     } catch (err) {
       console.error("Facebook post failed:", err.message);
+    }
+    try {
+      const story = await db.getStory(id);
+      if (instagramAutoPost(story)) await shareOnInstagram(db, story);
+    } catch (err) {
+      console.error("Instagram post failed:", err.message);
     }
   });
 }
@@ -378,4 +385,18 @@ export async function endLive() {
   await db.setSetting("live", null);
   revalidatePath("/", "layout");
   redirect(`/admin/live?done=${encodeURIComponent("Live broadcast ended and removed from the website.")}`);
+}
+
+// ---- Instagram ----
+export async function postInstagram(formData) {
+  await requireAdmin();
+  const story = await db.getStory(text(formData, "id", 60));
+  if (story?.status !== "approved") refresh("published", "Only published stories can be posted to Instagram");
+  if (story.instagram_post_id) refresh("published", "This story is already on Instagram");
+  try {
+    await shareOnInstagram(db, story);
+  } catch (err) {
+    refresh("published", err.message);
+  }
+  refresh("published", "Posted on Instagram");
 }

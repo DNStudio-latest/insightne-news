@@ -6,6 +6,7 @@ import { formatDate } from "../../lib/format.js";
 import { logout } from "./actions.js";
 import StoryActions from "./StoryActions.js";
 import { facebookReady } from "../../lib/facebook.js";
+import { instagramReady } from "../../lib/instagram.js";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Approval page", robots: { index: false, follow: false } };
@@ -188,7 +189,7 @@ function AdminStory({ story, view, admin }) {
         ))}
       </ul>
 
-      <StoryActions story={story} view={view} regions={regions} topics={settings.topics} facebook={facebookReady()} admin={admin} />
+      <StoryActions story={story} view={view} regions={regions} topics={settings.topics} facebook={facebookReady()} instagram={instagramReady()} admin={admin} />
     </article>
   );
 }

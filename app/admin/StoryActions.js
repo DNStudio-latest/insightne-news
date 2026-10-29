@@ -1,10 +1,10 @@
 "use client";
 // The APPROVE / EDIT / REJECT buttons under each story.
 import { useState } from "react";
-import { approve, reject, saveEdit, unpublish, restore, makeLead, toggleBreaking, notifyReaders, postFacebook } from "./actions.js";
+import { approve, reject, saveEdit, unpublish, restore, makeLead, toggleBreaking, notifyReaders, postFacebook, postInstagram } from "./actions.js";
 import { shrinkPhoto } from "./photo.js";
 
-export default function StoryActions({ story, view, regions, topics, facebook = false, admin = true }) {
+export default function StoryActions({ story, view, regions, topics, facebook = false, instagram = false, admin = true }) {
   // In no-AI mode a story arrives without a summary; WRITE SUMMARY opens the writing box.
   const needsSummary = !story.summary?.trim();
   const [editing, setEditing] = useState(false);
@@ -127,6 +127,19 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
               </form>
             )}
             {story.facebook_post_id && <p className="note" style={{ gridColumn: "1 / -1", margin: 0 }}>📘 Posted on Facebook</p>}
+            {instagram && !story.instagram_post_id && (
+              <form
+                action={postInstagram}
+                style={{ gridColumn: "1 / -1" }}
+                onSubmit={(e) => {
+                  if (!window.confirm("Post this story's news card on Instagram now?")) e.preventDefault();
+                }}
+              >
+                {id}
+                <button className="btn btn-plain" type="submit">📸 POST TO INSTAGRAM</button>
+              </form>
+            )}
+            {story.instagram_post_id && <p className="note" style={{ gridColumn: "1 / -1", margin: 0 }}>📸 Posted on Instagram</p>}
             {/* Big picture cards for the WhatsApp channel: open, save the picture, post it with the caption. */}
             <div className="card-links">
               <span>🖼 WhatsApp card:</span>

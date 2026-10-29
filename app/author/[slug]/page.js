@@ -1,21 +1,21 @@
 // A reporter's page: their name and every original story they wrote.
 import { notFound } from "next/navigation";
 import { db } from "../../../lib/db.js";
-import { settings, slugify } from "../../../lib/config.js";
+import { settings, slugify, editorName, bylineName } from "../../../lib/config.js";
 import { PageShell, SectionHead, StoryGrid } from "../../components.js";
 
 export const dynamic = "force-dynamic";
 
 async function authorStories(slug) {
   const originals = await db.listStories({ status: "approved", kind: "original", limit: 500 });
-  return originals.filter((s) => slugify(s.author || settings.defaultAuthor) === slug);
+  return originals.filter((s) => slugify(bylineName(s.author)) === slug);
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const [first] = await authorStories(slug);
   if (!first) return { title: "Reporter" };
-  const name = first.author || settings.defaultAuthor;
+  const name = bylineName(first.author);
   return { title: name, description: `Reports by ${name} for ${settings.siteName}.`, alternates: { canonical: `/author/${slug}` } };
 }
 
@@ -23,10 +23,10 @@ export default async function AuthorPage({ params }) {
   const { slug } = await params;
   const stories = await authorStories(slug);
   const editors = await db.listEditors().catch(() => []);
-  const known = [settings.publisher?.editor, ...editors.map((e) => e.name)].find((n) => n && slugify(n) === slug);
-  const name = stories[0]?.author || known;
+  const known = [editorName, ...editors.map((e) => e.name)].find((n) => n && slugify(n) === slug);
+  const name = stories[0] ? bylineName(stories[0].author) : known;
   if (!name) notFound();
-  const role = name === settings.publisher?.editor ? `Editor, ${settings.siteName}` : `Reporter, ${settings.siteName}`;
+  const role = name === editorName ? `Editor, ${settings.siteName}` : `Reporter, ${settings.siteName}`;
   const person = {
     "@context": "https://schema.org",
     "@type": "Person",

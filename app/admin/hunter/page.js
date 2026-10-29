@@ -6,6 +6,7 @@ import { hunterStore } from "../../../lib/hunter/store.js";
 import HunterDraft from "./HunterDraft.js";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 export const metadata = { title: "News Hunter", robots: { index: false, follow: false } };
 
 const VIEWS = { pending: "Waiting", approved: "Published", rejected: "Rejected" };

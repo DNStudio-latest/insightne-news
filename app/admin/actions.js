@@ -12,6 +12,8 @@ import { sendEmail, dailyEmail, FREE_DAILY_LIMIT } from "../../lib/newsletter.js
 import { topStories } from "../../lib/top.js";
 import { formatDay, youtubeId } from "../../lib/format.js";
 import { db } from "../../lib/db.js";
+import { hunterStore } from "../../lib/hunter/store.js";
+import { hasCheckMarks } from "../../lib/hunter/checks.js";
 import { settings, regions } from "../../lib/config.js";
 import { currentRole, currentUser, userForPassword, hashPassword, startSession, endSession } from "../../lib/auth.js";
 
@@ -406,4 +408,73 @@ export async function postInstagram(formData) {
     refresh("published", err.message);
   }
   refresh("published", "Posted on Instagram");
+}
+
+// ---- News Hunter drafts ----
+// Drafts are never published by the Hunter itself: only APPROVE here turns one into a published story.
+function backToHunter(notice, error = false) {
+  redirect(`/admin/hunter?${error ? "error" : "done"}=${encodeURIComponent(notice)}`);
+}
+
+function hunterFields(formData) {
+  return {
+    headline: text(formData, "headline", 300),
+    body: String(formData.get("body") || "").replace(/\r/g, "").trim().slice(0, 30000),
+    state: regions.includes(formData.get("state")) ? formData.get("state") : regions[0],
+  };
+}
+
+export async function saveHunterDraft(formData) {
+  await requireAdmin();
+  const id = text(formData, "id", 60);
+  const fields = hunterFields(formData);
+  if (!fields.headline || !fields.body) backToHunter("A draft needs a headline and text.", true);
+  await hunterStore.updateDraft(id, fields);
+  if (formData.get("andApprove")) return approveHunterDraft(formData);
+  backToHunter("Draft saved");
+}
+
+export async function approveHunterDraft(formData) {
+  await requireAdmin();
+  const draft = await hunterStore.getDraft(text(formData, "id", 60));
+  if (!draft || draft.status !== "pending") backToHunter("This draft was already approved or rejected.", true);
+  if (hasCheckMarks(draft.headline) || hasCheckMarks(draft.body)) {
+    backToHunter("This draft still has [CHECK] or [DELETED POST] notes. Check those parts against the source, edit them, then approve.", true);
+  }
+  const paragraphs = draft.body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  // Link to the original PDF, page or video at the bottom of the story.
+  const sourceLines = draft.sources.map((s) => `Source: ${s.name}, ${s.url}`);
+  const storyId = await db.createStory(
+    {
+      kind: "original",
+      status: "approved",
+      headline: draft.headline,
+      summary: paragraphs[0].slice(0, 600),
+      body: [...paragraphs.slice(1), ...sourceLines].join("\n\n"),
+      region: draft.state,
+      topic: draft.topic,
+      author: settings.defaultAuthor,
+      published_at: new Date().toISOString(),
+      score: draft.score,
+      needs_check: false,
+      check_reasons: [],
+    },
+    draft.sources.map((s) => ({ source_name: s.name, url: s.url, original_title: s.title || null })),
+  );
+  await hunterStore.updateDraft(draft.id, { status: "approved", story_id: storyId });
+  illustrateLater(storyId);
+  refreshPages();
+  backToHunter("Published on the website");
+}
+
+export async function rejectHunterDraft(formData) {
+  await requireAdmin();
+  await hunterStore.updateDraft(text(formData, "id", 60), { status: "rejected" });
+  backToHunter("Draft rejected");
+}
+
+export async function restoreHunterDraft(formData) {
+  await requireAdmin();
+  await hunterStore.updateDraft(text(formData, "id", 60), { status: "pending" });
+  backToHunter("Draft moved back to waiting");
 }

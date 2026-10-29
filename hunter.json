@@ -1,0 +1,76 @@
+{
+  "_help": "The News Hunter's list (runs at 2 PM, 6 PM and 9 PM). To stop watching something, change \"enabled\": true to false. 'pages' are the lists of press releases and notices it checks for new items. Every website here was checked to be official and to allow reading in its robots.txt.",
+
+  "sites": [
+    { "enabled": true, "state": "Tripura", "name": "ICA Tripura", "kind": "Information department", "pages": ["https://ica.tripura.gov.in/press-release", "https://ica.tripura.gov.in/notifications", "https://ica.tripura.gov.in/orders", "https://ica.tripura.gov.in/circulars", "https://ica.tripura.gov.in/news"] },
+    { "enabled": true, "state": "Tripura", "name": "ICA Tripura e-Sambad", "kind": "Daily government news bulletin", "pages": ["https://ica.tripura.gov.in/eSambad"] },
+    { "enabled": true, "state": "Tripura", "name": "Tripura Government portal", "kind": "State portal", "pages": ["https://tripura.gov.in", "https://tripura.gov.in/notifications"] },
+    { "enabled": true, "state": "Tripura", "name": "Lok Bhavan Tripura", "kind": "Governor's office", "pages": ["https://lokbhavan.tripura.gov.in", "https://lokbhavan.tripura.gov.in/press-release", "https://lokbhavan.tripura.gov.in/speeches"] },
+
+    { "enabled": true, "state": "Assam", "name": "DIPR Assam", "kind": "Information department", "pages": ["https://dipr.assam.gov.in/taxonomy/term/5836", "https://dipr.assam.gov.in/documents/notifications-0"] },
+    { "enabled": true, "state": "Assam", "name": "Assam CMO", "kind": "Chief Minister's office", "pages": ["https://cm.assam.gov.in/updates/pressreleases", "https://cm.assam.gov.in/updates/news-articles", "https://cm.assam.gov.in/cm-s-speeches"] },
+    { "enabled": true, "state": "Assam", "name": "Lok Bhavan Assam", "kind": "Governor's office", "pages": ["https://lokbhavan.assam.gov.in", "https://lokbhavan.assam.gov.in/document/press-releases", "https://lokbhavan.assam.gov.in/information-and-services/important-events-0"] },
+
+    { "enabled": true, "state": "Arunachal Pradesh", "name": "Lok Bhavan Arunachal", "kind": "Governor's office", "pages": ["https://arunachalgovernor.gov.in/html/press_rel.htm", "https://arunachalgovernor.gov.in/html/events.htm"] },
+
+    { "enabled": true, "state": "Meghalaya", "name": "DIPR Meghalaya", "kind": "Information department", "pages": ["https://megipr.gov.in", "https://megipr.gov.in/notifications.html"] },
+    { "enabled": true, "state": "Meghalaya", "name": "Meghalaya Government press page", "kind": "Press releases", "pages": ["https://meghalaya.gov.in/press", "https://meghalaya.gov.in/notifications"] },
+    { "enabled": true, "state": "Meghalaya", "name": "Lok Bhavan Meghalaya", "kind": "Governor's office", "pages": ["https://meggovernor.gov.in", "https://meggovernor.gov.in/All-Press-Release.html"] },
+    { "enabled": true, "state": "Meghalaya", "name": "Meghalaya CMO", "kind": "Chief Minister's office", "pages": ["https://cm.meghalaya.gov.in/press-release/"] },
+
+    { "enabled": true, "state": "Mizoram", "name": "DIPR Mizoram", "kind": "Information department", "pages": ["https://dipr.mizoram.gov.in/category/english-press-releases"] },
+    { "enabled": true, "state": "Mizoram", "name": "Lok Bhavan Mizoram", "kind": "Governor's office", "pages": ["https://rajbhavan.mizoram.gov.in/category/press-release/", "https://rajbhavan.mizoram.gov.in/events/"] },
+
+    { "enabled": true, "state": "Nagaland", "name": "IPR Nagaland", "kind": "Information department", "pages": ["https://ipr.nagaland.gov.in/naga-news", "https://ipr.nagaland.gov.in/activities"] },
+    { "enabled": true, "state": "Nagaland", "name": "Lok Bhavan Nagaland", "kind": "Governor's office", "pages": ["https://lokbhavan.nagaland.gov.in"] },
+    { "enabled": true, "state": "Nagaland", "name": "Nagaland CMO", "kind": "Chief Minister's office", "pages": ["https://chiefminister.nagaland.gov.in/category/news/", "https://chiefminister.nagaland.gov.in/category/speeches/"] },
+
+    { "enabled": true, "state": "Sikkim", "name": "Sikkim Government portal", "kind": "State portal", "pages": ["https://sikkim.gov.in/media/pressrelease", "https://sikkim.gov.in/media/news-announcement", "https://sikkim.gov.in/media/notification-circular"] },
+    { "enabled": true, "state": "Sikkim", "name": "Lok Bhavan Sikkim", "kind": "Governor's office", "pages": ["https://rajbhavansikkim.gov.in/category/press-release/", "https://rajbhavansikkim.gov.in/events/"] }
+  ],
+
+  "_youtube_help": "Official YouTube channels, read through YouTube's own RSS feed. 'proof' says how we know the channel is real.",
+  "youtube": [
+    { "enabled": true, "state": "Tripura", "name": "Tripura Government", "channelId": "UC47Z67ILoY7LueFd6PCSNFQ", "proof": "Linked from tripura.gov.in" },
+    { "enabled": true, "state": "Assam", "name": "Himanta Biswa Sarma (Chief Minister)", "channelId": "UCa637tUXPuLyl_v0DL5Vs6A", "proof": "Official channel @HimantaBiswaSarma, about 364K subscribers" },
+    { "enabled": true, "state": "Assam", "name": "DIPR Assam", "channelId": "UCbU_wWS401PVk5-BsGfmBsA", "proof": "Channel 'DIPR Assam' @diprassam, about 18K subscribers" },
+    { "enabled": true, "state": "Assam", "name": "Governor Lakshman Prasad Acharya", "channelId": "UCtcqsc2JK4-J1w4vpdvA61g", "proof": "Linked from rajbhavansikkim.gov.in" },
+    { "enabled": true, "state": "Manipur", "name": "Government of Manipur", "channelId": "UC5_4xgPCbZJM0OjIIHMc0wg", "proof": "Linked from manipur.gov.in" },
+    { "enabled": true, "state": "Meghalaya", "name": "CMO Meghalaya", "channelId": "UCBj-5oeTxt01stGOb_XzrAg", "proof": "Linked from cm.meghalaya.gov.in" },
+    { "enabled": true, "state": "Meghalaya", "name": "Lok Bhavan Shillong", "channelId": "UCL2T2yVbxPQEDeMjNuJtv5Q", "proof": "Linked from meggovernor.gov.in" },
+    { "enabled": true, "state": "Mizoram", "name": "DIPR Mizoram", "channelId": "UCO5BaxWYH45U7qdjyvZr9Xg", "proof": "Linked from dipr.mizoram.gov.in" },
+    { "enabled": true, "state": "Nagaland", "name": "DIPR Nagaland", "channelId": "UCzcWwqrCS8Sh5lX45Msfkvw", "proof": "Linked from ipr.nagaland.gov.in" },
+    { "enabled": true, "state": "Sikkim", "name": "IPR Sikkim", "channelId": "UCZ-7SrSRVd1UTwudtmaykmg", "proof": "Linked from ipr.sikkim.gov.in" }
+  ],
+
+  "_people_help": "Key people and official accounts for Version 2 (X) and Version 3 (Facebook, Instagram). Not used yet. 'proof' says how each account was confirmed; 'check' accounts are confirmed before use.",
+  "people": [
+    { "state": "Tripura", "name": "Prof. (Dr.) Manik Saha", "role": "Chief Minister", "x": "DrManikSaha2", "proof": "Your verified list" },
+    { "state": "Tripura", "name": "Tripura CMO", "role": "Chief Minister's office", "x": "tripura_cmo", "facebook": "CMofficeTripura", "proof": "Linked from tripura.gov.in" },
+    { "state": "Tripura", "name": "Tripura Government", "role": "State government", "x": "mygovtripura", "facebook": "mygovtripuraofficial", "proof": "Linked from tripura.gov.in" },
+    { "state": "Tripura", "name": "Governor of Tripura", "role": "Lok Bhavan Tripura", "x": "TripuraGovernor", "instagram": "tripuragovernor", "proof": "Linked from lokbhavan.tripura.gov.in" },
+    { "state": "Tripura", "name": "BJP Tripura", "role": "Ruling party state unit", "x": "BJP4Tripura", "youtube": "UCekWFSmZ11x2QyJdCsHJxHw", "proof": "Your verified list" },
+    { "state": "Tripura", "name": "Pradyot Kishore Manikya Debbarma", "role": "Tipra Motha founder", "x": "PradyotManikya", "proof": "Your verified list" },
+    { "state": "Tripura", "name": "Biplab Kumar Deb", "role": "MP, former Chief Minister", "x": "BjpBiplab", "facebook": "bjpbiplab", "proof": "check: linked from an old tripura.gov.in page" },
+    { "state": "Assam", "name": "Himanta Biswa Sarma", "role": "Chief Minister", "x": "himantabiswa", "instagram": "himantabiswasarma", "proof": "Instagram linked from cm.assam.gov.in" },
+    { "state": "Assam", "name": "Assam CMO", "role": "Chief Minister's office", "x": "CMOfficeAssam", "proof": "Linked from cm.assam.gov.in" },
+    { "state": "Assam", "name": "Lakshman Prasad Acharya", "role": "Governor", "x": "Laxmanacharya54", "facebook": "laxmanacharyabjp", "instagram": "lakshman.prasad.acharya", "proof": "Linked from lokbhavan.assam.gov.in" },
+    { "state": "Arunachal Pradesh", "name": "Pema Khandu", "role": "Chief Minister", "x": "PemaKhanduBJP", "proof": "Your verified list" },
+    { "state": "Arunachal Pradesh", "name": "Kiren Rijiju", "role": "Union Minister", "x": "KirenRijiju", "proof": "Your verified list" },
+    { "state": "Manipur", "name": "Yumnam Khemchand Singh", "role": "Chief Minister", "x": "YKhemchandSingh", "proof": "Your verified list" },
+    { "state": "Manipur", "name": "Government of Manipur", "role": "State government", "x": "govt_of_manipur", "instagram": "govt_of_manipur", "proof": "Linked from manipur.gov.in" },
+    { "state": "Meghalaya", "name": "Conrad K Sangma", "role": "Chief Minister", "x": "SangmaConrad", "facebook": "conradksangma", "instagram": "conrad_k_sangma", "proof": "Linked from cm.meghalaya.gov.in" },
+    { "state": "Meghalaya", "name": "CMO Meghalaya", "role": "Chief Minister's office", "x": "CMO_Meghalaya", "facebook": "cmmeghalaya", "instagram": "cmo_meghalaya", "proof": "Linked from cm.meghalaya.gov.in" },
+    { "state": "Meghalaya", "name": "Lok Bhavan Meghalaya", "role": "Governor's office", "x": "lokbhavanmeg", "instagram": "lokbhavanmeghalaya", "proof": "Linked from meggovernor.gov.in" },
+    { "state": "Meghalaya", "name": "DIPR Meghalaya", "role": "Information department", "x": "MeghalayaGov", "facebook": "diprmeghalaya", "instagram": "dipr.meghalaya", "proof": "Linked from meghalaya.gov.in and megipr.gov.in" },
+    { "state": "Mizoram", "name": "Lalduhoma", "role": "Chief Minister", "x": "Lal_Duhoma", "proof": "Your verified list" },
+    { "state": "Mizoram", "name": "CMO Mizoram", "role": "Chief Minister's office", "x": "CMOMizoram", "proof": "Your verified list" },
+    { "state": "Mizoram", "name": "Governor of Mizoram", "role": "Lok Bhavan Mizoram", "x": "MizoramGovernor", "instagram": "governormizoram", "proof": "Linked from rajbhavan.mizoram.gov.in" },
+    { "state": "Mizoram", "name": "DIPR Mizoram", "role": "Information department", "x": "dipr_mizoram", "instagram": "dipr_mizoram", "proof": "Linked from dipr.mizoram.gov.in" },
+    { "state": "Nagaland", "name": "Neiphiu Rio", "role": "Chief Minister", "x": "Neiphiu_Rio", "proof": "Your verified list, and linked from chiefminister.nagaland.gov.in" },
+    { "state": "Nagaland", "name": "Lok Bhavan Kohima", "role": "Governor's office", "x": "LokBhavanKohima", "proof": "Linked from lokbhavan.nagaland.gov.in" },
+    { "state": "Nagaland", "name": "DIPR Nagaland", "role": "Information department", "x": "dipr_nagaland", "facebook": "dipr.nagaland", "instagram": "diprnagaland", "proof": "Linked from ipr.nagaland.gov.in" },
+    { "state": "Sikkim", "name": "Prem Singh Tamang (Golay)", "role": "Chief Minister", "x": "PSTamangGolay", "proof": "Your verified list" },
+    { "state": "Sikkim", "name": "Government of Sikkim", "role": "State government", "instagram": "governmentofsikkim", "proof": "Linked from ipr.sikkim.gov.in" }
+  ]
+}

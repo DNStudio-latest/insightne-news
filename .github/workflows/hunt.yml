@@ -1,0 +1,31 @@
+# Runs the News Hunter, for free, on GitHub.
+# The Supabase timer (supabase/hunter-timer.sql) starts it at 2 PM, 6 PM and 9 PM India time.
+# You can also run it by hand: GitHub > Actions > "Hunt news" > "Run workflow".
+name: Hunt news
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: hunt-news
+  cancel-in-progress: false
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # Free tools for reading PDFs: pdftotext/pdftoppm (poppler) and Tesseract OCR with English and Bengali.
+      - run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ben
+      - run: npm ci
+      - run: npm run hunt
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}

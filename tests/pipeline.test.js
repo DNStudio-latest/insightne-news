@@ -147,24 +147,24 @@ test("copied wording is caught: asks again, then flags if still copied", async (
   assert.ok(stuck.check_reasons.some((r) => r.includes("repeats source wording")));
 });
 
-test("auto-publish: off by default; when on, only trusted + unflagged stories go live", async () => {
-  const feed = [article(30, "Trusted Paper", "College results declared"), article(31, "Other Paper", "School reopens"), article(32, "Trusted Paper", "Man arrested in theft case")];
+test("auto-publish: off by default; when on, only stories scoring 8+ with nothing to check go live", async () => {
+  const feed = [article(30, "Some Paper", "College results declared"), article(31, "Other Paper", "School reopens"), article(32, "Some Paper", "Man arrested in theft case")];
   const ai = fakeAi({
-    scores: { "College results declared": 8, "School reopens": 8, "Man arrested in theft case": 8 },
+    scores: { "College results declared": 8, "School reopens": 7, "Man arrested in theft case": 9 },
     groups: (a) => a.map((x) => ({ articleIds: [x.id], existingStoryId: null })),
   });
-  const trusted = new Set(["Trusted Paper"]);
 
   reset();
-  await runPipeline({ db, ai, sources: [], settings, trusted, fetchFeeds: async () => ({ articles: feed, okCount: 1, failed: [] }), log: quiet });
+  await runPipeline({ db, ai, sources: [], settings, fetchFeeds: async () => ({ articles: feed, okCount: 1, failed: [] }), log: quiet });
   assert.equal((await db.listStories({ status: "approved" })).length, 0);
 
   reset();
-  const on = { ...settings, autoPublish: { enabled: true } };
-  const run = await runPipeline({ db, ai, sources: [], settings: on, trusted, fetchFeeds: async () => ({ articles: feed, okCount: 1, failed: [] }), log: quiet });
+  const on = { ...settings, autoPublish: { enabled: true, minScore: 8 } };
+  const run = await runPipeline({ db, ai, sources: [], settings: on, fetchFeeds: async () => ({ articles: feed, okCount: 1, failed: [] }), log: quiet });
   const live = await db.listStories({ status: "approved" });
-  assert.equal(run.auto_published, 1);
+  assert.equal(run.auto_published, 1, "score 7 waits; the arrest story needs an extra check");
   assert.deepEqual(live.map((s) => s.headline), ["Our headline: College results declared"]);
+  assert.equal(live[0].auto_published, true);
 });
 
 test("if the AI fails, nothing crashes and articles are retried next run", async () => {
@@ -360,4 +360,16 @@ test("YouTube links on their own line become videos in a story", async () => {
   assert.equal(youtubeId("https://youtube.com/shorts/NroLEx68N-U"), "NroLEx68N-U");
   assert.equal(youtubeId("watch https://youtu.be/NroLEx68N-U"), null);
   assert.deepEqual(articleBlocks("Intro.\n\nhttps://youtu.be/NroLEx68N-U\n\n## Next").map((b) => b.type), ["p", "youtube", "h2"]);
+});
+
+test("auto-publish: only briefs scoring 8+ with a summary and no extra check go live", async () => {
+  const { shouldAutoPublish } = await import("../lib/pipeline.js");
+  const on = { autoPublish: { enabled: true, minScore: 8 } };
+  const good = { score: 8, summary: "A summary.", needs_check: false };
+  assert.equal(shouldAutoPublish(good, on), true);
+  assert.equal(shouldAutoPublish({ ...good, score: 7 }, on), false, "score too low");
+  assert.equal(shouldAutoPublish({ ...good, needs_check: true }, on), false, "needs an extra check");
+  assert.equal(shouldAutoPublish({ ...good, summary: "" }, on), false, "no summary yet");
+  assert.equal(shouldAutoPublish({ ...good, kind: "original" }, on), false, "own reports are published by their writer");
+  assert.equal(shouldAutoPublish(good, { autoPublish: { enabled: false, minScore: 8 } }), false, "switched off");
 });

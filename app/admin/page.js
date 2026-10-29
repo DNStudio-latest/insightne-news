@@ -128,7 +128,7 @@ function RunBox({ run }) {
   return (
     <div className="run-box">
       <strong>Last check:</strong> {formatDate(run.started_at)}
-      {run.practice_mode && " (no-AI mode)"} · {run.feeds_ok} feeds worked · {run.articles_new} new articles · {run.stories_created} new stories
+      {run.practice_mode && " (no-AI mode)"} · {run.feeds_ok} feeds worked · {run.articles_new} new articles · {run.stories_created} new stories{run.auto_published > 0 && ` (${run.auto_published} auto-published)`}
       {run.feeds_failed?.length > 0 && (
         <ul>
           {run.feeds_failed.map((f) => (

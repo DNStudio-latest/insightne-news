@@ -30,7 +30,7 @@ const run = await runPipeline({
 });
 
 // Stories that arrived without a summary (for example in no-AI mode) get one now.
-await fillMissingSummaries({ db, ai });
+await fillMissingSummaries({ db, ai, settings });
 
 // Bengali headline and summary for each story (only with Gemini).
 await fillMissingTranslations({ db, ai });

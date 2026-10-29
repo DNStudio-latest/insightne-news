@@ -71,7 +71,8 @@
     "autoPost": "originals"
   },
   "autoPublish": {
-    "_help": "FUTURE OPTION. Keep \"enabled\": false. If you ever set it to true, stories come out without your approval ONLY when every source of the story has \"autoPublish\": true in sources.json AND the story is not marked NEEDS EXTRA CHECK.",
-    "enabled": false
+    "_help": "News briefs from other sites go live WITHOUT your approval when enabled is true, the story scores minScore or more out of 10, it has a summary, and it is NOT marked NEEDS EXTRA CHECK (crime, violence, religion, communities, rumours, copied words). Everything else waits for you. Set enabled to false to approve everything yourself again.",
+    "enabled": true,
+    "minScore": 8
   }
 }

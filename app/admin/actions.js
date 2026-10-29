@@ -43,7 +43,7 @@ function illustrateLater(id) {
     }
     try {
       const story = await db.getStory(id);
-      if (facebookAutoPost() && story?.status === "approved") await shareOnFacebook(db, story);
+      if (facebookAutoPost(story)) await shareOnFacebook(db, story);
     } catch (err) {
       console.error("Facebook post failed:", err.message);
     }

@@ -398,7 +398,7 @@ main { padding: 20px 0 40px; }
 
 /* Language menu in the top strip */
 .lang-switch { display: inline-flex; align-items: center; gap: 4px; }
-.lang-switch select { font: inherit; font-size: 0.78rem; font-weight: 700; color: #fff; background: transparent; border: 1px solid rgba(255,255,255,0.45); border-radius: 999px; padding: 1px 6px; cursor: pointer; }
+.lang-switch select { font: inherit; font-size: 0.8rem; font-weight: 800; color: #1d2124; background: #ffd76a; border: 0; border-radius: 999px; padding: 3px 8px; cursor: pointer; }
 .lang-switch option { color: #1d2124; background: #fff; }
 .translated-note { font-size: 0.8rem; color: var(--muted); margin: 6px 0 0; }
 
@@ -439,3 +439,15 @@ main { padding: 20px 0 40px; }
 .live-pill { flex: none; background: #e53935; color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 0.72rem; font-weight: 800; }
 .live-note { margin: 0; font-size: 0.8rem; color: var(--muted); }
 .live-box.big .live-head h2 { font-size: 1.4rem; }
+
+/* First-visit language card (bottom of the screen) */
+.lang-welcome { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 40; width: min(460px, calc(100% - 24px)); background: var(--card); color: var(--text); border: 1px solid var(--line); border-top: 4px solid var(--accent); border-radius: 16px; box-shadow: 0 16px 40px rgba(0,0,0,0.25); padding: 16px 16px 12px; animation: lang-up 0.35s ease-out; }
+@keyframes lang-up { from { transform: translate(-50%, 30px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .lang-welcome { animation: none; } }
+.lang-welcome-title { margin: 0 28px 2px 0; font-weight: 800; font-size: 1.02rem; line-height: 1.35; }
+.lang-welcome-sub { margin: 0; font-size: 0.82rem; color: var(--muted); }
+.lang-welcome-options { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 8px; }
+.lang-welcome-options button { font: inherit; font-weight: 700; font-size: 0.98rem; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--text); cursor: pointer; }
+.lang-welcome-options button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.lang-welcome-note { margin: 0; font-size: 0.75rem; color: var(--muted); }
+.lang-welcome-close { position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: transparent; color: var(--muted); font-size: 1rem; cursor: pointer; }

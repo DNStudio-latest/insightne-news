@@ -286,3 +286,63 @@ export function NewsletterSignup({ lang = "en" }) {
     </form>
   );
 }
+
+// First visit: a small card at the bottom of the screen that tells readers the site is in 5 languages.
+// Shown once per browser (until the reader picks a language or closes it). It never covers the whole page.
+const WELCOME = {
+  en: "Read InsightNE News in your language",
+  bn: "আপনার ভাষায় ইনসাইটএনই নিউজ পড়ুন",
+  hi: "इनसाइटएनई न्यूज़ अपनी भाषा में पढ़ें",
+  as: "আপোনাৰ ভাষাত ইনছাইটএনই নিউজ পঢ়ক",
+  ne: "इनसाइटएनई न्युज आफ्नै भाषामा पढ्नुहोस्",
+};
+
+export function LanguageWelcome({ current }) {
+  const [show, setShow] = useState(false);
+  const [suggested, setSuggested] = useState(null);
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("lang-asked") || /(^|;\s*)lang=/.test(document.cookie)) return;
+    } catch {
+      return;
+    }
+    // Suggest the language the phone or computer is set to, if we have it.
+    const codes = LANGUAGES.map((l) => l.code);
+    const fromBrowser = (navigator.languages || [navigator.language]).map((l) => String(l).slice(0, 2).toLowerCase()).find((c) => codes.includes(c) && c !== "en");
+    setSuggested(fromBrowser || null);
+    const timer = setTimeout(() => setShow(true), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const remember = () => {
+    try {
+      localStorage.setItem("lang-asked", "1");
+    } catch {}
+  };
+  const choose = (code) => {
+    remember();
+    if (code === current) return setShow(false);
+    window.location.href = `/lang/${code}?back=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+  };
+  if (!show) return null;
+  const order = suggested ? [suggested, ...LANGUAGES.map((l) => l.code).filter((c) => c !== suggested)] : LANGUAGES.map((l) => l.code);
+
+  return (
+    <div className="lang-welcome" role="dialog" aria-label="Choose your language">
+      <button type="button" className="lang-welcome-close" aria-label="Close" onClick={() => (remember(), setShow(false))}>✕</button>
+      <p className="lang-welcome-title">🌐 {WELCOME[suggested || current] || WELCOME.en}</p>
+      {(suggested || current) !== "en" && <p className="lang-welcome-sub">{WELCOME.en}</p>}
+      <div className="lang-welcome-options">
+        {order.map((code) => {
+          const l = LANGUAGES.find((x) => x.code === code);
+          return (
+            <button key={code} type="button" lang={code} className={code === (suggested || current) ? "on" : undefined} onClick={() => choose(code)}>
+              {l.name}
+            </button>
+          );
+        })}
+      </div>
+      <p className="lang-welcome-note">You can change this any time with the 🌐 button at the top.</p>
+    </div>
+  );
+}

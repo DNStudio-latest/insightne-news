@@ -5,7 +5,7 @@ import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js"
 import { CopyLinkButton, NavBar } from "./client.js";
 import { AI_CREDIT } from "../lib/images.js";
 import { initLang, lang, pick, tr } from "../lib/lang.js";
-import { LangSwitch, AlertsButton, NewsletterSignup } from "./client.js";
+import { LangSwitch, AlertsButton, NewsletterSignup, LanguageWelcome } from "./client.js";
 import { newsletterReady } from "../lib/newsletter.js";
 import { pushPublicKey } from "../lib/push.js";
 import { indiaMatch } from "../lib/cricket.js";
@@ -546,6 +546,7 @@ export async function PageShell({ current, children, ticker, updatedAt }) {
       <SiteHeader current={current} ticker={ticker} updatedAt={updatedAt} breaking={breaking} cricket={cricket} live={live} />
       <main className="container">{children}</main>
       <SiteFooter />
+      <LanguageWelcome current={lang()} />
     </>
   );
 }

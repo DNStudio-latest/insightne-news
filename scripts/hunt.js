@@ -6,6 +6,7 @@ import { settings, states } from "../lib/config.js";
 import { createGeminiCaller } from "../lib/gemini.js";
 import { createHunterAi } from "../lib/hunter/ai.js";
 import { createPoliteFetcher } from "../lib/hunter/polite.js";
+import { createRelayFetch } from "../lib/hunter/relay.js";
 import { hunterStore } from "../lib/hunter/store.js";
 import { runHunter } from "../lib/hunter/run.js";
 
@@ -21,9 +22,26 @@ const quick = createGeminiCaller({ maxOutputTokens: 4000 });
 const writer = createGeminiCaller({ model: process.env.HUNTER_MODEL || "gemini-flash-latest", maxOutputTokens: 4000 });
 const judgeAi = createHunterAi({ generate: quick, states, topics: settings.topics });
 const draftAi = createHunterAi({ generate: writer, states, topics: settings.topics });
-const ai = { judge: judgeAi.judge, draft: draftAi.draft };
+// If the stronger model's free limit runs out (or it stops answering), the rest of the drafts are written by Flash-Lite.
+let writerDown = false;
+async function draft(docs) {
+  if (!writerDown) {
+    try {
+      return await draftAi.draft(docs);
+    } catch (err) {
+      if (!/429|50\d|did not answer/.test(err.message)) throw err;
+      writerDown = true;
+      console.log(`  ⚠ ${err.message} — Flash-Lite writes the rest of the drafts`);
+    }
+  }
+  return judgeAi.draft(docs);
+}
+const ai = { judge: judgeAi.judge, draft };
+
+// On GitHub (in the USA), government websites are fetched through the website's Mumbai server.
+const fetchFn = process.env.GITHUB_ACTIONS ? createRelayFetch() : fetch;
 
 console.log(`InsightNE News Hunter — ${new Date().toISOString()}`);
-const run = await runHunter({ store: hunterStore, get: createPoliteFetcher(), ai, generate: quick, config: hunterConfig, readOnly });
+const run = await runHunter({ store: hunterStore, get: createPoliteFetcher({ fetchFn }), ai, generate: quick, config: hunterConfig, readOnly });
 console.log("Done.", JSON.stringify({ ...run, pages_failed: run.pages_failed.map((f) => `${f.name}: ${f.error}`) }, null, 1));
 process.exit(run.error ? 1 : 0);

@@ -99,3 +99,30 @@ test("a full run: new item read once, judged, drafted with checks; nothing publi
   assert.equal(second.drafts_created, 0, "the same item is never processed twice");
   assert.equal(fetched.filter((u) => u.includes("governor-meets")).length, 1);
 });
+
+test("on GitHub, government pages go through the website's Mumbai server; only with the right password", async () => {
+  const { createRelayFetch, relayAllowed } = await import("../lib/hunter/relay.js");
+  process.env.SUPABASE_SECRET_KEY = "test-secret";
+  const { GET } = await import("../app/api/hunter-fetch/route.js");
+  const upstream = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    upstream.push({ url, ua: init.headers["User-Agent"] });
+    return Object.defineProperty(new Response("<p>press release</p>", { status: 200, headers: { "content-type": "text/html" } }), "url", { value: url });
+  };
+  try {
+    const viaRoute = (url, init) => GET(new Request(url, { headers: init.headers }));
+    const relayFetch = createRelayFetch({ relayUrl: "https://site.test/api/hunter-fetch", secret: "test-secret", fetchFn: (url, init) => (url.startsWith("https://site.test") ? viaRoute(url, init) : Promise.resolve(new Response("direct"))) });
+    const res = await relayFetch("https://ica.tripura.gov.in/press-release", { headers: { "User-Agent": "Bot" } });
+    assert.equal(res.status, 200);
+    assert.equal(res.url, "https://ica.tripura.gov.in/press-release");
+    assert.equal(await res.text(), "<p>press release</p>");
+    assert.deepEqual(upstream, [{ url: "https://ica.tripura.gov.in/press-release", ua: "Bot" }]);
+    assert.equal(await (await relayFetch("https://www.youtube.com/x")).text(), "direct");
+    assert.equal((await GET(new Request("https://site.test/api/hunter-fetch?url=https://ica.tripura.gov.in/"))).status, 403);
+    assert.equal(relayAllowed("http://169.254.169.254/latest"), false);
+    assert.equal(relayAllowed("https://evil.com/?x=.gov.in"), false);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});

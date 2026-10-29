@@ -73,5 +73,7 @@ alter table hunter_pages enable row level security;
 alter table hunter_items enable row level security;
 alter table hunter_drafts enable row level security;
 alter table hunter_runs enable row level security;
+grant select, insert, update, delete on hunter_pages, hunter_items, hunter_drafts, hunter_runs to service_role;
+grant usage, select on all sequences in schema public to service_role;
 
 -- The timer is in hunter-timer.sql: run it after testing the Hunter by hand.

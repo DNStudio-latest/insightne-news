@@ -9,6 +9,7 @@ const FLAG_LABELS = {
   kokborok: { text: "Kokborok source", color: "#8a5a00" },
   ocr: { text: "Scanned document (OCR)", color: "#8a5a00" },
   video: { text: "From a video", color: "#555" },
+  sensitive: { text: "Sensitive: crime, court, communal or deaths", color: "var(--danger)" },
 };
 
 const when = (iso) => new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" });

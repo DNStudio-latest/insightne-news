@@ -175,3 +175,17 @@ test("election watcher: first visit remembers old links quietly; a new schedule 
   assert.equal(alerts[0].label, "🗳️ ELECTION");
   assert.equal((await store.itemsWithStatus("queued")).length, 1);
 });
+
+test("auto-publish rules: only clean, high-scoring, non-sensitive drafts from web pages or PDFs", async () => {
+  const { autoPublishCheck, safeShot } = await import("../lib/hunter/auto.js");
+  const rules = { enabled: true, minScore: 8, perDay: 10 };
+  const good = { headline: "Tripura to observe Rashtriya Ekta Diwas", body: "The state will observe it on October 31.", flags: [], score: 9, sources: [{ kind: "page", proof: "a.webp" }, { kind: "pdf" }] };
+  assert.equal(autoPublishCheck(good, rules).ok, true);
+  assert.equal(autoPublishCheck(good, { ...rules, enabled: false }).ok, false);
+  assert.equal(autoPublishCheck({ ...good, score: 7 }, rules).ok, false);
+  assert.equal(autoPublishCheck({ ...good, flags: ["sensitive"] }, rules).ok, false);
+  assert.equal(autoPublishCheck({ ...good, body: "He said 10 [CHECK] people came." }, rules).ok, false);
+  assert.equal(autoPublishCheck({ ...good, sources: [{ kind: "video" }] }, rules).ok, false);
+  assert.equal(safeShot(good).proof, "a.webp");
+  assert.equal(safeShot({ sources: [{ kind: "pdf", proof: "b.webp" }] }), null);
+});

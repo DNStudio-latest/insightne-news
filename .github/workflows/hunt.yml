@@ -1,10 +1,12 @@
 # Runs the News Hunter, for free, on GitHub.
-# The Supabase timer (supabase/hunter-timer.sql) starts it at 2 PM, 6 PM and 9 PM India time.
+# It runs by itself every hour, day and night (free, because the repository is public).
 # You can also run it by hand: GitHub > Actions > "Hunt news" > "Run workflow".
 name: Hunt news
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *" # every hour, at 17 minutes past
 
 concurrency:
   group: hunt-news

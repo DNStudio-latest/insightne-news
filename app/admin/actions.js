@@ -4,12 +4,13 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { refreshSite } from "../../lib/site-cache.js";
 import { after } from "next/server";
-import { addIllustration } from "../../lib/images.js";
 import { compressPhoto } from "../../lib/photo.js";
 import { sendAlert } from "../../lib/push.js";
-import { shareOnFacebook, facebookAutoPost } from "../../lib/facebook.js";
-import { shareOnInstagram, instagramAutoPost } from "../../lib/instagram.js";
+import { shareOnFacebook } from "../../lib/facebook.js";
+import { shareOnInstagram } from "../../lib/instagram.js";
 import { logSocial, checkSocial } from "../../lib/social.js";
+import { finishPublishing } from "../../lib/after-publish.js";
+import { publishHunterDraft } from "../../lib/hunter/publish.js";
 import { sendEmail, dailyEmail, FREE_DAILY_LIMIT } from "../../lib/newsletter.js";
 import { topStories } from "../../lib/top.js";
 import { formatDay, youtubeId } from "../../lib/format.js";
@@ -46,33 +47,7 @@ function refresh(view = "pending", notice = "") {
 // After a story is published, in the background: make its AI illustration (only if Cloudflare is set up),
 // then post it to Facebook if "autoPost" is switched on in settings.json.
 function illustrateLater(id) {
-  after(async () => {
-    try {
-      const story = await db.getStory(id);
-      if (story?.status === "approved" && (await addIllustration(db, story))) refreshPages();
-    } catch (err) {
-      console.error("Illustration failed:", err.message);
-    }
-    const story = await db.getStory(id).catch(() => null);
-    if (facebookAutoPost(story) && !story.facebook_post_id) {
-      try {
-        await shareOnFacebook(db, story);
-        await logSocial(db, "Facebook", story);
-      } catch (err) {
-        console.error("Facebook post failed:", err.message);
-        await logSocial(db, "Facebook", story, err.message);
-      }
-    }
-    if (instagramAutoPost(story) && !story.instagram_post_id) {
-      try {
-        await shareOnInstagram(db, story);
-        await logSocial(db, "Instagram", story);
-      } catch (err) {
-        console.error("Instagram post failed:", err.message);
-        await logSocial(db, "Instagram", story, err.message);
-      }
-    }
-  });
+  after(() => finishPublishing(db, id, refreshPages));
 }
 
 function editedFields(formData) {
@@ -464,33 +439,9 @@ export async function approveHunterDraft(formData) {
   if (hasCheckMarks(draft.headline) || hasCheckMarks(draft.body)) {
     backToHunter("This draft still has [CHECK] or [DELETED POST] notes. Check those parts against the source, edit them, then approve.", true);
   }
-  const paragraphs = draft.body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
-  // Link to the original PDF, page or video at the bottom of the story.
-  const sourceLines = draft.sources.map((s) => `Source: ${s.name}, ${s.url}`);
   // The chosen proof screenshot becomes the photo, only if you switched it on for this draft.
   const shot = draft.use_photo ? draft.sources[draft.photo_index ?? 0] : null;
-  const image_url = shot?.proof ? await db.uploadImage(await hunterStore.readProof(shot.proof), "image/webp") : null;
-  const storyId = await db.createStory(
-    {
-      kind: "original",
-      status: "approved",
-      image_url,
-      image_caption: shot ? `Screenshot of the official page: ${shot.name}` : null,
-      image_credit: shot ? shot.name : null,
-      headline: draft.headline,
-      summary: paragraphs[0].slice(0, 600),
-      body: [...paragraphs.slice(1), ...sourceLines].join("\n\n"),
-      region: draft.state,
-      topic: draft.topic,
-      author: settings.defaultAuthor,
-      published_at: new Date().toISOString(),
-      score: draft.score,
-      needs_check: false,
-      check_reasons: [],
-    },
-    draft.sources.map((s) => ({ source_name: s.name, url: s.url, original_title: s.title || null })),
-  );
-  await hunterStore.updateDraft(draft.id, { status: "approved", story_id: storyId });
+  const storyId = await publishHunterDraft({ db, hunterStore, draft, shot });
   illustrateLater(storyId);
   refreshPages();
   backToHunter("Published on the website");

@@ -11,6 +11,7 @@ import { createProofCapturer } from "../lib/hunter/proof.js";
 import { hunterStore } from "../lib/hunter/store.js";
 import { runHunter } from "../lib/hunter/run.js";
 import { createTelegramAlert } from "../lib/hunter/alert.js";
+import { createPublisher } from "../lib/hunter/auto.js";
 import { db } from "../lib/db.js";
 
 // "--read-only" tests finding and reading items without AI (no key needed, no drafts written).
@@ -50,7 +51,7 @@ const proof = readOnly ? null : createProofCapturer();
 // Urgent items are sent to the editor's phone (Telegram), if the secrets are set.
 const alert = readOnly ? null : createTelegramAlert({ token: process.env.TELEGRAM_BOT_TOKEN, chatId: process.env.TELEGRAM_CHAT_ID });
 if (!readOnly && !alert) console.log("Urgent phone alerts are off: TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are not set.");
-const run = await runHunter({ store: hunterStore, get: createPoliteFetcher({ fetchFn }), ai, generate: quick, config: hunterConfig, readOnly, proof, site: db, alert });
+const run = await runHunter({ store: hunterStore, get: createPoliteFetcher({ fetchFn }), ai, generate: quick, config: hunterConfig, readOnly, proof, site: db, alert, publish: readOnly ? null : createPublisher() });
 await proof?.close();
 console.log("Done.", JSON.stringify({ ...run, pages_failed: run.pages_failed.map((f) => `${f.name}: ${f.error}`) }, null, 1));
 process.exit(run.error ? 1 : 0);

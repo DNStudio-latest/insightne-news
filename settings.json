@@ -13,9 +13,18 @@
   "liveChannels": {
     "_help": "Official government channels listed on the Live page (name and YouTube link). Add more the same way; check each link is the real, official channel first.",
     "list": [
-      { "name": "PM Narendra Modi", "url": "https://www.youtube.com/@NarendraModi/streams" },
-      { "name": "Sansad TV (Parliament)", "url": "https://www.youtube.com/channel/UCISgnSNwqQ2i8lhCun3KtQg/streams" },
-      { "name": "DD India", "url": "https://www.youtube.com/@DDIndia/streams" }
+      {
+        "name": "PM Narendra Modi",
+        "url": "https://www.youtube.com/@NarendraModi/streams"
+      },
+      {
+        "name": "Sansad TV (Parliament)",
+        "url": "https://www.youtube.com/channel/UCISgnSNwqQ2i8lhCun3KtQg/streams"
+      },
+      {
+        "name": "DD India",
+        "url": "https://www.youtube.com/@DDIndia/streams"
+      }
     ]
   },
   "social": {
@@ -81,5 +90,9 @@
     "_help": "News briefs from other sites go live WITHOUT your approval when enabled is true, the story scores minScore or more out of 10, it has a summary, and it is NOT marked NEEDS EXTRA CHECK (crime, violence, religion, communities, rumours, copied words). Everything else waits for you. Set enabled to false to approve everything yourself again.",
     "enabled": true,
     "minScore": 8
+  },
+  "cricket": {
+    "_help": "The India men's score box follows only matches against this opponent (exact team name, e.g. \"New Zealand\", \"Pakistan\"). Leave it empty \"\" to show any India men's match.",
+    "followOpponent": "New Zealand"
   }
 }

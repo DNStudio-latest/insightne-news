@@ -80,8 +80,11 @@ export default async function HomePage() {
   const others = stories.filter((s) => s.id !== lead.id);
   const latest = others.filter((s) => s.topic !== ARTICLES).slice(0, 8); // articles have their own column
   const ownStories = others.filter((s) => s.kind === "original" && s.topic !== ARTICLES);
-  // Two more of our own stories under the lead (like a newspaper's front page), then the next three in "Originals".
-  const underLead = ownStories.filter((s) => s.image_url).slice(0, 2);
+  // Under the lead: the newest stories written by our team, sub-editors first (not News Hunter or desk copy).
+  const byPerson = ownStories.filter((s) => s.author && s.author !== settings.defaultAuthor);
+  const underLead = [...byPerson.filter((s) => s.author_id), ...byPerson.filter((s) => !s.author_id)]
+    .filter((s, i, all) => all.findIndex((x) => x.headline === s.headline) === i) // a story saved twice shows once
+    .slice(0, 2);
   const originals = ownStories.filter((s) => !underLead.includes(s)).slice(0, 3);
   const hasSide = articles.length > 0 || mostRead.length >= 3;
   const storiesByState = states.map((state) => [state, others.filter((s) => s.region === state).slice(0, 3)]);

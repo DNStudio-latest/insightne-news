@@ -370,6 +370,106 @@
       "url": "https://x.com/chandandnath",
       "check": "check",
       "source": "X search result; profile describes him as BJP Tripura state convenor (may be out of date)"
+    },
+    {
+      "name": "Manik Sarkar",
+      "role": "Former Chief Minister, Tripura; CPI(M) Politburo member",
+      "state": "Tripura",
+      "platform": "Instagram",
+      "handle": "@cpimmaniksarkar",
+      "url": "https://www.instagram.com/cpimmaniksarkar/",
+      "check": "check",
+      "source": "Instagram search result; bio says Politburo member and former CM. A fake Facebook account in his name was complained about by CPI(M), so no Facebook page is listed"
+    },
+    {
+      "name": "Manik Sarkar",
+      "role": "Former Chief Minister, Tripura; CPI(M) Politburo member",
+      "state": "Tripura",
+      "platform": "X",
+      "handle": "",
+      "url": "",
+      "check": "check",
+      "source": "No personal X account confirmed. CPI(M) accounts are the best place to check"
+    },
+    {
+      "name": "Pradyot Bikram Manikya Debbarma",
+      "role": "Tipra Motha Party chief; royal House of Tripura (a ThePrint report says he announced an exit from active politics; check the date)",
+      "state": "Tripura",
+      "platform": "Facebook",
+      "handle": "PradyotBikramManikya",
+      "url": "https://www.facebook.com/PradyotBikramManikya/",
+      "check": "check",
+      "source": "Facebook search result, about 352K followers, listed as official page"
+    },
+    {
+      "name": "TIPRA Motha Party",
+      "role": "State party page, Tripura",
+      "state": "Tripura",
+      "platform": "Facebook",
+      "handle": "TIPRAMothaParty",
+      "url": "https://www.facebook.com/TIPRAMothaParty/",
+      "check": "check",
+      "source": "Facebook search result, described as the official party page"
+    },
+    {
+      "name": "Biplab Kumar Deb",
+      "role": "BJP national general secretary; Lok Sabha MP, West Tripura; former Chief Minister",
+      "state": "Tripura",
+      "platform": "X",
+      "handle": "@BjpBiplab",
+      "url": "https://x.com/BjpBiplab",
+      "check": "found",
+      "source": "X profile (bio lists these roles); Wikidata"
+    },
+    {
+      "name": "Biplab Kumar Deb",
+      "role": "BJP national general secretary; Lok Sabha MP, West Tripura; former Chief Minister",
+      "state": "Tripura",
+      "platform": "Facebook",
+      "handle": "bjpbiplab",
+      "url": "https://www.facebook.com/bjpbiplab/",
+      "check": "found",
+      "source": "Facebook page (same roles in its description); Wikidata"
+    },
+    {
+      "name": "Jitendra Chaudhury",
+      "role": "CPI(M) Tripura state secretary; Politburo member",
+      "state": "Tripura",
+      "platform": "X",
+      "handle": "@Jitendra1958",
+      "url": "https://x.com/jitendra1958",
+      "check": "check",
+      "source": "X search result; bio matches. The cached page showed no posts, so the account may be inactive"
+    },
+    {
+      "name": "Gaurav Gogoi",
+      "role": "President, Assam Pradesh Congress Committee; MP",
+      "state": "Assam",
+      "platform": "X",
+      "handle": "@GauravGogoiAsm",
+      "url": "https://x.com/GauravGogoiAsm",
+      "check": "found",
+      "source": "X profile; a 27 Oct 2026 news report cites his post"
+    },
+    {
+      "name": "Assam Congress (state unit)",
+      "role": "Official party account, Assam",
+      "state": "Assam",
+      "platform": "X",
+      "handle": "@INCAssam",
+      "url": "https://x.com/INCAssam",
+      "check": "found",
+      "source": "X posts describing it as the Assam Congress account"
+    },
+    {
+      "name": "Mukul Sangma",
+      "role": "Leader of the Opposition, Meghalaya Assembly (TMC)",
+      "state": "Meghalaya",
+      "platform": "X",
+      "handle": "@mukulsangma",
+      "url": "https://x.com/mukulsangma",
+      "check": "check",
+      "source": "News reports (The Statesman; Sangbad Pratidin) name this account; verification not confirmed"
     }
   ],
   "websites": [

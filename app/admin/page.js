@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { db, cleanSearch } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
 import { currentUser } from "../../lib/auth.js";
+import { SUB_EDITOR, storyCounts } from "../../lib/staff.js";
 import { formatDate } from "../../lib/format.js";
 import { logout } from "./actions.js";
 import StoryActions from "./StoryActions.js";
@@ -32,6 +33,9 @@ export default async function AdminPage({ searchParams }) {
   const user = await currentUser();
   if (!user) redirect("/admin/login");
   const admin = user.role === "admin";
+  // A sub-editor sees only the stories they wrote.
+  const sub = user.role === SUB_EDITOR;
+  const mine = sub ? { authorId: user.id } : {};
   const params = await searchParams;
   const view = VIEWS[params.view] && (admin || params.view !== "rejected") ? params.view : "pending";
   const q = cleanSearch(params.q);
@@ -39,10 +43,11 @@ export default async function AdminPage({ searchParams }) {
   const sort = SORTS[params.sort] ? params.sort : "newest";
   const filtering = Boolean(q || state);
 
-  const [found, pendingAll, lastRun] = await Promise.all([
-    q ? db.searchStories(q, { status: VIEWS[view], limit: 300 }) : db.listStories({ status: VIEWS[view], limit: 500 }),
-    view === "pending" && !filtering ? null : db.listStories({ status: "pending", limit: 500 }),
-    db.lastRun(),
+  const [found, pendingAll, lastRun, myCount] = await Promise.all([
+    q ? db.searchStories(q, { status: VIEWS[view], limit: 300, ...mine }) : db.listStories({ status: VIEWS[view], limit: 500, ...mine }),
+    view === "pending" && !filtering ? null : db.listStories({ status: "pending", limit: 500, ...mine }),
+    sub ? null : db.lastRun(),
+    sub ? db.storyAuthors().then((rows) => storyCounts(rows, [{ id: user.id, name: user.name }])[user.id]).catch(() => null) : null,
   ]);
   const matching = found.filter((s) => !state || s.region === state).sort(SORTS[sort]);
   const stories = matching.slice(0, MAX_SHOWN);
@@ -51,15 +56,15 @@ export default async function AdminPage({ searchParams }) {
   return (
     <div className="wrap">
       <div className="admin-bar">
-        <h1>{settings.siteName} · {admin ? "Approvals" : "Editor"}</h1>
+        <h1>{settings.siteName} · {admin ? "Approvals" : sub ? "Sub-editor" : "Editor"}</h1>
         <form action={logout}>
           <button className="btn btn-plain" type="submit">Sign out</button>
         </form>
       </div>
 
       <nav className="tabs">
-        <a href="/admin?view=pending" aria-current={view === "pending" ? "page" : undefined}>Pending ({pendingCount})</a>
-        <a href="/admin?view=published" aria-current={view === "published" ? "page" : undefined}>Published</a>
+        <a href="/admin?view=pending" aria-current={view === "pending" ? "page" : undefined}>{sub ? "My drafts" : "Pending"} ({pendingCount})</a>
+        <a href="/admin?view=published" aria-current={view === "published" ? "page" : undefined}>{sub ? "My published stories" : "Published"}</a>
         {admin && <a href="/admin?view=rejected" aria-current={view === "rejected" ? "page" : undefined}>Rejected</a>}
         <a href="/admin/write">✍ Write story</a>
         {admin && (
@@ -77,13 +82,22 @@ export default async function AdminPage({ searchParams }) {
       </nav>
 
       {params.done && <div className="notice">✓ {params.done}</div>}
-      {!admin && (
+      {sub && (
+        <div className="run-box">
+          Signed in as <b>{user.name}</b> (sub-editor).{" "}
+          {myCount !== null && <>Stories you have published so far: <b style={{ fontSize: "1.25em" }}>{myCount}</b>. </>}
+          You see and edit only your own stories, in any state or topic. Your name appears as the byline (“By {user.name}, Sub-Editor”).
+          Making a story the lead or breaking news is for the admin.{" "}
+          {settings.subEditors?.canPublish === false ? "New stories you send go to Pending, and the admin publishes them." : "Stories you publish go live straight away."}
+        </div>
+      )}
+      {!admin && !sub && (
         <p className="note">
           Signed in as <b>{user.name}</b> (editor): you can write stories, upload photos and edit. Your name appears as the byline on stories you write.{" "}
           {settings.editors?.canPublish === true ? "Stories you publish go live straight away." : "New stories you send go to Pending, and the admin publishes them."}
         </p>
       )}
-      <RunBox run={lastRun} />
+      {!sub && <RunBox run={lastRun} />}
 
       <form className="admin-filter" action="/admin" role="search">
         <input type="hidden" name="view" value={view} />
@@ -117,7 +131,7 @@ export default async function AdminPage({ searchParams }) {
         )}
         {stories.length === 0 && (
           <div className="empty">
-            {filtering ? "No stories found. Try another word or state." : view === "pending" ? "Nothing waiting. New stories arrive every 3 hours." : "Nothing here yet."}
+            {filtering ? "No stories found. Try another word or state." : sub ? (view === "pending" ? "No drafts. Tap ✍ Write story to start one." : "You have not published a story yet. Tap ✍ Write story to start.") : view === "pending" ? "Nothing waiting. New stories arrive every 3 hours." : "Nothing here yet."}
           </div>
         )}
         {stories.map((story) => (

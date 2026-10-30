@@ -1,6 +1,7 @@
 import { db } from "../../lib/db.js";
 import { settings, slugify, editorName } from "../../lib/config.js";
 import { InfoPage, Email, publisher } from "../info.js";
+import { staffTitle, storyCounts } from "../../lib/staff.js";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Ownership and team", alternates: { canonical: "/team" } };
@@ -8,6 +9,7 @@ export const metadata = { title: "Ownership and team", alternates: { canonical: 
 // Who owns and runs the site, and the reporters who write for it (from the Editors list on the approval page).
 export default async function TeamPage() {
   const editors = (await db.listEditors().catch(() => [])).filter((e) => e.active && e.name !== publisher.editor);
+  const counts = storyCounts(await db.storyAuthors().catch(() => []), editors);
   return (
     <InfoPage title="Ownership and team">
       <h2>Ownership</h2>
@@ -27,7 +29,8 @@ export default async function TeamPage() {
           <ul>
             {editors.map((e) => (
               <li key={e.id}>
-                <a href={`/author/${slugify(e.name)}`}>{e.name}</a>
+                <a href={`/author/${slugify(e.name)}`}>{e.name}</a>, {staffTitle(e)}
+                {counts[e.id] > 0 && ` · ${counts[e.id]} ${counts[e.id] === 1 ? "report" : "reports"}`}
               </li>
             ))}
           </ul>

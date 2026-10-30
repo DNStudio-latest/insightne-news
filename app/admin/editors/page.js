@@ -3,6 +3,7 @@ import { db } from "../../../lib/db.js";
 import { currentRole } from "../../../lib/auth.js";
 import { formatDate } from "../../../lib/format.js";
 import { addEditor, changeEditor } from "../actions.js";
+import { SUB_EDITOR, storyCounts } from "../../../lib/staff.js";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Editors", robots: { index: false, follow: false } };
@@ -14,6 +15,7 @@ export default async function EditorsPage({ searchParams }) {
   if (role !== "admin") redirect("/admin"); // admin only
   const { done } = await searchParams;
   const editors = await db.listEditors().catch(() => null);
+  const counts = storyCounts(await db.storyAuthors().catch(() => []), editors || []);
 
   return (
     <div className="wrap">
@@ -36,6 +38,13 @@ export default async function EditorsPage({ searchParams }) {
           or Facebook.
         </p>
         <label>
+          Role
+          <select name="role" defaultValue={SUB_EDITOR}>
+            <option value={SUB_EDITOR}>Sub-editor: writes and edits only their own stories (no lead or breaking news)</option>
+            <option value="editor">Editor: can edit every story</option>
+          </select>
+        </label>
+        <label>
           Full name (as it should appear on stories)
           <input type="text" name="name" required maxLength={80} placeholder="e.g. Rina Das" />
         </label>
@@ -53,15 +62,23 @@ export default async function EditorsPage({ searchParams }) {
         {editors?.map((e) => (
           <article key={e.id} className="story">
             <div className="meta">
+              <span className="badge" style={{ background: "var(--accent)" }}>{e.role === SUB_EDITOR ? "Sub-editor" : "Editor"}</span>
               {e.active ? <span className="badge">Can sign in</span> : <span className="tag">Paused</span>}
               <span>Added {formatDate(e.created_at)}</span>
             </div>
-            <h2>{e.name}</h2>
+            <h2>
+              {e.name} <span className="score" title="Published stories with their byline">📰 {counts[e.id]} {counts[e.id] === 1 ? "story" : "stories"}</span>
+            </h2>
             <div className="actions">
               <form action={changeEditor}>
                 <input type="hidden" name="id" value={e.id} />
                 <input type="hidden" name="what" value="toggle" />
                 <button className="btn btn-plain" type="submit">{e.active ? "PAUSE" : "ALLOW AGAIN"}</button>
+              </form>
+              <form action={changeEditor}>
+                <input type="hidden" name="id" value={e.id} />
+                <input type="hidden" name="what" value="role" />
+                <button className="btn btn-plain" type="submit">{e.role === SUB_EDITOR ? "MAKE EDITOR" : "MAKE SUB-EDITOR"}</button>
               </form>
               <form action={changeEditor}>
                 <input type="hidden" name="id" value={e.id} />

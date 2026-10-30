@@ -19,8 +19,9 @@ import { hunterStore } from "../../lib/hunter/store.js";
 import { hasCheckMarks } from "../../lib/hunter/checks.js";
 import { settings, regions } from "../../lib/config.js";
 import { currentRole, currentUser, userForPassword, hashPassword, startSession, endSession } from "../../lib/auth.js";
+import { SUB_EDITOR, staffTitle } from "../../lib/staff.js";
 
-// Any signed-in person (admin or editor). Returns "admin" or "editor".
+// Any signed-in person. Returns "admin", "editor" or "sub_editor".
 async function requireLogin() {
   const role = await currentRole();
   if (!role) redirect("/admin/login");
@@ -115,6 +116,8 @@ export async function saveEdit(formData) {
   const id = String(formData.get("id"));
   const view = String(formData.get("view") || "pending");
   const existing = await db.getStory(id);
+  // Sub-editors may change only the stories they wrote.
+  if (role === SUB_EDITOR && (!existing || existing.author_id !== (await currentUser())?.id)) refresh(view, "You can edit only your own stories");
   const fields = { ...editedFields(formData), ...(await photoFields(formData, existing, (message) => refresh(view, message))) };
   // If the English text changed, the Hindi/Assamese/Nepali versions are made again at the next collector run.
   if (fields.headline !== existing?.headline || fields.summary !== existing?.summary) fields.translations = {};
@@ -161,11 +164,14 @@ export async function saveOriginal(formData) {
   const user = await currentUser();
   const id = text(formData, "id", 60);
   const existing = id ? await db.getStory(id) : null;
-  // Editors publish their own stories directly when "editors.canPublish" is true in settings.json;
-  // otherwise a new story from an editor waits in Pending for your approval.
-  const canPublish = role === "admin" || settings.editors?.canPublish === true;
+  const sub = role === SUB_EDITOR;
+  // Sub-editors may open and change only the stories they wrote.
+  if (sub && existing && existing.author_id !== user.id) refresh("published", "You can edit only your own stories");
+  // Editors publish their own stories directly when "editors.canPublish" is true in settings.json, and
+  // sub-editors unless "subEditors.canPublish" is false; otherwise a new story waits in Pending for your approval.
+  const canPublish = role === "admin" || (sub ? settings.subEditors?.canPublish !== false : settings.editors?.canPublish === true);
   const editorSends = !canPublish && formData.get("intent") === "publish" && existing?.status !== "approved";
-  const publish = canPublish ? formData.get("intent") === "publish" || (role === "editor" && existing?.status === "approved") : existing?.status === "approved";
+  const publish = canPublish ? formData.get("intent") === "publish" || (role !== "admin" && existing?.status === "approved") : existing?.status === "approved";
   const backToEditor = (message) => redirect(`/admin/write?${id ? `id=${id}&` : ""}error=${encodeURIComponent(message)}`);
 
   const fields = {
@@ -175,13 +181,15 @@ export async function saveOriginal(formData) {
     body: String(formData.get("body") || "").trim().slice(0, 60000),
     region: regions.includes(formData.get("region")) ? formData.get("region") : regions[0],
     topic: settings.topics.includes(formData.get("topic")) ? formData.get("topic") : null,
-    // The byline. Editors: their own name on new stories; editing someone else's story keeps that writer's name.
-    // Admin: what you typed in "Written by" (your name is filled in for you).
-    author: role === "editor" ? existing?.author || user.name : text(formData, "author", 120) || user.name || settings.defaultAuthor,
+    // The byline. Sub-editors: always their own name. Editors: their own name on new stories; editing someone
+    // else's story keeps that writer's name. Admin: what you typed in "Written by" (your name is filled in for you).
+    author: sub ? user.name : role === "editor" ? existing?.author || user.name : text(formData, "author", 120) || user.name || settings.defaultAuthor,
     headline_bn: text(formData, "headline_bn", 300) || null,
     summary_bn: text(formData, "summary_bn", 2000) || null,
     body_bn: String(formData.get("body_bn") || "").trim().slice(0, 60000) || null,
   };
+  // A sub-editor's story is theirs: it counts for them and shows their title under the byline.
+  if (sub) Object.assign(fields, { author_id: user.id, author_title: staffTitle({ role }) });
   if (!fields.headline) backToEditor("Please write a headline.");
   if (existing && (fields.headline !== existing.headline || fields.summary !== existing.summary)) fields.translations = {};
   if (publish && (!fields.summary || !fields.body)) backToEditor("Please write the intro and the story text before publishing.");
@@ -325,8 +333,10 @@ export async function addEditor(formData) {
   if (!name) backToEditors("Please write the person's name.");
   if (password.length < 8) backToEditors("The password must have at least 8 characters.");
   if (password === process.env.ADMIN_PASSWORD) backToEditors("Please choose a password different from your own.");
-  await db.createEditor({ name, password_hash: hashPassword(password) });
-  backToEditors(`${name} can now sign in. Give them the password in person or by phone.`);
+  const sub = formData.get("role") === SUB_EDITOR;
+  const saved = await db.createEditor({ name, password_hash: hashPassword(password), ...(sub && { role: SUB_EDITOR }) }).then(() => true, () => false);
+  if (!saved) backToEditors("Could not add them. If you chose Sub-editor, first run supabase/sub-editors.sql in Supabase → SQL Editor.");
+  backToEditors(`${name} can now sign in${sub ? " as a sub-editor" : ""}. Give them the password in person or by phone.`);
 }
 
 export async function changeEditor(formData) {
@@ -348,6 +358,12 @@ export async function changeEditor(formData) {
     if (password.length < 8) backToEditors("The new password must have at least 8 characters.");
     await db.updateEditor(id, { password_hash: hashPassword(password) });
     backToEditors(`New password saved for ${editor.name}.`);
+  }
+  if (what === "role") {
+    const role = editor.role === SUB_EDITOR ? "editor" : SUB_EDITOR;
+    const saved = await db.updateEditor(id, { role }).then(() => true, () => false);
+    if (!saved) backToEditors("Could not change it. First run supabase/sub-editors.sql in Supabase → SQL Editor.");
+    backToEditors(role === SUB_EDITOR ? `${editor.name} is now a sub-editor: they see and edit only their own stories.` : `${editor.name} is now an editor: they can edit every story.`);
   }
   if (what === "rename") {
     const name = text(formData, "name", 80);

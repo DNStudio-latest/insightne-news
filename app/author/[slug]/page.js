@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "../../../lib/db.js";
 import { settings, slugify, editorName, bylineName } from "../../../lib/config.js";
 import { PageShell, SectionHead, StoryGrid } from "../../components.js";
+import { staffTitle } from "../../../lib/staff.js";
 
 export const dynamic = "force-dynamic";
 
@@ -26,8 +27,9 @@ export default async function AuthorPage({ params }) {
   const known = [editorName, ...editors.map((e) => e.name)].find((n) => n && slugify(n) === slug);
   const name = stories[0] ? bylineName(stories[0].author) : known;
   if (!name) notFound();
-  const role = name === editorName ? `Editor, ${settings.siteName}` : `Reporter, ${settings.siteName}`;
-  const person = {
+  const person = editors.find((e) => slugify(e.name) === slug);
+  const role = name === editorName ? `Editor, ${settings.siteName}` : `${staffTitle(person)}, ${settings.siteName}`;
+  const schema = {
     "@context": "https://schema.org",
     "@type": "Person",
     name,
@@ -37,7 +39,7 @@ export default async function AuthorPage({ params }) {
   };
   return (
     <PageShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />
       <SectionHead title={name} />
       <p className="note" style={{ marginTop: -4, marginBottom: 18 }}>
         {role} · {stories.length} {stories.length === 1 ? "report" : "reports"}

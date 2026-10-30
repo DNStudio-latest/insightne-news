@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { db } from "../../../lib/db.js";
 import { settings, regions } from "../../../lib/config.js";
 import { currentUser } from "../../../lib/auth.js";
+import { SUB_EDITOR } from "../../../lib/staff.js";
 import StoryEditor from "./StoryEditor.js";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,8 @@ export default async function WritePage({ searchParams }) {
   const role = user.role;
   const { id, error } = await searchParams;
   const story = id ? await db.getStory(String(id)) : null;
+  // Sub-editors may open only the stories they wrote.
+  if (role === SUB_EDITOR && story && story.author_id !== user.id) redirect(`/admin?done=${encodeURIComponent("You can edit only your own stories")}`);
 
   return (
     <div className="wrap">
@@ -38,7 +41,7 @@ export default async function WritePage({ searchParams }) {
         topics={settings.topics}
         defaultAuthor={user.name || settings.defaultAuthor}
         role={role}
-        editorsPublish={settings.editors?.canPublish === true}
+        editorsPublish={role === SUB_EDITOR ? settings.subEditors?.canPublish !== false : settings.editors?.canPublish === true}
       />
     </div>
   );

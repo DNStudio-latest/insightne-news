@@ -77,6 +77,10 @@
     "_help": "People who sign in with EDITOR_PASSWORD. If canPublish is true, the stories they write go live straight away; if false, they wait in Pending for the admin.",
     "canPublish": true
   },
+  "subEditors": {
+    "_help": "People marked Sub-editor on /admin/editors. They see and edit only their own stories and can't make a story the lead or breaking news. If canPublish is true, their stories go live straight away; if false, they wait in Pending for the admin.",
+    "canPublish": true
+  },
   "facebook": {
     "_help": "Posting to your Facebook page. Needs FACEBOOK_PAGE_ID and FACEBOOK_PAGE_TOKEN in Vercel (see docs/5-FACEBOOK.md). autoPost: \"originals\" = your own reports are posted automatically when published; true = every story you approve; false = only with the POST TO FACEBOOK button.",
     "autoPost": "originals"

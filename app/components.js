@@ -452,12 +452,13 @@ export function Byline({ story, link = false }) {
 // 🎧 "Listen Top News": a short spoken briefing of the Top 5, read by the reader's own phone (a tab on the right edge of every page).
 const INTRO = "Here are today's top stories from InsightNE News.";
 const OUTRO = "That's all for now. Read the full stories on the InsightNE News website.";
+const NO_SOUND = "No sound? Turn up the volume. On iPhone, switch off Silent mode.";
 
 export async function TopBriefing({ stories }) {
   const top = stories ?? (await topStories(site).catch(() => []));
   if (!top.length) return null;
   const items = top.map((s) => ({ headline: pick(s, "headline"), summary: pick(s, "summary"), headline_en: s.headline, summary_en: s.summary }));
-  const texts = { intro: tr(INTRO), outro: tr(OUTRO), intro_en: INTRO, outro_en: OUTRO, listen: tr("Listen Top News"), pause: tr("Pause"), resume: tr("Resume"), stop: tr("Stop") };
+  const texts = { intro: tr(INTRO), outro: tr(OUTRO), intro_en: INTRO, outro_en: OUTRO, listen: tr("Listen Top News"), pause: tr("Pause"), resume: tr("Resume"), stop: tr("Stop"), noSound: tr(NO_SOUND) };
   return <ListenBriefing items={items} lang={lang()} texts={texts} />;
 }
 

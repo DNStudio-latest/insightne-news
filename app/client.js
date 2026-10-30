@@ -1,6 +1,6 @@
 "use client";
 // Small pieces that run in the reader's browser.
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { LANGUAGES } from "../lib/languages.js";
 
@@ -348,7 +348,7 @@ export function LanguageWelcome({ current }) {
 }
 
 // "Listen to today's top news": the phone or computer reads the top stories aloud with its own voice (free, no audio files).
-// items: [{ headline, summary, headline_en, summary_en }]; texts: { intro, outro, intro_en, outro_en, listen, pause, resume, stop }.
+// items: [{ headline, summary, headline_en, summary_en }]; texts: { intro, outro, intro_en, outro_en, listen, pause, resume, stop, noSound }.
 const VOICE_LANGS = { en: ["en-IN", "en"], bn: ["bn-IN", "bn"], hi: ["hi-IN", "hi"], as: ["as-IN", "as", "bn-IN", "bn"], ne: ["ne-NP", "ne", "hi-IN", "hi"] };
 
 function findVoice(code) {
@@ -368,81 +368,204 @@ const sentences = (text, max = 2) =>
     .filter(Boolean)
     .slice(0, max);
 
+const saveTo = (kind, key, value) => {
+  try {
+    window[kind].setItem(key, value);
+  } catch {}
+};
+
 export function ListenBriefing({ items, lang = "en", texts }) {
   const [supported, setSupported] = useState(false);
   const [state, setState] = useState("idle"); // idle | playing | paused
   const [current, setCurrent] = useState(-1);
+  const [tip, setTip] = useState(false);
+  const [mini, setMini] = useState(false);
+  const [closed, setClosed] = useState(false);
+  // Where the reader moved the tab, as a share of the free space ({ fx: 0 = left edge … 1 = right edge, fy }); null = default spot.
+  const [spot, setSpot] = useState(null);
+  const boxRef = useRef(null);
+  const run = useRef({ token: 0, pieces: [], index: 0, voice: null, langCode: "en-IN", utter: null, heard: false });
+  const drag = useRef(null);
+  const justDragged = useRef(false);
 
   useEffect(() => {
     if (!("speechSynthesis" in window)) return;
     setSupported(true);
     window.speechSynthesis.getVoices(); // starts loading the voice list
-    return () => window.speechSynthesis.cancel();
+    try {
+      const saved = JSON.parse(localStorage.getItem("listen-spot") || "null");
+      if (typeof saved?.fx === "number" && typeof saved?.fy === "number") setSpot(saved);
+      setMini(localStorage.getItem("listen-mini") === "1");
+      setClosed(sessionStorage.getItem("listen-closed") === "1");
+    } catch {}
+    return () => {
+      run.current.token += 1;
+      window.speechSynthesis.cancel();
+    };
   }, []);
 
-  if (!supported || !items?.length) return null;
+  // Puts the tab where the reader left it (also after the screen turns or resizes).
+  useLayoutEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const place = () => {
+      if (!spot) return void (el.style.left = el.style.top = el.style.right = "");
+      el.style.left = `${Math.round(spot.fx * Math.max(0, window.innerWidth - el.offsetWidth))}px`;
+      el.style.top = `${Math.round(spot.fy * Math.max(0, window.innerHeight - el.offsetHeight))}px`;
+      el.style.right = "auto";
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  });
 
-  function play() {
-    const synth = window.speechSynthesis;
-    synth.cancel();
-    // The reader's language if the device has a voice for it; otherwise English.
-    let voice = lang !== "en" ? findVoice(lang) : null;
-    const local = Boolean(voice);
-    if (!voice) voice = findVoice("en");
-    const pieces = [{ text: local ? texts.intro : texts.intro_en, item: -1 }];
-    items.forEach((s, i) => {
-      const headline = local ? s.headline : s.headline_en;
-      const summary = local ? s.summary : s.summary_en;
-      pieces.push({ text: headline, item: i, pause: true });
-      for (const line of sentences(summary)) pieces.push({ text: line, item: i });
-    });
-    pieces.push({ text: local ? texts.outro : texts.outro_en, item: -1, pause: true });
+  if (!supported || !items?.length || closed) return null;
 
-    pieces.forEach((p, n) => {
-      const u = new SpeechSynthesisUtterance(p.text);
-      if (voice) {
-        u.voice = voice;
-        u.lang = voice.lang;
-      }
-      u.rate = 0.95;
-      u.onstart = () => setCurrent(p.item);
-      if (n === pieces.length - 1) u.onend = () => (setState("idle"), setCurrent(-1));
-      // A short silence before each new story.
-      if (p.pause) {
-        const gap = new SpeechSynthesisUtterance(" ");
-        gap.volume = 0;
-        synth.speak(gap);
-      }
-      synth.speak(u);
-    });
-    setState("playing");
+  // One sentence at a time; the next starts when the last one ends (reliable on iPhone and Android).
+  function speakFrom(n, token) {
+    const r = run.current;
+    if (token !== r.token) return;
+    if (n >= r.pieces.length) return void (setState("idle"), setCurrent(-1), setTip(false));
+    r.index = n;
+    const piece = r.pieces[n];
+    const u = new SpeechSynthesisUtterance(piece.text);
+    u.lang = r.langCode;
+    if (r.voice) u.voice = r.voice;
+    u.rate = 0.95;
+    u.onstart = () => {
+      r.heard = true;
+      if (token === r.token) setCurrent(piece.item);
+    };
+    const next = () => {
+      if (token === r.token) setTimeout(() => speakFrom(n + 1, token), r.pieces[n + 1]?.pause ? 450 : 60);
+    };
+    u.onend = next;
+    u.onerror = (e) => e.error !== "interrupted" && e.error !== "canceled" && next();
+    r.utter = u; // keeps it alive: Chrome can drop the "ended" signal of a forgotten sentence
+    window.speechSynthesis.speak(u);
   }
 
-  function stop() {
+  function play(from = 0) {
+    const synth = window.speechSynthesis;
+    if (synth.speaking || synth.pending) synth.cancel();
+    const r = run.current;
+    if (from === 0) {
+      // The reader's language if the device has a voice for it; otherwise English.
+      const own = lang !== "en" ? findVoice(lang) : null;
+      const local = lang === "en" || Boolean(own);
+      r.voice = own || findVoice("en");
+      r.langCode = r.voice?.lang || (local ? VOICE_LANGS[lang]?.[0] : "en-IN") || "en-IN";
+      r.pieces = [{ text: local ? texts.intro : texts.intro_en, item: -1 }];
+      items.forEach((s, i) => {
+        r.pieces.push({ text: local ? s.headline : s.headline_en, item: i, pause: true });
+        for (const line of sentences(local ? s.summary : s.summary_en)) r.pieces.push({ text: line, item: i });
+      });
+      r.pieces.push({ text: local ? texts.outro : texts.outro_en, item: -1, pause: true });
+    }
+    r.token += 1;
+    r.heard = false;
+    const token = r.token;
+    setState("playing");
+    setTip(true);
+    speakFrom(from, token); // the first sentence must start inside the tap, or iPhones stay silent
+    // The "no sound?" tip goes away once the voice has started.
+    setTimeout(() => run.current.token === token && run.current.heard && setTip(false), 6000);
+  }
+
+  function halt() {
+    run.current.token += 1;
     window.speechSynthesis.cancel();
+  }
+  function stop() {
+    halt();
     setState("idle");
     setCurrent(-1);
+    setTip(false);
   }
-
-  const label = state === "idle" ? texts.listen : state === "playing" ? texts.pause : texts.resume;
   const onTap = () => {
     if (state === "idle") play();
-    else if (state === "playing") (window.speechSynthesis.pause(), setState("paused"));
-    else (window.speechSynthesis.resume(), setState("playing"));
+    else if (state === "playing") (halt(), setState("paused")); // pausing restarts the sentence later (phones' own pause is unreliable)
+    else play(run.current.index);
+  };
+  const shrink = (value) => (setMini(value), saveTo("localStorage", "listen-mini", value ? "1" : "0"));
+  const close = () => (stop(), setClosed(true), saveTo("sessionStorage", "listen-closed", "1"));
+  // A tap that ends a drag is not a press.
+  const tapped = (fn) => () => !justDragged.current && fn();
+
+  // Dragging: move the finger more than a few pixels to move the tab; let go near a side and it sticks to that edge.
+  const onPointerDown = (e) => {
+    if (e.button > 0) return;
+    const r = boxRef.current.getBoundingClientRect();
+    drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, left: r.left, top: r.top, moved: false, last: null };
+  };
+  const onPointerMove = (e) => {
+    const d = drag.current;
+    if (!d || d.id !== e.pointerId) return;
+    const dx = e.clientX - d.x;
+    const dy = e.clientY - d.y;
+    if (!d.moved) {
+      if (Math.hypot(dx, dy) < 8) return;
+      d.moved = true;
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+      e.currentTarget.classList.add("is-dragging");
+    }
+    const el = boxRef.current;
+    const maxX = Math.max(0, window.innerWidth - el.offsetWidth);
+    const maxY = Math.max(0, window.innerHeight - el.offsetHeight);
+    const left = Math.min(maxX, Math.max(0, d.left + dx));
+    const top = Math.min(maxY, Math.max(0, d.top + dy));
+    Object.assign(el.style, { left: `${left}px`, top: `${top}px`, right: "auto" });
+    d.last = { left, top, maxX, maxY };
+  };
+  const onPointerUp = (e) => {
+    const d = drag.current;
+    drag.current = null;
+    if (!d?.moved) return;
+    e.currentTarget.classList.remove("is-dragging");
+    justDragged.current = true;
+    setTimeout(() => (justDragged.current = false), 50);
+    if (!d.last) return;
+    let { left, top, maxX, maxY } = d.last;
+    if (left < 28) left = 0;
+    if (maxX - left < 28) left = maxX;
+    const next = { fx: maxX ? left / maxX : 1, fy: maxY ? top / maxY : 0.6 };
+    setSpot(next);
+    saveTo("localStorage", "listen-spot", JSON.stringify(next));
   };
 
-  // A tab fixed to the right edge of the screen: it stays in the same place while the reader scrolls.
+  const side = !spot || spot.fx >= 0.999 ? "right" : spot.fx <= 0.001 ? "left" : "free";
+  const label = state === "idle" ? texts.listen : state === "playing" ? texts.pause : texts.resume;
+  const icon = <span className="listen-float-icon" aria-hidden="true">{state === "playing" ? "❚❚" : "▶"}</span>;
+
   return (
-    <div className={`listen-float${state !== "idle" ? " is-on" : ""}`}>
-      {state !== "idle" && (
-        <button type="button" className="listen-float-stop" onClick={stop} aria-label={texts.stop} title={texts.stop}>✕</button>
+    <div
+      ref={boxRef}
+      className={`listen-float side-${side}${mini ? " is-mini" : ""}${state !== "idle" ? " is-on" : ""}`}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+    >
+      {mini ? (
+        <button type="button" className="listen-float-mini" onClick={tapped(() => shrink(false))} aria-label={texts.listen} title={texts.listen}>
+          {icon}
+        </button>
+      ) : (
+        <>
+          <div className="listen-float-tools">
+            {state !== "idle" && (
+              <button type="button" onClick={tapped(stop)} aria-label={texts.stop} title={texts.stop}>■</button>
+            )}
+            <button type="button" onClick={tapped(() => shrink(true))} aria-label="Make smaller" title="Make smaller">–</button>
+            <button type="button" onClick={tapped(close)} aria-label="Close" title="Close">✕</button>
+          </div>
+          <button type="button" className="listen-float-tab" onClick={tapped(onTap)} aria-label={label}>
+            {icon}
+            <span className="listen-float-text">{state === "idle" || current < 0 ? label : `${current + 1}/${items.length} · ${label}`}</span>
+          </button>
+          {tip && <p className="listen-float-tip">🔊 {texts.noSound}</p>}
+        </>
       )}
-      <button type="button" className="listen-float-tab" onClick={onTap} aria-label={label}>
-        <span className="listen-float-icon" aria-hidden="true">{state === "playing" ? "❚❚" : "▶"}</span>
-        <span className="listen-float-text">
-          {state === "idle" || current < 0 ? label : `${current + 1}/${items.length} · ${label}`}
-        </span>
-      </button>
       <p className="sr-only" aria-live="polite">{current >= 0 ? `${current + 1}/${items.length}: ${items[current].headline}` : ""}</p>
     </div>
   );

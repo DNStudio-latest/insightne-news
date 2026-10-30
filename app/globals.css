@@ -482,24 +482,45 @@ main { padding: 20px 0 40px; }
   overflow-wrap: break-word;
 }
 
-/* 🎧 Listen Top News: a tab fixed to the right edge of the screen (stays put while scrolling) */
-.listen-float { position: fixed; right: 0; top: 62%; z-index: 35; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-.listen-float-tab {
-  display: flex; align-items: center; gap: 8px; max-width: 132px; min-height: 52px; padding: 8px 12px 8px 10px;
-  border: 0; border-radius: 14px 0 0 14px; background: #d32f2f; color: #fff; cursor: pointer;
-  font: 800 0.92rem/1.15 var(--sans); text-align: left; box-shadow: -3px 4px 14px rgba(0, 0, 0, 0.3);
+/* 🎧 Listen Top News: a tab on the right edge of the screen (stays put while scrolling). Readers can drag it anywhere,
+   make it a small circle (–) or close it (✕). */
+.listen-float {
+  position: fixed; right: 0; top: 58%; z-index: 35; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
 }
-.listen-float-tab:hover { background: #b71c1c; }
-.listen-float-tab:focus-visible { outline: 3px solid #fff; outline-offset: -5px; }
+.listen-float.side-left { align-items: flex-start; }
+.listen-float.is-dragging { opacity: 0.85; cursor: grabbing; }
+.listen-float-tab, .listen-float-mini {
+  display: flex; align-items: center; gap: 8px; border: 0; background: #d32f2f; color: #fff; cursor: pointer;
+  box-shadow: -3px 4px 14px rgba(0, 0, 0, 0.3);
+}
+.listen-float-tab {
+  max-width: 132px; min-height: 52px; padding: 8px 12px 8px 10px; border-radius: 14px;
+  font: 800 0.92rem/1.15 var(--sans); text-align: left;
+}
+.listen-float.side-right .listen-float-tab { border-radius: 14px 0 0 14px; }
+.listen-float.side-left .listen-float-tab { border-radius: 0 14px 14px 0; }
+.listen-float-mini { justify-content: center; width: 50px; height: 50px; padding: 0; border-radius: 50%; }
+.listen-float.side-right .listen-float-mini { border-radius: 25px 0 0 25px; }
+.listen-float.side-left .listen-float-mini { border-radius: 0 25px 25px 0; }
+.listen-float-tab:hover, .listen-float-mini:hover { background: #b71c1c; }
+.listen-float-tab:focus-visible, .listen-float-mini:focus-visible { outline: 3px solid #fff; outline-offset: -5px; }
 .listen-float-icon {
   flex: none; display: grid; place-items: center; width: 30px; height: 30px; border: 2.5px solid #fff; border-radius: 50%;
   font-size: 0.72rem; padding-left: 2px; animation: listen-pulse 2s ease-out infinite;
 }
 .listen-float.is-on .listen-float-icon { padding-left: 0; letter-spacing: -1px; animation-duration: 1s; }
 @keyframes listen-pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6); } 100% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); } }
-.listen-float-stop {
-  width: 32px; height: 32px; margin-right: 8px; border-radius: 50%; border: 0; background: #1b1b1b; color: #fff;
-  font-size: 0.85rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+.listen-float-tools { display: flex; gap: 6px; padding: 0 6px; }
+.listen-float-tools button {
+  display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 0;
+  background: rgba(27, 27, 27, 0.85); color: #fff; font: 700 0.85rem/1 var(--sans); cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.listen-float-tools button:focus-visible { outline: 3px solid #d32f2f; outline-offset: 1px; }
+.listen-float-tip {
+  max-width: 200px; margin: 0 6px; padding: 8px 10px; border-radius: 10px; background: rgba(27, 27, 27, 0.92); color: #fff;
+  font: 600 0.8rem/1.35 var(--sans); text-align: left; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 @media print { .listen-float { display: none; } }
 @media (prefers-reduced-motion: reduce) { .listen-float-icon { animation: none; } }

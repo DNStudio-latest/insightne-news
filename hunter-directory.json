@@ -470,6 +470,166 @@
       "url": "https://x.com/mukulsangma",
       "check": "check",
       "source": "News reports (The Statesman; Sangbad Pratidin) name this account; verification not confirmed"
+    },
+    {
+      "name": "Debabrata Saikia",
+      "role": "Former Leader of Opposition, Assam; MLA Nazira",
+      "state": "Assam",
+      "platform": "X",
+      "handle": "@DsaikiaOfficial",
+      "url": "https://x.com/DsaikiaOfficial",
+      "check": "check",
+      "source": "X search result; bio is out of date"
+    },
+    {
+      "name": "Akhil Gogoi",
+      "role": "President, Raijor Dal; MLA Sibsagar",
+      "state": "Assam",
+      "platform": "X",
+      "handle": "@AkhilGogoiAG",
+      "url": "https://x.com/AkhilGogoiAG",
+      "check": "found",
+      "source": "X profile (bio gives these roles)"
+    },
+    {
+      "name": "Akhil Gogoi",
+      "role": "President, Raijor Dal; MLA Sibsagar",
+      "state": "Assam",
+      "platform": "Facebook",
+      "handle": "AkhilGogoiRD",
+      "url": "https://www.facebook.com/AkhilGogoiRD",
+      "check": "check",
+      "source": "Facebook search result; may be party or personal page"
+    },
+    {
+      "name": "Akhil Gogoi",
+      "role": "President, Raijor Dal; MLA Sibsagar",
+      "state": "Assam",
+      "platform": "Instagram",
+      "handle": "akhilgogoiag",
+      "url": "https://www.instagram.com/akhilgogoiag/",
+      "check": "check",
+      "source": "Instagram search result"
+    },
+    {
+      "name": "Prestone Tynsong",
+      "role": "Deputy Chief Minister, Meghalaya (NPP)",
+      "state": "Meghalaya",
+      "platform": "Facebook",
+      "handle": "PrestoneTynsongDyCM",
+      "url": "https://www.facebook.com/PrestoneTynsongDyCM/",
+      "check": "check",
+      "source": "Facebook search result, listed under government officials"
+    },
+    {
+      "name": "Vincent Pala",
+      "role": "Former MP; President, Meghalaya Pradesh Congress Committee",
+      "state": "Meghalaya",
+      "platform": "X",
+      "handle": "@vincentpala",
+      "url": "https://x.com/vincentpala",
+      "check": "found",
+      "source": "X profile (bio: Former MP, President MPCC)"
+    },
+    {
+      "name": "Congress Meghalaya (state unit)",
+      "role": "Official party account, Meghalaya",
+      "state": "Meghalaya",
+      "platform": "X",
+      "handle": "@INCMeghalaya",
+      "url": "https://x.com/INCMeghalaya",
+      "check": "check",
+      "source": "Linked from search result; not checked on the platform"
+    },
+    {
+      "name": "Keisham Meghachandra Singh",
+      "role": "CLP Leader, Manipur Congress; former PCC president",
+      "state": "Manipur",
+      "platform": "X",
+      "handle": "@meghachandra_k",
+      "url": "https://x.com/meghachandra_k",
+      "check": "found",
+      "source": "X profile (bio gives these roles)"
+    },
+    {
+      "name": "Keisham Meghachandra Singh",
+      "role": "CLP Leader, Manipur Congress; former PCC president",
+      "state": "Manipur",
+      "platform": "Facebook",
+      "handle": "KMeghachandra",
+      "url": "https://www.facebook.com/KMeghachandra",
+      "check": "check",
+      "source": "Facebook search result; cached page shows an old title"
+    },
+    {
+      "name": "Naga People's Front (party)",
+      "role": "Official party account, Nagaland",
+      "state": "Nagaland",
+      "platform": "X",
+      "handle": "@npf_fna",
+      "url": "https://x.com/npf_fna",
+      "check": "found",
+      "source": "X profile, described as the official NPF account"
+    },
+    {
+      "name": "T.R. Zeliang",
+      "role": "Deputy Chief Minister, Nagaland (per reports; 2026 status not confirmed)",
+      "state": "Nagaland",
+      "platform": "X",
+      "handle": "@TRZeliang",
+      "url": "https://x.com/trzeliang",
+      "check": "check",
+      "source": "X search result; snapshot is several years old"
+    },
+    {
+      "name": "Yanthungo Patton",
+      "role": "Deputy Chief Minister, Nagaland (per reports; 2026 status not confirmed)",
+      "state": "Nagaland",
+      "platform": "X",
+      "handle": "@YanthungoPatton",
+      "url": "https://x.com/yanthungopatton",
+      "check": "check",
+      "source": "X search result; snapshot is several years old"
+    },
+    {
+      "name": "Sikkim Krantikari Morcha (party)",
+      "role": "Official party account, Sikkim",
+      "state": "Sikkim",
+      "platform": "X",
+      "handle": "@KrantiSikkim",
+      "url": "https://x.com/krantisikkim",
+      "check": "check",
+      "source": "X search result; last indexed a while ago"
+    },
+    {
+      "name": "Arunachal Congress (state unit)",
+      "role": "Official party account, Arunachal Pradesh",
+      "state": "Arunachal Pradesh",
+      "platform": "X",
+      "handle": "@INCArunachal",
+      "url": "https://x.com/INCArunachal",
+      "check": "found",
+      "source": "X profile, described as the official Arunachal Congress account"
+    },
+    {
+      "name": "Chowna Mein",
+      "role": "Deputy Chief Minister, Arunachal Pradesh; MLA Chowkham",
+      "state": "Arunachal Pradesh",
+      "platform": "X",
+      "handle": "@ChownaMeinBJP",
+      "url": "https://x.com/ChownaMeinBJP",
+      "check": "found",
+      "source": "X profile (bio gives these roles); recent posts"
+    },
+    {
+      "name": "Kriti Devi Debbarman",
+      "role": "MP, Tripura East (Lok Sabha)",
+      "state": "Tripura",
+      "platform": "X",
+      "handle": "@kritiddebbarman",
+      "url": "https://x.com/kritiddebbarman",
+      "check": "found",
+      "source": "X profile (bio: official handle, MP Tripura East)"
     }
   ],
   "websites": [

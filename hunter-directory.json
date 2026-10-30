@@ -1,55 +1,437 @@
 {
   "_help": "The News Hunter's search list: key people and official pages of the Northeast states. Each account says where it was found (source). 'found' = found in an official or news source; 'check' = found only on a third-party or search-snippet source, confirm on the platform before relying on it. Nothing here is used to publish anything: it only opens profiles for you to read. Last researched 2026-10-30.",
   "people": [
-    { "name": "Manik Saha", "role": "Chief Minister, Tripura", "state": "Tripura", "platform": "X", "handle": "@DrManikSaha2", "url": "https://x.com/DrManikSaha2", "check": "found", "source": "X profile; Wikidata" },
-    { "name": "Manik Saha", "role": "Chief Minister, Tripura", "state": "Tripura", "platform": "Facebook", "handle": "drmaniksaha", "url": "https://www.facebook.com/drmaniksaha/", "check": "check", "source": "Wikidata; Tripura Times (Facebook page statistics)" },
-    { "name": "Indra Sena Reddy Nallu", "role": "Governor, Tripura (Lok Bhavan)", "state": "Tripura", "platform": "X", "handle": "@TripuraGovernor", "url": "https://x.com/TripuraGovernor", "check": "found", "source": "X posts by LokBhavan Tripura; Tripura government Governor profile" },
-    { "name": "Mriganka Deo Barman", "role": "BJP Prabhari for Tripura (Sep 2026 list, reported)", "state": "Tripura", "platform": "", "handle": "", "url": "", "check": "check", "source": "tripurainfo.com and Northeast Today reports; no handle found yet" },
-    { "name": "Conrad K Sangma", "role": "Chief Minister, Meghalaya", "state": "Meghalaya", "platform": "X", "handle": "@SangmaConrad", "url": "https://x.com/SangmaConrad", "check": "found", "source": "X profile (Chief Minister, Government of Meghalaya)" },
-    { "name": "Conrad K Sangma", "role": "Chief Minister, Meghalaya", "state": "Meghalaya", "platform": "Instagram", "handle": "conrad_k_sangma", "url": "https://www.instagram.com/conrad_k_sangma/", "check": "check", "source": "Instagram search result; Wikidata" },
-    { "name": "Conrad K Sangma", "role": "Chief Minister, Meghalaya", "state": "Meghalaya", "platform": "Facebook", "handle": "conradksangma", "url": "https://www.facebook.com/conradksangma/", "check": "check", "source": "Facebook search result; Wikidata. Looks supporter-run, not confirmed as official" },
-    { "name": "Lok Bhavan Meghalaya", "role": "Governor's office, Shillong", "state": "Meghalaya", "platform": "X", "handle": "@lokbhavanmeg", "url": "https://x.com/lokbhavanmeg", "check": "found", "source": "X profile" },
-    { "name": "Himanta Biswa Sarma", "role": "Chief Minister, Assam", "state": "Assam", "platform": "X", "handle": "@himantabiswa", "url": "https://x.com/himantabiswa", "check": "found", "source": "X profile; CM Office Assam posts" },
-    { "name": "Himanta Biswa Sarma", "role": "Chief Minister, Assam", "state": "Assam", "platform": "Facebook", "handle": "himantabiswasarma", "url": "https://www.facebook.com/himantabiswasarma/", "check": "check", "source": "Facebook search result; Sentinel Assam report (live stream on the official page); Linktree lists it" },
-    { "name": "CM Office Assam", "role": "Chief Minister's Office, Assam", "state": "Assam", "platform": "X", "handle": "@CMOfficeAssam", "url": "https://x.com/CMOfficeAssam", "check": "found", "source": "X profile, linked to cm.assam.gov.in" },
-    { "name": "Lok Bhavan Assam", "role": "Governor's office, Assam (old name Raj Bhavan; may be inactive)", "state": "Assam", "platform": "X", "handle": "@AssamRajbhavan", "url": "https://x.com/AssamRajbhavan", "check": "check", "source": "X search result; last post in results Aug 2025" },
-    { "name": "Neiphiu Rio", "role": "Chief Minister, Nagaland", "state": "Nagaland", "platform": "X", "handle": "@Neiphiu_Rio", "url": "https://x.com/Neiphiu_Rio", "check": "found", "source": "X profile; verified at sign-up (2018 report); posts Oct 2026" },
-    { "name": "Nand Kishore Yadav", "role": "Governor, Nagaland", "state": "Nagaland", "platform": "X", "handle": "via @LokBhavanKohima", "url": "https://x.com/LokBhavanKohima", "check": "found", "source": "Lok Bhavan Nagaland posts (swearing-in); PTI report" },
-    { "name": "Lok Bhavan Nagaland", "role": "Governor's office, Kohima", "state": "Nagaland", "platform": "X", "handle": "@LokBhavanKohima", "url": "https://x.com/LokBhavanKohima", "check": "found", "source": "X profile, linked to lokbhavan.nagaland.gov.in" },
-    { "name": "Lalduhoma", "role": "Chief Minister, Mizoram", "state": "Mizoram", "platform": "X", "handle": "@Lal_Duhoma", "url": "https://x.com/Lal_Duhoma", "check": "found", "source": "X profile; tagged by Mizoram Governor's office" },
-    { "name": "Lalduhoma", "role": "Chief Minister, Mizoram", "state": "Mizoram", "platform": "Facebook", "handle": "lalduhoma.official", "url": "https://www.facebook.com/lalduhoma.official/", "check": "check", "source": "Facebook search result; YouTube channel links" },
-    { "name": "Lalduhoma", "role": "Chief Minister, Mizoram", "state": "Mizoram", "platform": "Instagram", "handle": "lalduhoma.cm", "url": "https://www.instagram.com/lalduhoma.cm/", "check": "check", "source": "Instagram search result" },
-    { "name": "CMO Mizoram", "role": "Chief Minister's Office, Mizoram", "state": "Mizoram", "platform": "X", "handle": "@CMOMizoram", "url": "https://x.com/cmomizoram", "check": "found", "source": "X profile" },
-    { "name": "Yumnam Khemchand Singh", "role": "Chief Minister, Manipur", "state": "Manipur", "platform": "X", "handle": "@YKhemchandSingh", "url": "https://x.com/YKhemchandSingh", "check": "found", "source": "X profile, labelled Chief Minister, Manipur" },
-    { "name": "Yumnam Khemchand Singh", "role": "Chief Minister, Manipur", "state": "Manipur", "platform": "Facebook", "handle": "YKhemchandSingh", "url": "https://www.facebook.com/YKhemchandSingh/", "check": "check", "source": "Facebook search result; a 2021 report warned about fake pages in a CM's name" },
-    { "name": "CMO Manipur", "role": "Chief Minister's Office, Manipur", "state": "Manipur", "platform": "X", "handle": "@manipur_cmo", "url": "https://x.com/manipur_cmo", "check": "found", "source": "X profile" },
-    { "name": "Prem Singh Tamang (Golay)", "role": "Chief Minister, Sikkim", "state": "Sikkim", "platform": "X", "handle": "@PSTamangGolay", "url": "https://x.com/PSTamangGolay", "check": "found", "source": "X profile, official account of the 6th CM; Wikidata" },
-    { "name": "Prem Singh Tamang (Golay)", "role": "Chief Minister, Sikkim", "state": "Sikkim", "platform": "Facebook", "handle": "cmpsgolay", "url": "https://www.facebook.com/cmpsgolay/", "check": "check", "source": "Facebook search result; a 2020-era report said the page was hacked once" },
-    { "name": "Dushyant Kumar Gautam", "role": "Governor, Sikkim (sworn in Oct 2026, per reports)", "state": "Sikkim", "platform": "", "handle": "", "url": "", "check": "check", "source": "All India Radio post; Wikipedia. No handle found yet" },
-    { "name": "Governor of Sikkim (old account)", "role": "Governor's office, Sikkim (profile names the previous governor)", "state": "Sikkim", "platform": "X", "handle": "@GovernorSikkim", "url": "https://x.com/governorsikkim", "check": "check", "source": "X search result; profile may be out of date" },
-    { "name": "Pema Khandu", "role": "Chief Minister, Arunachal Pradesh", "state": "Arunachal Pradesh", "platform": "X", "handle": "@PemaKhanduBJP", "url": "https://x.com/PemaKhanduBJP", "check": "found", "source": "X profile; Wikidata" },
-    { "name": "Pema Khandu", "role": "Chief Minister, Arunachal Pradesh", "state": "Arunachal Pradesh", "platform": "Facebook", "handle": "PemaKhanduBJP", "url": "https://www.facebook.com/PemaKhanduBJP", "check": "check", "source": "Wikidata; celebrity-info site (weaker source)" },
-    { "name": "Pema Khandu", "role": "Chief Minister, Arunachal Pradesh", "state": "Arunachal Pradesh", "platform": "Instagram", "handle": "pemakhandu_bjp", "url": "https://www.instagram.com/pemakhandu_bjp/", "check": "check", "source": "Wikidata; celebrity-info site. A different account, pema_khandu_wangchuk, is not the official one" },
-    { "name": "CMO Arunachal", "role": "Chief Minister's Office, Arunachal Pradesh", "state": "Arunachal Pradesh", "platform": "X", "handle": "@ArunachalCMO", "url": "https://x.com/ArunachalCMO", "check": "found", "source": "X profile" }
+    {
+      "name": "Manik Saha",
+      "role": "Chief Minister, Tripura",
+      "state": "Tripura",
+      "platform": "X",
+      "handle": "@DrManikSaha2",
+      "url": "https://x.com/DrManikSaha2",
+      "check": "found",
+      "source": "X profile; Wikidata"
+    },
+    {
+      "name": "Manik Saha",
+      "role": "Chief Minister, Tripura",
+      "state": "Tripura",
+      "platform": "Facebook",
+      "handle": "drmaniksaha",
+      "url": "https://www.facebook.com/drmaniksaha/",
+      "check": "check",
+      "source": "Wikidata; Tripura Times (Facebook page statistics)"
+    },
+    {
+      "name": "Indra Sena Reddy Nallu",
+      "role": "Governor, Tripura (Lok Bhavan)",
+      "state": "Tripura",
+      "platform": "X",
+      "handle": "@TripuraGovernor",
+      "url": "https://x.com/TripuraGovernor",
+      "check": "found",
+      "source": "X posts by LokBhavan Tripura; Tripura government Governor profile"
+    },
+    {
+      "name": "Mriganka Deo Barman",
+      "role": "BJP Prabhari for Tripura (Sep 2026 list, reported)",
+      "state": "Tripura",
+      "platform": "",
+      "handle": "",
+      "url": "",
+      "check": "check",
+      "source": "tripurainfo.com and Northeast Today reports; no handle found yet"
+    },
+    {
+      "name": "Conrad K Sangma",
+      "role": "Chief Minister, Meghalaya",
+      "state": "Meghalaya",
+      "platform": "X",
+      "handle": "@SangmaConrad",
+      "url": "https://x.com/SangmaConrad",
+      "check": "found",
+      "source": "X profile (Chief Minister, Government of Meghalaya)"
+    },
+    {
+      "name": "Conrad K Sangma",
+      "role": "Chief Minister, Meghalaya",
+      "state": "Meghalaya",
+      "platform": "Instagram",
+      "handle": "conrad_k_sangma",
+      "url": "https://www.instagram.com/conrad_k_sangma/",
+      "check": "check",
+      "source": "Instagram search result; Wikidata"
+    },
+    {
+      "name": "Conrad K Sangma",
+      "role": "Chief Minister, Meghalaya",
+      "state": "Meghalaya",
+      "platform": "Facebook",
+      "handle": "conradksangma",
+      "url": "https://www.facebook.com/conradksangma/",
+      "check": "check",
+      "source": "Facebook search result; Wikidata. Looks supporter-run, not confirmed as official"
+    },
+    {
+      "name": "Lok Bhavan Meghalaya",
+      "role": "Governor's office, Shillong",
+      "state": "Meghalaya",
+      "platform": "X",
+      "handle": "@lokbhavanmeg",
+      "url": "https://x.com/lokbhavanmeg",
+      "check": "found",
+      "source": "X profile"
+    },
+    {
+      "name": "Himanta Biswa Sarma",
+      "role": "Chief Minister, Assam",
+      "state": "Assam",
+      "platform": "X",
+      "handle": "@himantabiswa",
+      "url": "https://x.com/himantabiswa",
+      "check": "found",
+      "source": "X profile; CM Office Assam posts"
+    },
+    {
+      "name": "Himanta Biswa Sarma",
+      "role": "Chief Minister, Assam",
+      "state": "Assam",
+      "platform": "Facebook",
+      "handle": "himantabiswasarma",
+      "url": "https://www.facebook.com/himantabiswasarma/",
+      "check": "check",
+      "source": "Facebook search result; Sentinel Assam report (live stream on the official page); Linktree lists it"
+    },
+    {
+      "name": "CM Office Assam",
+      "role": "Chief Minister's Office, Assam",
+      "state": "Assam",
+      "platform": "X",
+      "handle": "@CMOfficeAssam",
+      "url": "https://x.com/CMOfficeAssam",
+      "check": "found",
+      "source": "X profile, linked to cm.assam.gov.in"
+    },
+    {
+      "name": "Lok Bhavan Assam",
+      "role": "Governor's office, Assam (old name Raj Bhavan; may be inactive)",
+      "state": "Assam",
+      "platform": "X",
+      "handle": "@AssamRajbhavan",
+      "url": "https://x.com/AssamRajbhavan",
+      "check": "check",
+      "source": "X search result; last post in results Aug 2025"
+    },
+    {
+      "name": "Neiphiu Rio",
+      "role": "Chief Minister, Nagaland",
+      "state": "Nagaland",
+      "platform": "X",
+      "handle": "@Neiphiu_Rio",
+      "url": "https://x.com/Neiphiu_Rio",
+      "check": "found",
+      "source": "X profile; verified at sign-up (2018 report); posts Oct 2026"
+    },
+    {
+      "name": "Nand Kishore Yadav",
+      "role": "Governor, Nagaland",
+      "state": "Nagaland",
+      "platform": "X",
+      "handle": "via @LokBhavanKohima",
+      "url": "https://x.com/LokBhavanKohima",
+      "check": "found",
+      "source": "Lok Bhavan Nagaland posts (swearing-in); PTI report"
+    },
+    {
+      "name": "Lok Bhavan Nagaland",
+      "role": "Governor's office, Kohima",
+      "state": "Nagaland",
+      "platform": "X",
+      "handle": "@LokBhavanKohima",
+      "url": "https://x.com/LokBhavanKohima",
+      "check": "found",
+      "source": "X profile, linked to lokbhavan.nagaland.gov.in"
+    },
+    {
+      "name": "Lalduhoma",
+      "role": "Chief Minister, Mizoram",
+      "state": "Mizoram",
+      "platform": "X",
+      "handle": "@Lal_Duhoma",
+      "url": "https://x.com/Lal_Duhoma",
+      "check": "found",
+      "source": "X profile; tagged by Mizoram Governor's office"
+    },
+    {
+      "name": "Lalduhoma",
+      "role": "Chief Minister, Mizoram",
+      "state": "Mizoram",
+      "platform": "Facebook",
+      "handle": "lalduhoma.official",
+      "url": "https://www.facebook.com/lalduhoma.official/",
+      "check": "check",
+      "source": "Facebook search result; YouTube channel links"
+    },
+    {
+      "name": "Lalduhoma",
+      "role": "Chief Minister, Mizoram",
+      "state": "Mizoram",
+      "platform": "Instagram",
+      "handle": "lalduhoma.cm",
+      "url": "https://www.instagram.com/lalduhoma.cm/",
+      "check": "check",
+      "source": "Instagram search result"
+    },
+    {
+      "name": "CMO Mizoram",
+      "role": "Chief Minister's Office, Mizoram",
+      "state": "Mizoram",
+      "platform": "X",
+      "handle": "@CMOMizoram",
+      "url": "https://x.com/cmomizoram",
+      "check": "found",
+      "source": "X profile"
+    },
+    {
+      "name": "Yumnam Khemchand Singh",
+      "role": "Chief Minister, Manipur",
+      "state": "Manipur",
+      "platform": "X",
+      "handle": "@YKhemchandSingh",
+      "url": "https://x.com/YKhemchandSingh",
+      "check": "found",
+      "source": "X profile, labelled Chief Minister, Manipur"
+    },
+    {
+      "name": "Yumnam Khemchand Singh",
+      "role": "Chief Minister, Manipur",
+      "state": "Manipur",
+      "platform": "Facebook",
+      "handle": "YKhemchandSingh",
+      "url": "https://www.facebook.com/YKhemchandSingh/",
+      "check": "check",
+      "source": "Facebook search result; a 2021 report warned about fake pages in a CM's name"
+    },
+    {
+      "name": "CMO Manipur",
+      "role": "Chief Minister's Office, Manipur",
+      "state": "Manipur",
+      "platform": "X",
+      "handle": "@manipur_cmo",
+      "url": "https://x.com/manipur_cmo",
+      "check": "found",
+      "source": "X profile"
+    },
+    {
+      "name": "Prem Singh Tamang (Golay)",
+      "role": "Chief Minister, Sikkim",
+      "state": "Sikkim",
+      "platform": "X",
+      "handle": "@PSTamangGolay",
+      "url": "https://x.com/PSTamangGolay",
+      "check": "found",
+      "source": "X profile, official account of the 6th CM; Wikidata"
+    },
+    {
+      "name": "Prem Singh Tamang (Golay)",
+      "role": "Chief Minister, Sikkim",
+      "state": "Sikkim",
+      "platform": "Facebook",
+      "handle": "cmpsgolay",
+      "url": "https://www.facebook.com/cmpsgolay/",
+      "check": "check",
+      "source": "Facebook search result; a 2020-era report said the page was hacked once"
+    },
+    {
+      "name": "Dushyant Kumar Gautam",
+      "role": "Governor, Sikkim (sworn in Oct 2026, per reports)",
+      "state": "Sikkim",
+      "platform": "",
+      "handle": "",
+      "url": "",
+      "check": "check",
+      "source": "All India Radio post; Wikipedia. No handle found yet"
+    },
+    {
+      "name": "Governor of Sikkim (old account)",
+      "role": "Governor's office, Sikkim (profile names the previous governor)",
+      "state": "Sikkim",
+      "platform": "X",
+      "handle": "@GovernorSikkim",
+      "url": "https://x.com/governorsikkim",
+      "check": "check",
+      "source": "X search result; profile may be out of date"
+    },
+    {
+      "name": "Pema Khandu",
+      "role": "Chief Minister, Arunachal Pradesh",
+      "state": "Arunachal Pradesh",
+      "platform": "X",
+      "handle": "@PemaKhanduBJP",
+      "url": "https://x.com/PemaKhanduBJP",
+      "check": "found",
+      "source": "X profile; Wikidata"
+    },
+    {
+      "name": "Pema Khandu",
+      "role": "Chief Minister, Arunachal Pradesh",
+      "state": "Arunachal Pradesh",
+      "platform": "Facebook",
+      "handle": "PemaKhanduBJP",
+      "url": "https://www.facebook.com/PemaKhanduBJP",
+      "check": "check",
+      "source": "Wikidata; celebrity-info site (weaker source)"
+    },
+    {
+      "name": "Pema Khandu",
+      "role": "Chief Minister, Arunachal Pradesh",
+      "state": "Arunachal Pradesh",
+      "platform": "Instagram",
+      "handle": "pemakhandu_bjp",
+      "url": "https://www.instagram.com/pemakhandu_bjp/",
+      "check": "check",
+      "source": "Wikidata; celebrity-info site. A different account, pema_khandu_wangchuk, is not the official one"
+    },
+    {
+      "name": "CMO Arunachal",
+      "role": "Chief Minister's Office, Arunachal Pradesh",
+      "state": "Arunachal Pradesh",
+      "platform": "X",
+      "handle": "@ArunachalCMO",
+      "url": "https://x.com/ArunachalCMO",
+      "check": "found",
+      "source": "X profile"
+    },
+    {
+      "name": "Ajay Kumar Bhalla",
+      "role": "Governor, Manipur (Lok Bhavan)",
+      "state": "Manipur",
+      "platform": "X",
+      "handle": "@LokBhavManipur",
+      "url": "https://x.com/LokBhavManipur",
+      "check": "found",
+      "source": "X profile (Office of the Governor of Manipur); posts in 2026"
+    },
+    {
+      "name": "Lok Bhavan Manipur",
+      "role": "Governor's office, Imphal (renamed from Raj Bhavan)",
+      "state": "Manipur",
+      "platform": "X",
+      "handle": "@LokBhavManipur",
+      "url": "https://x.com/LokBhavManipur",
+      "check": "found",
+      "source": "X profile; same account as the Governor's office"
+    },
+    {
+      "name": "Vijay Kumar Singh",
+      "role": "Governor, Mizoram (Lok Bhavan), in office since Jan 2025 per reports",
+      "state": "Mizoram",
+      "platform": "X",
+      "handle": "@MizoramGovernor",
+      "url": "https://x.com/MizoramGovernor",
+      "check": "found",
+      "source": "X profile (Lok Bhavan, Mizoram), Aizawl; posts in 2026"
+    },
+    {
+      "name": "Lok Bhavan Mizoram",
+      "role": "Governor's office, Aizawl",
+      "state": "Mizoram",
+      "platform": "X",
+      "handle": "@MizoramGovernor",
+      "url": "https://x.com/MizoramGovernor",
+      "check": "found",
+      "source": "X profile; same account as the Governor's office"
+    }
   ],
   "websites": [
-    { "name": "ICA Tripura", "state": "Tripura", "url": "https://ica.tripura.gov.in" },
-    { "name": "Tripura government portal", "state": "Tripura", "url": "https://tripura.gov.in" },
-    { "name": "Lok Bhavan Tripura", "state": "Tripura", "url": "https://lokbhavan.tripura.gov.in" },
-    { "name": "DIPR Assam", "state": "Assam", "url": "https://dipr.assam.gov.in" },
-    { "name": "Assam Chief Minister's Office", "state": "Assam", "url": "https://cm.assam.gov.in" },
-    { "name": "Lok Bhavan Assam", "state": "Assam", "url": "https://lokbhavan.assam.gov.in" },
-    { "name": "Lok Bhavan Arunachal Pradesh", "state": "Arunachal Pradesh", "url": "https://arunachalgovernor.gov.in" },
-    { "name": "DIPR Meghalaya", "state": "Meghalaya", "url": "https://megipr.gov.in" },
-    { "name": "Meghalaya government press page", "state": "Meghalaya", "url": "https://meghalaya.gov.in" },
-    { "name": "Lok Bhavan Meghalaya", "state": "Meghalaya", "url": "https://meggovernor.gov.in" },
-    { "name": "Meghalaya Chief Minister's Office", "state": "Meghalaya", "url": "https://cm.meghalaya.gov.in" },
-    { "name": "DIPR Mizoram", "state": "Mizoram", "url": "https://dipr.mizoram.gov.in" },
-    { "name": "Lok Bhavan Mizoram", "state": "Mizoram", "url": "https://rajbhavan.mizoram.gov.in" },
-    { "name": "IPR Nagaland", "state": "Nagaland", "url": "https://ipr.nagaland.gov.in" },
-    { "name": "Lok Bhavan Nagaland", "state": "Nagaland", "url": "https://lokbhavan.nagaland.gov.in" },
-    { "name": "Nagaland Chief Minister's Office", "state": "Nagaland", "url": "https://chiefminister.nagaland.gov.in" },
-    { "name": "Sikkim government portal", "state": "Sikkim", "url": "https://sikkim.gov.in" },
-    { "name": "Lok Bhavan Sikkim", "state": "Sikkim", "url": "https://rajbhavansikkim.gov.in" }
+    {
+      "name": "ICA Tripura",
+      "state": "Tripura",
+      "url": "https://ica.tripura.gov.in"
+    },
+    {
+      "name": "Tripura government portal",
+      "state": "Tripura",
+      "url": "https://tripura.gov.in"
+    },
+    {
+      "name": "Lok Bhavan Tripura",
+      "state": "Tripura",
+      "url": "https://lokbhavan.tripura.gov.in"
+    },
+    {
+      "name": "DIPR Assam",
+      "state": "Assam",
+      "url": "https://dipr.assam.gov.in"
+    },
+    {
+      "name": "Assam Chief Minister's Office",
+      "state": "Assam",
+      "url": "https://cm.assam.gov.in"
+    },
+    {
+      "name": "Lok Bhavan Assam",
+      "state": "Assam",
+      "url": "https://lokbhavan.assam.gov.in"
+    },
+    {
+      "name": "Lok Bhavan Arunachal Pradesh",
+      "state": "Arunachal Pradesh",
+      "url": "https://arunachalgovernor.gov.in"
+    },
+    {
+      "name": "DIPR Meghalaya",
+      "state": "Meghalaya",
+      "url": "https://megipr.gov.in"
+    },
+    {
+      "name": "Meghalaya government press page",
+      "state": "Meghalaya",
+      "url": "https://meghalaya.gov.in"
+    },
+    {
+      "name": "Lok Bhavan Meghalaya",
+      "state": "Meghalaya",
+      "url": "https://meggovernor.gov.in"
+    },
+    {
+      "name": "Meghalaya Chief Minister's Office",
+      "state": "Meghalaya",
+      "url": "https://cm.meghalaya.gov.in"
+    },
+    {
+      "name": "DIPR Mizoram",
+      "state": "Mizoram",
+      "url": "https://dipr.mizoram.gov.in"
+    },
+    {
+      "name": "Lok Bhavan Mizoram",
+      "state": "Mizoram",
+      "url": "https://rajbhavan.mizoram.gov.in"
+    },
+    {
+      "name": "IPR Nagaland",
+      "state": "Nagaland",
+      "url": "https://ipr.nagaland.gov.in"
+    },
+    {
+      "name": "Lok Bhavan Nagaland",
+      "state": "Nagaland",
+      "url": "https://lokbhavan.nagaland.gov.in"
+    },
+    {
+      "name": "Nagaland Chief Minister's Office",
+      "state": "Nagaland",
+      "url": "https://chiefminister.nagaland.gov.in"
+    },
+    {
+      "name": "Sikkim government portal",
+      "state": "Sikkim",
+      "url": "https://sikkim.gov.in"
+    },
+    {
+      "name": "Lok Bhavan Sikkim",
+      "state": "Sikkim",
+      "url": "https://rajbhavansikkim.gov.in"
+    }
   ]
 }

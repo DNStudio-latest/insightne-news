@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { refreshSite } from "../../lib/site-cache.js";
 import { after } from "next/server";
 import { addIllustration } from "../../lib/images.js";
+import { compressPhoto } from "../../lib/photo.js";
 import { sendAlert } from "../../lib/push.js";
 import { shareOnFacebook, facebookAutoPost } from "../../lib/facebook.js";
 import { shareOnInstagram, instagramAutoPost } from "../../lib/instagram.js";
@@ -128,7 +129,8 @@ async function photoFields(formData, existing, onError) {
   if (file && typeof file === "object" && file.size > 0) {
     if (!/^image\/(jpeg|png|webp)$/.test(file.type)) onError("The photo must be a JPG, PNG or WEBP image.");
     if (file.size > 4 * 1024 * 1024) onError("The photo is too big (over 4 MB).");
-    fields.image_url = await db.uploadImage(new Uint8Array(await file.arrayBuffer()), file.type);
+    const photo = await compressPhoto(new Uint8Array(await file.arrayBuffer()), file.type);
+    fields.image_url = await db.uploadImage(photo.bytes, photo.contentType);
   }
   return fields;
 }
@@ -216,7 +218,8 @@ export async function saveOriginal(formData) {
   for (const file of formData.getAll("galleryFiles")) {
     if (!file || typeof file !== "object" || !file.size || gallery.length >= 20) continue;
     if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 4 * 1024 * 1024) continue;
-    gallery.push({ url: await db.uploadImage(new Uint8Array(await file.arrayBuffer()), file.type), caption: null });
+    const photo = await compressPhoto(new Uint8Array(await file.arrayBuffer()), file.type);
+    gallery.push({ url: await db.uploadImage(photo.bytes, photo.contentType), caption: null });
   }
   fields.gallery = gallery;
 

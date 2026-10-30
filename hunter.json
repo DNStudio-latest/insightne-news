@@ -2,7 +2,7 @@
   "_help": "The News Hunter's list (runs every hour, day and night). To stop watching something, change \"enabled\": true to false. 'pages' are the lists of press releases and notices it checks for new items. Every website here was checked to be official and to allow reading in its robots.txt.",
 
   "_autoPublish_help": "Drafts published without you: only from these official websites, with no [CHECK] notes, no flags (sensitive, scanned, video, Kokborok), and a score of at least minScore. At most perDay a day. Each one is sent to your Telegram. To stop it, change enabled to false.",
-  "autoPublish": { "enabled": true, "minScore": 8, "perDay": 10 },
+  "autoPublish": { "enabled": true, "minScore": 7, "perDay": 10 },
 
   "sites": [
     { "enabled": true, "state": "Tripura", "name": "ICA Tripura", "kind": "Information department", "pages": ["https://ica.tripura.gov.in/press-release", "https://ica.tripura.gov.in/notifications", "https://ica.tripura.gov.in/orders", "https://ica.tripura.gov.in/circulars", "https://ica.tripura.gov.in/news"] },

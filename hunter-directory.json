@@ -340,6 +340,36 @@
       "url": "https://x.com/MizoramGovernor",
       "check": "found",
       "source": "X profile; same account as the Governor's office"
+    },
+    {
+      "name": "BJP Tripura (state unit)",
+      "role": "Official party account, Tripura",
+      "state": "Tripura",
+      "platform": "X",
+      "handle": "@BJP4Tripura",
+      "url": "https://x.com/BJP4Tripura",
+      "check": "found",
+      "source": "X profile, described as the official account of BJP Tripura"
+    },
+    {
+      "name": "BJP Tripura (state unit)",
+      "role": "Official party page, Tripura",
+      "state": "Tripura",
+      "platform": "Facebook",
+      "handle": "BJP4Tripura",
+      "url": "https://www.facebook.com/BJP4Tripura/",
+      "check": "found",
+      "source": "Facebook page, described as the official page of BJP Tripura Pradesh"
+    },
+    {
+      "name": "Chandan Debnath",
+      "role": "BJP Tripura general secretary (reported after July 2026 reshuffle); Gomati district prabhari",
+      "state": "Tripura",
+      "platform": "X",
+      "handle": "@chandandnath",
+      "url": "https://x.com/chandandnath",
+      "check": "check",
+      "source": "X search result; profile describes him as BJP Tripura state convenor (may be out of date)"
     }
   ],
   "websites": [

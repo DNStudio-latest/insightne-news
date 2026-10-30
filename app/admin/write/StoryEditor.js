@@ -1,6 +1,6 @@
 "use client";
 // The "Write a story" form. Photos are made smaller on your phone before they are uploaded.
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { saveOriginal } from "../actions.js";
 import { shrinkPhoto } from "../photo.js";
 
@@ -11,9 +11,12 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor, rol
   const [galleryFiles, setGalleryFiles] = useState([]);
   const [removeImage, setRemoveImage] = useState(false);
   const [busy, setBusy] = useState(false);
+  const sending = useRef(false); // a quick second tap must not send the story twice
   const isPublished = story?.status === "approved";
 
   async function submit(formData) {
+    if (sending.current) return;
+    sending.current = true;
     setBusy(true);
     formData.delete("image");
     if (photo) formData.set("image", photo);
@@ -23,6 +26,7 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor, rol
     try {
       await saveOriginal(formData);
     } finally {
+      sending.current = false;
       setBusy(false);
     }
   }

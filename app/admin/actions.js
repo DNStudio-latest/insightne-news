@@ -20,6 +20,7 @@ import { hasCheckMarks } from "../../lib/hunter/checks.js";
 import { settings, regions } from "../../lib/config.js";
 import { currentRole, currentUser, userForPassword, hashPassword, startSession, endSession } from "../../lib/auth.js";
 import { SUB_EDITOR, staffTitle } from "../../lib/staff.js";
+import { cleanText } from "../../lib/clean-text.js";
 
 // Any signed-in person. Returns "admin", "editor" or "sub_editor".
 async function requireLogin() {
@@ -213,13 +214,21 @@ export async function saveOriginal(formData) {
     Object.assign(fields, { status: "pending", published_at: null });
   }
 
-  let storyId = id;
+  // A double tap on PUBLISH (or a slow phone connection sending the form twice) must not make the story twice:
+  // the same headline by the same writer saved in the last 5 minutes is the same story.
+  const twin = existing
+    ? null
+    : (await db.listStories({ status: fields.status, kind: "original", limit: 20 })).find(
+        (s) => s.headline === cleanText(fields.headline) && s.author === cleanText(fields.author) && Date.now() - new Date(s.created_at).getTime() < 5 * 60000,
+      );
+  let storyId = id || twin?.id;
   if (existing) await db.updateStory(id, fields);
+  else if (twin) await db.updateStory(twin.id, fields);
   else storyId = await db.createStory({ ...fields, score: null, needs_check: false, check_reasons: [] });
 
   const wantsLead = role === "admin" ? Boolean(formData.get("is_lead")) : Boolean(existing?.is_lead);
   if (publish && wantsLead) await db.setLead(storyId);
-  if (publish && !existing?.published_at) illustrateLater(storyId);
+  if (publish && !existing?.published_at && !twin) illustrateLater(storyId); // the twin already had its photo and Facebook post
   else if (existing?.is_lead && (!wantsLead || !publish)) await db.setLead(null);
 
   if (editorSends) refresh("pending", "Sent for approval — the admin will publish it");

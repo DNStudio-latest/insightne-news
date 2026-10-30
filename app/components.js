@@ -323,11 +323,20 @@ export function ArticlesList({ stories }) {
       <ol>
         {stories.map((s) => (
           <li key={s.id}>
-            <a className="h-link" href={storyUrl(s)}>{pick(s, "headline")}</a>
-            <span className="article-by">
-              {bylineName(s.author)}
-              {s.author_title && `, ${s.author_title}`}
-            </span>
+            <div>
+              <a className="h-link" href={storyUrl(s)}>{pick(s, "headline")}</a>
+              <span className="article-by">
+                {bylineName(s.author)}
+                {s.author_title && `, ${s.author_title}`}
+              </span>
+            </div>
+            <a href={storyUrl(s)} tabIndex={-1} aria-hidden="true">
+              {s.image_url ? (
+                <img className="article-thumb" src={s.image_url} alt="" loading="lazy" width={64} height={64} />
+              ) : (
+                <span className="article-thumb article-thumb-pen">✍</span>
+              )}
+            </a>
           </li>
         ))}
       </ol>

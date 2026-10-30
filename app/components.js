@@ -453,12 +453,12 @@ export function Byline({ story, link = false }) {
 const INTRO = "Here are today's top stories from InsightNE News.";
 const OUTRO = "That's all for now. Read the full stories on the InsightNE News website.";
 
-export async function TopBriefing({ stories }) {
+export async function TopBriefing({ stories, invite = false }) {
   const top = stories ?? (await topStories(site).catch(() => []));
   if (!top.length) return null;
   const items = top.map((s) => ({ headline: pick(s, "headline"), summary: pick(s, "summary"), headline_en: s.headline, summary_en: s.summary }));
-  const texts = { intro: tr(INTRO), outro: tr(OUTRO), intro_en: INTRO, outro_en: OUTRO, listen: tr("Listen to today's top news"), pause: tr("Pause"), resume: tr("Resume"), stop: tr("Stop") };
-  return <ListenBriefing items={items} lang={lang()} texts={texts} />;
+  const texts = { intro: tr(INTRO), outro: tr(OUTRO), intro_en: INTRO, outro_en: OUTRO, listen: tr("Listen to today's top news"), sub: tr("Today's top stories, read aloud in about 2 minutes"), isNew: tr("NEW"), listenNow: tr("Listen now"), notNow: tr("Not now"), pause: tr("Pause"), resume: tr("Resume"), stop: tr("Stop") };
+  return <ListenBriefing items={items} lang={lang()} texts={texts} showInvite={invite} />;
 }
 
 export function WhatsAppFollow() {

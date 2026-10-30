@@ -98,7 +98,7 @@ export default async function HomePage() {
       <LivePlayer live={live} />
       <WeatherStrip weather={weather} />
       <CricketBox match={cricket} />
-      <TopBriefing />
+      <TopBriefing invite />
 
       <div className={hasSide ? "front-top with-side" : "front-top"}>
         <div className="lead-col">

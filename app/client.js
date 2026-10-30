@@ -348,7 +348,7 @@ export function LanguageWelcome({ current }) {
 }
 
 // "Listen to today's top news": the phone or computer reads the top stories aloud with its own voice (free, no audio files).
-// items: [{ headline, summary, headline_en, summary_en }]; texts: { intro, outro, intro_en, outro_en, listen, pause, resume, stop }.
+// items: [{ headline, summary, headline_en, summary_en }]; texts: { intro, outro, intro_en, outro_en, listen, sub, isNew, listenNow, notNow, pause, resume, stop }.
 const VOICE_LANGS = { en: ["en-IN", "en"], bn: ["bn-IN", "bn"], hi: ["hi-IN", "hi"], as: ["as-IN", "as", "bn-IN", "bn"], ne: ["ne-NP", "ne", "hi-IN", "hi"] };
 
 function findVoice(code) {
@@ -361,6 +361,12 @@ function findVoice(code) {
 }
 
 // Two sentences at most, split into short pieces (Chrome stops reading long texts after about 15 seconds).
+const rememberInvite = () => {
+  try {
+    localStorage.setItem("listen-invited", "1");
+  } catch {}
+};
+
 const sentences = (text, max = 2) =>
   String(text || "")
     .split(/(?<=[.!?।])\s+/)
@@ -368,17 +374,26 @@ const sentences = (text, max = 2) =>
     .filter(Boolean)
     .slice(0, max);
 
-export function ListenBriefing({ items, lang = "en", texts }) {
+export function ListenBriefing({ items, lang = "en", texts, showInvite = false }) {
   const [supported, setSupported] = useState(false);
   const [state, setState] = useState("idle"); // idle | playing | paused
   const [current, setCurrent] = useState(-1);
+  const [invite, setInvite] = useState(false);
 
   useEffect(() => {
     if (!("speechSynthesis" in window)) return;
     setSupported(true);
     window.speechSynthesis.getVoices(); // starts loading the voice list
-    return () => window.speechSynthesis.cancel();
-  }, []);
+    // A one-time invitation, a few seconds after arriving. Not on a first visit while the language card is open.
+    let timer;
+    if (showInvite) {
+      try {
+        const langAsked = localStorage.getItem("lang-asked") || /(^|;\s*)lang=/.test(document.cookie);
+        if (langAsked && !localStorage.getItem("listen-invited")) timer = setTimeout(() => setInvite(true), 3000);
+      } catch {}
+    }
+    return () => (clearTimeout(timer), window.speechSynthesis.cancel());
+  }, [showInvite]);
 
   if (!supported || !items?.length) return null;
 
@@ -424,27 +439,57 @@ export function ListenBriefing({ items, lang = "en", texts }) {
     setCurrent(-1);
   }
 
+  const startFromInvite = () => {
+    rememberInvite();
+    setInvite(false);
+    play();
+  };
+
   return (
-    <div className="listen-box">
-      {state === "idle" ? (
-        <button type="button" className="listen-btn" onClick={play}>
-          <span aria-hidden="true">🎧</span> {texts.listen} <span className="listen-time">· {Math.max(1, Math.round((items.length * 20) / 60))} min</span>
-        </button>
-      ) : (
-        <>
-          <div className="listen-controls">
-            {state === "playing" ? (
-              <button type="button" className="listen-btn" onClick={() => (window.speechSynthesis.pause(), setState("paused"))}>⏸ {texts.pause}</button>
-            ) : (
-              <button type="button" className="listen-btn" onClick={() => (window.speechSynthesis.resume(), setState("playing"))}>▶ {texts.resume}</button>
-            )}
-            <button type="button" className="listen-btn listen-stop" onClick={stop}>■ {texts.stop}</button>
-          </div>
-          <p className="listen-now" aria-live="polite">
-            {current >= 0 ? <><b>{current + 1}/{items.length}</b> {items[current].headline}</> : "🎧 …"}
+    <>
+      <section className={`listen-box${state !== "idle" ? " listen-on" : ""}`} aria-label={texts.listen}>
+        <span className="listen-icon" aria-hidden="true">🎧</span>
+        <div className="listen-text">
+          <p className="listen-title">
+            <span className="listen-new">{texts.isNew}</span> {texts.listen}
           </p>
-        </>
+          {state === "idle" || current < 0 ? (
+            <p className="listen-sub">{texts.sub}</p>
+          ) : (
+            <p className="listen-sub" aria-live="polite">
+              <b>{current + 1}/{items.length}</b> {items[current].headline}
+            </p>
+          )}
+        </div>
+        <div className="listen-controls">
+          {state === "idle" && (
+            <button type="button" className="listen-btn" onClick={play}>▶ {texts.listenNow}</button>
+          )}
+          {state === "playing" && (
+            <button type="button" className="listen-btn" onClick={() => (window.speechSynthesis.pause(), setState("paused"))}>⏸ {texts.pause}</button>
+          )}
+          {state === "paused" && (
+            <button type="button" className="listen-btn" onClick={() => (window.speechSynthesis.resume(), setState("playing"))}>▶ {texts.resume}</button>
+          )}
+          {state !== "idle" && (
+            <button type="button" className="listen-btn listen-stop" onClick={stop}>■ {texts.stop}</button>
+          )}
+        </div>
+      </section>
+
+      {invite && state === "idle" && (
+        <div className="listen-invite" role="dialog" aria-label={texts.listen}>
+          <button type="button" className="lang-welcome-close" aria-label="Close" onClick={() => (rememberInvite(), setInvite(false))}>✕</button>
+          <p className="listen-invite-title">
+            <span className="listen-new">{texts.isNew}</span> 🎧 {texts.listen}
+          </p>
+          <p className="listen-invite-sub">{texts.sub}</p>
+          <div className="listen-controls">
+            <button type="button" className="listen-btn" onClick={startFromInvite}>▶ {texts.listenNow}</button>
+            <button type="button" className="listen-btn listen-stop" onClick={() => (rememberInvite(), setInvite(false))}>{texts.notNow}</button>
+          </div>
+        </div>
       )}
-    </div>
+    </>
   );
 }

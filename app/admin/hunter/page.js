@@ -4,6 +4,8 @@ import { formatDate } from "../../../lib/format.js";
 import { regions, states } from "../../../lib/config.js";
 import { hunterStore } from "../../../lib/hunter/store.js";
 import HunterDraft from "./HunterDraft.js";
+import DirectorySearch from "./DirectorySearch.js";
+import directory from "../../../hunter-directory.json";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -31,6 +33,8 @@ export default async function HunterPage({ searchParams }) {
         <h1>🕵 News Hunter</h1>
         <a className="btn btn-plain" href="/admin">← Back</a>
       </div>
+
+      <DirectorySearch people={directory.people} websites={directory.websites} />
 
       <nav className="tabs">
         {Object.entries(VIEWS).map(([key, label]) => (

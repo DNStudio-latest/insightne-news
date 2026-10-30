@@ -23,6 +23,8 @@ jobs:
       # Free tools for reading PDFs: pdftotext/pdftoppm (poppler) and Tesseract OCR with English and Bengali.
       - run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ben
       - run: npm ci
+      # The browser that takes the proof screenshots of the source pages.
+      - run: npx playwright install --with-deps chromium
       - run: npm run hunt
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

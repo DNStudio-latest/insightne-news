@@ -449,6 +449,14 @@ export async function saveHunterDraft(formData) {
   backToHunter("Draft saved");
 }
 
+// Saves the choice of proof screenshot, and whether it becomes the photo when the draft is published.
+export async function setHunterPhoto(formData) {
+  await requireAdmin();
+  const id = text(formData, "id", 60);
+  await hunterStore.updateDraft(id, { use_photo: formData.get("usePhoto") === "1", photo_index: Number(formData.get("photoIndex")) || 0 });
+  backToHunter("Photo choice saved");
+}
+
 export async function approveHunterDraft(formData) {
   await requireAdmin();
   const draft = await hunterStore.getDraft(text(formData, "id", 60));
@@ -459,10 +467,16 @@ export async function approveHunterDraft(formData) {
   const paragraphs = draft.body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
   // Link to the original PDF, page or video at the bottom of the story.
   const sourceLines = draft.sources.map((s) => `Source: ${s.name}, ${s.url}`);
+  // The chosen proof screenshot becomes the photo, only if you switched it on for this draft.
+  const shot = draft.use_photo ? draft.sources[draft.photo_index ?? 0] : null;
+  const image_url = shot?.proof ? await db.uploadImage(await hunterStore.readProof(shot.proof), "image/webp") : null;
   const storyId = await db.createStory(
     {
       kind: "original",
       status: "approved",
+      image_url,
+      image_caption: shot ? `Screenshot of the official page: ${shot.name}` : null,
+      image_credit: shot ? shot.name : null,
       headline: draft.headline,
       summary: paragraphs[0].slice(0, 600),
       body: [...paragraphs.slice(1), ...sourceLines].join("\n\n"),

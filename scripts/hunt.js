@@ -7,6 +7,7 @@ import { createGeminiCaller } from "../lib/gemini.js";
 import { createHunterAi } from "../lib/hunter/ai.js";
 import { createPoliteFetcher } from "../lib/hunter/polite.js";
 import { createRelayFetch } from "../lib/hunter/relay.js";
+import { createProofCapturer } from "../lib/hunter/proof.js";
 import { hunterStore } from "../lib/hunter/store.js";
 import { runHunter } from "../lib/hunter/run.js";
 
@@ -42,6 +43,9 @@ const ai = { judge: judgeAi.judge, draft };
 const fetchFn = process.env.GITHUB_ACTIONS ? createRelayFetch() : fetch;
 
 console.log(`InsightNE News Hunter — ${new Date().toISOString()}`);
-const run = await runHunter({ store: hunterStore, get: createPoliteFetcher({ fetchFn }), ai, generate: quick, config: hunterConfig, readOnly });
+// Screenshots of the source pages (proof). Not used in the read-only test.
+const proof = readOnly ? null : createProofCapturer();
+const run = await runHunter({ store: hunterStore, get: createPoliteFetcher({ fetchFn }), ai, generate: quick, config: hunterConfig, readOnly, proof });
+await proof?.close();
 console.log("Done.", JSON.stringify({ ...run, pages_failed: run.pages_failed.map((f) => `${f.name}: ${f.error}`) }, null, 1));
 process.exit(run.error ? 1 : 0);

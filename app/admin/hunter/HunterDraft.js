@@ -1,7 +1,7 @@
 "use client";
 // One News Hunter draft: read it, edit it, approve (publish) or reject it.
 import { useState } from "react";
-import { saveHunterDraft, approveHunterDraft, rejectHunterDraft, restoreHunterDraft } from "../actions.js";
+import { saveHunterDraft, approveHunterDraft, rejectHunterDraft, restoreHunterDraft, setHunterPhoto } from "../actions.js";
 
 const FLAG_LABELS = {
   check: { text: "Has [CHECK] parts", color: "var(--danger)" },
@@ -89,6 +89,44 @@ export default function HunterDraft({ draft, view, regions }) {
           </li>
         ))}
       </ul>
+
+      {draft.sources.some((s) => s.proof) && (
+        <form action={setHunterPhoto} className="photo-choice">
+          {id}
+          <strong>📸 Proof screenshots</strong>
+          <div className="proof-row">
+            {draft.sources.map(
+              (s, i) =>
+                s.proof && (
+                  <a key={i} href={`/api/hunter-proof?draft=${draft.id}&i=${i}`} target="_blank" rel="noopener noreferrer">
+                    <img src={`/api/hunter-proof?draft=${draft.id}&i=${i}`} alt={`Screenshot of ${s.name}`} width={140} />
+                    <span className="orig">{s.name}</span>
+                  </a>
+                ),
+            )}
+          </div>
+          <label>
+            Screenshot to use
+            <select name="photoIndex" defaultValue={draft.photo_index ?? 0}>
+              {draft.sources.map(
+                (s, i) =>
+                  s.proof && (
+                    <option key={i} value={i}>
+                      {s.name}
+                    </option>
+                  ),
+              )}
+            </select>
+          </label>
+          <label>
+            <input type="checkbox" name="usePhoto" value="1" defaultChecked={draft.use_photo} /> Use this screenshot as the photo when published
+          </label>
+          <p className="note">
+            Before switching this on, open the screenshot and check: (1) no mobile numbers, emails or private details are visible; (2) the page belongs to the source named; (3) you are allowed to use it. Other publishers' pages may be copyrighted.
+          </p>
+          <button className="btn btn-edit" type="submit">SAVE PHOTO CHOICE</button>
+        </form>
+      )}
 
       <div className="actions">
         {view === "pending" && (

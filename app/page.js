@@ -2,7 +2,7 @@ import { site } from "../lib/site-cache.js";
 import { settings, generalRegion, states, northeastRegions, widerRegions, topics, ARTICLES } from "../lib/config.js";
 import { capitalsWeather } from "../lib/weather.js";
 import { indiaMatch } from "../lib/cricket.js";
-import { LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, ArticlesList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
+import { LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, ArticlesList, Card, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
 import { LiveUpdates, PollBox } from "./client.js";
 import { initLang, lang } from "../lib/lang.js";
 
@@ -78,8 +78,12 @@ export default async function HomePage() {
 
   const lead = stories.find((s) => s.is_lead) || stories.find((s) => s.kind === "original" && s.image_url) || stories[0];
   const others = stories.filter((s) => s.id !== lead.id);
-  const latest = others.slice(0, 8);
-  const originals = others.filter((s) => s.kind === "original" && s.topic !== ARTICLES).slice(0, 3); // articles have their own column
+  const latest = others.filter((s) => s.topic !== ARTICLES).slice(0, 8); // articles have their own column
+  const ownStories = others.filter((s) => s.kind === "original" && s.topic !== ARTICLES);
+  // Two more of our own stories under the lead (like a newspaper's front page), then the next three in "Originals".
+  const underLead = ownStories.filter((s) => s.image_url).slice(0, 2);
+  const originals = ownStories.filter((s) => !underLead.includes(s)).slice(0, 3);
+  const hasSide = articles.length > 0 || mostRead.length >= 3;
   const storiesByState = states.map((state) => [state, others.filter((s) => s.region === state).slice(0, 3)]);
 
   return (
@@ -92,10 +96,24 @@ export default async function HomePage() {
       <WeatherStrip weather={weather} />
       <CricketBox match={cricket} />
 
-      <div className={articles.length ? "front-top with-articles" : "front-top"}>
-        <LeadStory story={lead} />
+      <div className={hasSide ? "front-top with-side" : "front-top"}>
+        <div className="lead-col">
+          <LeadStory story={lead} />
+          {underLead.length > 0 && (
+            <div className="under-lead">
+              {underLead.map((s) => (
+                <Card key={s.id} story={s} showSummary={false} />
+              ))}
+            </div>
+          )}
+        </div>
         <LatestList stories={latest} />
-        <ArticlesList stories={articles} />
+        {hasSide && (
+          <div className="front-side">
+            <ArticlesList stories={articles} />
+            {mostRead.length >= 3 && <LatestList stories={mostRead} title="Most read today" />}
+          </div>
+        )}
       </div>
 
       {originals.length > 0 && (
@@ -109,11 +127,6 @@ export default async function HomePage() {
 
       {poll && <PollBox {...poll} />}
 
-      {mostRead.length >= 3 && (
-        <section className="section">
-          <LatestList stories={mostRead} title="Most read today" />
-        </section>
-      )}
 
       <CategoryBlock title={`Across the ${generalRegion}`} href={categoryUrl(generalRegion)} stories={acrossTheRegion(others.filter((s) => northeastRegions.includes(s.region)), 5)} />
 

@@ -100,8 +100,12 @@ main { padding: 20px 0 40px; }
 
 /* Lead story */
 .front-top { display: grid; gap: 24px; grid-template-columns: 1fr; margin-bottom: 30px; }
-@media (min-width: 900px) { .front-top { grid-template-columns: 2fr 1fr; } .front-top .articles { grid-column: 1 / -1; } }
-@media (min-width: 1100px) { .front-top.with-articles { grid-template-columns: 2fr 1fr 1fr; } .front-top .articles { grid-column: auto; } }
+.front-top > * { align-self: start; } /* each box only as tall as what is in it: no empty white boxes */
+.front-side { display: grid; gap: 24px; }
+.under-lead { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+@media (max-width: 899px) { .under-lead { display: none; } } /* on phones these stories are already in Latest, just below */
+@media (min-width: 900px) { .front-top { grid-template-columns: 2fr 1fr; } .front-side { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; align-items: start; } }
+@media (min-width: 1100px) { .front-top.with-side { grid-template-columns: 2fr 1fr 1fr; } .front-side { grid-column: auto; grid-template-columns: 1fr; } }
 .articles h3 a { color: inherit; }
 .article-by { display: block; margin-top: 3px; font-size: 0.8rem; font-weight: 700; color: var(--accent); }
 .articles li { display: grid; grid-template-columns: 1fr 64px; gap: 10px; align-items: start; }

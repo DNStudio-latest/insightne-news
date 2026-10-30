@@ -42,6 +42,14 @@ export default function PrivacyPage() {
         advertising by visiting <a href="https://www.google.com/settings/ads">Google Ads Settings</a> or{" "}
         <a href="https://www.aboutads.info/choices/">www.aboutads.info</a>.
       </p>
+      <h2>Facebook and Instagram posts</h2>
+      <p>
+        Our News Hunter reads publicly visible posts from official government pages, political leaders' pages and news pages
+        on Facebook and Instagram, using Meta's official tools. It keeps only the text and picture needed to write a short news
+        draft, and it names the source and links to the original post. A member of our editorial team reviews every draft before
+        anything is published. We do not collect private messages, friend lists or the personal information of the people who
+        post. Our Facebook page and Instagram account publish our own approved news stories.
+      </p>
       <h2>Sharing</h2>
       <p>We do not sell your personal information. We share information only when required by law.</p>
       <h2>Children</h2>

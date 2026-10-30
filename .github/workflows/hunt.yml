@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   hunt:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # pinned: the Ubuntu 26 "latest" broke the screenshot browser install
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4

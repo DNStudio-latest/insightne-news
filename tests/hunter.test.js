@@ -135,3 +135,23 @@ test("dates: the first date written is the publishing date; '10,' in a date is t
   const bad = checkDraft("The hearing is on November 12, 2026.", [src]);
   assert.equal(bad.text, "The hearing is on November 12 [CHECK], 2026.");
 });
+
+test("urgent alerts: sent to Telegram with the link; off when the secrets are missing", async () => {
+  const { createTelegramAlert } = await import("../lib/hunter/alert.js");
+  assert.equal(createTelegramAlert({ token: "", chatId: "1" }), null);
+  const sent = [];
+  const alert = createTelegramAlert({ token: "T", chatId: "42", fetchFn: async (url, opts) => (sent.push({ url, body: JSON.parse(opts.body) }), new Response("{}")) });
+  await alert({ title: "Flood warning issued", state: "Assam", source: "ASDMA", url: "https://example.gov.in/x" });
+  assert.equal(sent[0].url, "https://api.telegram.org/botT/sendMessage");
+  assert.equal(sent[0].body.chat_id, "42");
+  assert.match(sent[0].body.text, /URGENT \(Assam\): Flood warning issued/);
+});
+
+test("rejected drafts are remembered for 30 days, so similar items can be ranked lower", async () => {
+  const store = createLocalHunterStore(path.join(os.tmpdir(), `hunter-rej-${Date.now()}.json`));
+  const id = await store.createDraft({ headline: "Old story", event: "Minister visits a school", sources: [], flags: [], body: "" });
+  await store.updateDraft(id, { status: "rejected" });
+  const rejected = await store.recentRejected(30);
+  assert.equal(rejected.length, 1);
+  assert.equal(rejected[0].event, "Minister visits a school");
+});

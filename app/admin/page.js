@@ -9,6 +9,8 @@ import { facebookReady } from "../../lib/facebook.js";
 import { instagramReady } from "../../lib/instagram.js";
 
 export const dynamic = "force-dynamic";
+// Room for the photo, Facebook and Instagram posts that run after APPROVE.
+export const maxDuration = 60;
 export const metadata = { title: "Approval page", robots: { index: false, follow: false } };
 
 const VIEWS = { pending: "pending", published: "approved", rejected: "rejected" };
@@ -65,6 +67,7 @@ export default async function AdminPage({ searchParams }) {
             <a href="/admin/hunter">🕵 News Hunter</a>
             <a href="/admin/live">🔴 Live</a>
             <a href="/admin/whatsapp">📲 WhatsApp posts</a>
+            <a href="/admin/social">📘 Facebook & Instagram</a>
             <a href="/admin/polls">📊 Polls</a>
             <a href="/admin/newsletter">✉ Daily email</a>
             <a href="/admin/editors">👥 Editors</a>

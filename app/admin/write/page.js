@@ -5,6 +5,7 @@ import { currentUser } from "../../../lib/auth.js";
 import StoryEditor from "./StoryEditor.js";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 export const metadata = { title: "Write a story", robots: { index: false, follow: false } };
 
 export default async function WritePage({ searchParams }) {

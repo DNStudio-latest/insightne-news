@@ -8,6 +8,7 @@ import { addIllustration } from "../../lib/images.js";
 import { sendAlert } from "../../lib/push.js";
 import { shareOnFacebook, facebookAutoPost } from "../../lib/facebook.js";
 import { shareOnInstagram, instagramAutoPost } from "../../lib/instagram.js";
+import { logSocial, checkSocial } from "../../lib/social.js";
 import { sendEmail, dailyEmail, FREE_DAILY_LIMIT } from "../../lib/newsletter.js";
 import { topStories } from "../../lib/top.js";
 import { formatDay, youtubeId } from "../../lib/format.js";
@@ -51,17 +52,24 @@ function illustrateLater(id) {
     } catch (err) {
       console.error("Illustration failed:", err.message);
     }
-    try {
-      const story = await db.getStory(id);
-      if (facebookAutoPost(story)) await shareOnFacebook(db, story);
-    } catch (err) {
-      console.error("Facebook post failed:", err.message);
+    const story = await db.getStory(id).catch(() => null);
+    if (facebookAutoPost(story) && !story.facebook_post_id) {
+      try {
+        await shareOnFacebook(db, story);
+        await logSocial(db, "Facebook", story);
+      } catch (err) {
+        console.error("Facebook post failed:", err.message);
+        await logSocial(db, "Facebook", story, err.message);
+      }
     }
-    try {
-      const story = await db.getStory(id);
-      if (instagramAutoPost(story)) await shareOnInstagram(db, story);
-    } catch (err) {
-      console.error("Instagram post failed:", err.message);
+    if (instagramAutoPost(story) && !story.instagram_post_id) {
+      try {
+        await shareOnInstagram(db, story);
+        await logSocial(db, "Instagram", story);
+      } catch (err) {
+        console.error("Instagram post failed:", err.message);
+        await logSocial(db, "Instagram", story, err.message);
+      }
     }
   });
 }
@@ -321,7 +329,9 @@ export async function postFacebook(formData) {
   if (story.facebook_post_id) refresh("published", "This story is already on your Facebook page");
   try {
     await shareOnFacebook(db, story);
+    await logSocial(db, "Facebook", story);
   } catch (err) {
+    await logSocial(db, "Facebook", story, err.message);
     refresh("published", err.message);
   }
   refresh("published", "Posted on your Facebook page");
@@ -404,7 +414,9 @@ export async function postInstagram(formData) {
   if (story.instagram_post_id) refresh("published", "This story is already on Instagram");
   try {
     await shareOnInstagram(db, story);
+    await logSocial(db, "Instagram", story);
   } catch (err) {
+    await logSocial(db, "Instagram", story, err.message);
     refresh("published", err.message);
   }
   refresh("published", "Posted on Instagram");
@@ -477,4 +489,12 @@ export async function restoreHunterDraft(formData) {
   await requireAdmin();
   await hunterStore.updateDraft(text(formData, "id", 60), { status: "pending" });
   backToHunter("Draft moved back to waiting");
+}
+
+// ---- Facebook / Instagram connection check ----
+export async function checkSocialConnection() {
+  await requireAdmin();
+  const steps = await checkSocial(db);
+  await db.setSetting("social_check", { at: new Date().toISOString(), steps });
+  redirect("/admin/social");
 }

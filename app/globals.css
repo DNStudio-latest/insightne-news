@@ -481,3 +481,18 @@ main { padding: 20px 0 40px; }
   -webkit-hyphens: auto;
   overflow-wrap: break-word;
 }
+
+/* 🎧 Listen to today's top news */
+.listen-box { margin: 12px 0 16px; }
+.listen-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.listen-btn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 10px 18px;
+  border: 0; border-radius: 999px; background: var(--brand); color: #fff;
+  font: 600 1rem var(--sans); cursor: pointer;
+}
+.listen-btn:hover { background: var(--brand-dark); }
+.listen-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.listen-stop { background: var(--card); color: var(--text); border: 1px solid var(--line); }
+.listen-stop:hover { background: var(--brand-soft); }
+.listen-time { font-weight: 400; opacity: 0.85; }
+.listen-now { margin: 8px 0 0; color: var(--muted); font-size: 0.95rem; text-align: left; }

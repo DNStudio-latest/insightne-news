@@ -346,3 +346,105 @@ export function LanguageWelcome({ current }) {
     </div>
   );
 }
+
+// "Listen to today's top news": the phone or computer reads the top stories aloud with its own voice (free, no audio files).
+// items: [{ headline, summary, headline_en, summary_en }]; texts: { intro, outro, intro_en, outro_en, listen, pause, resume, stop }.
+const VOICE_LANGS = { en: ["en-IN", "en"], bn: ["bn-IN", "bn"], hi: ["hi-IN", "hi"], as: ["as-IN", "as", "bn-IN", "bn"], ne: ["ne-NP", "ne", "hi-IN", "hi"] };
+
+function findVoice(code) {
+  const voices = window.speechSynthesis.getVoices();
+  for (const want of VOICE_LANGS[code] || VOICE_LANGS.en) {
+    const voice = voices.find((v) => v.lang.replace("_", "-").toLowerCase() === want.toLowerCase()) || voices.find((v) => v.lang.toLowerCase().startsWith(`${want.toLowerCase()}-`));
+    if (voice) return voice;
+  }
+  return null;
+}
+
+// Two sentences at most, split into short pieces (Chrome stops reading long texts after about 15 seconds).
+const sentences = (text, max = 2) =>
+  String(text || "")
+    .split(/(?<=[.!?।])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .slice(0, max);
+
+export function ListenBriefing({ items, lang = "en", texts }) {
+  const [supported, setSupported] = useState(false);
+  const [state, setState] = useState("idle"); // idle | playing | paused
+  const [current, setCurrent] = useState(-1);
+
+  useEffect(() => {
+    if (!("speechSynthesis" in window)) return;
+    setSupported(true);
+    window.speechSynthesis.getVoices(); // starts loading the voice list
+    return () => window.speechSynthesis.cancel();
+  }, []);
+
+  if (!supported || !items?.length) return null;
+
+  function play() {
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    // The reader's language if the device has a voice for it; otherwise English.
+    let voice = lang !== "en" ? findVoice(lang) : null;
+    const local = Boolean(voice);
+    if (!voice) voice = findVoice("en");
+    const pieces = [{ text: local ? texts.intro : texts.intro_en, item: -1 }];
+    items.forEach((s, i) => {
+      const headline = local ? s.headline : s.headline_en;
+      const summary = local ? s.summary : s.summary_en;
+      pieces.push({ text: headline, item: i, pause: true });
+      for (const line of sentences(summary)) pieces.push({ text: line, item: i });
+    });
+    pieces.push({ text: local ? texts.outro : texts.outro_en, item: -1, pause: true });
+
+    pieces.forEach((p, n) => {
+      const u = new SpeechSynthesisUtterance(p.text);
+      if (voice) {
+        u.voice = voice;
+        u.lang = voice.lang;
+      }
+      u.rate = 0.95;
+      u.onstart = () => setCurrent(p.item);
+      if (n === pieces.length - 1) u.onend = () => (setState("idle"), setCurrent(-1));
+      // A short silence before each new story.
+      if (p.pause) {
+        const gap = new SpeechSynthesisUtterance(" ");
+        gap.volume = 0;
+        synth.speak(gap);
+      }
+      synth.speak(u);
+    });
+    setState("playing");
+  }
+
+  function stop() {
+    window.speechSynthesis.cancel();
+    setState("idle");
+    setCurrent(-1);
+  }
+
+  return (
+    <div className="listen-box">
+      {state === "idle" ? (
+        <button type="button" className="listen-btn" onClick={play}>
+          <span aria-hidden="true">🎧</span> {texts.listen} <span className="listen-time">· {Math.max(1, Math.round((items.length * 20) / 60))} min</span>
+        </button>
+      ) : (
+        <>
+          <div className="listen-controls">
+            {state === "playing" ? (
+              <button type="button" className="listen-btn" onClick={() => (window.speechSynthesis.pause(), setState("paused"))}>⏸ {texts.pause}</button>
+            ) : (
+              <button type="button" className="listen-btn" onClick={() => (window.speechSynthesis.resume(), setState("playing"))}>▶ {texts.resume}</button>
+            )}
+            <button type="button" className="listen-btn listen-stop" onClick={stop}>■ {texts.stop}</button>
+          </div>
+          <p className="listen-now" aria-live="polite">
+            {current >= 0 ? <><b>{current + 1}/{items.length}</b> {items[current].headline}</> : "🎧 …"}
+          </p>
+        </>
+      )}
+    </div>
+  );
+}

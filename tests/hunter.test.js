@@ -155,3 +155,23 @@ test("rejected drafts are remembered for 30 days, so similar items can be ranked
   assert.equal(rejected.length, 1);
   assert.equal(rejected[0].event, "Minister visits a school");
 });
+
+test("election watcher: first visit remembers old links quietly; a new schedule link is saved and alerted", async () => {
+  const { watchElections } = await import("../lib/hunter/watch.js");
+  const store = createLocalHunterStore(path.join(os.tmpdir(), `hunter-watch-${Date.now()}.json`));
+  const config = { sites: [{ enabled: true, watch: true, state: "Tripura", name: "CEO Tripura", pages: ["https://ceo.example.gov.in/press-release"] }, { enabled: true, state: "Tripura", name: "Not watched", pages: ["https://other.gov.in/x"] }] };
+  const page = (links) => ({ ok: true, url: "https://ceo.example.gov.in/press-release", text: `<html><body><main>${links.map(([href, text]) => `<p><a href="${href}">${text}</a></p>`).join("")}</main></body></html>` });
+  const old = [["/files/old-roll.pdf", "Draft electoral roll 2025 published"], ["/files/old-note.pdf", "Press note on voter awareness 2025"], ["/files/old-form.pdf", "Form 6 for new voters 2025"]];
+  const alerts = [];
+  const alert = async (a) => alerts.push(a);
+  const asked = [];
+  const first = await watchElections({ store, get: async (u) => (asked.push(u), page(old)), config, alert, log: () => {} });
+  assert.deepEqual(asked, ["https://ceo.example.gov.in/press-release"]);
+  assert.equal(first.alerts, 0);
+  const second = await watchElections({ store, get: async () => page([...old, ["/files/schedule.pdf", "Press Note: Schedule for General Election to Tripura Legislative Assembly 2028"]]), config, alert, log: () => {} });
+  assert.equal(second.new_links, 1);
+  assert.equal(alerts.length, 1);
+  assert.match(alerts[0].title, /Schedule for General Election/);
+  assert.equal(alerts[0].label, "🗳️ ELECTION");
+  assert.equal((await store.itemsWithStatus("queued")).length, 1);
+});

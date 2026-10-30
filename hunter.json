@@ -26,7 +26,20 @@
     { "enabled": true, "state": "Nagaland", "name": "Nagaland CMO", "kind": "Chief Minister's office", "pages": ["https://chiefminister.nagaland.gov.in/category/news/", "https://chiefminister.nagaland.gov.in/category/speeches/"] },
 
     { "enabled": true, "state": "Sikkim", "name": "Sikkim Government portal", "kind": "State portal", "pages": ["https://sikkim.gov.in/media/pressrelease", "https://sikkim.gov.in/media/news-announcement", "https://sikkim.gov.in/media/notification-circular"] },
-    { "enabled": true, "state": "Sikkim", "name": "Lok Bhavan Sikkim", "kind": "Governor's office", "pages": ["https://rajbhavansikkim.gov.in/category/press-release/", "https://rajbhavansikkim.gov.in/events/"] }
+    { "enabled": true, "state": "Sikkim", "name": "Lok Bhavan Sikkim", "kind": "Governor's office", "pages": ["https://rajbhavansikkim.gov.in/category/press-release/", "https://rajbhavansikkim.gov.in/events/"] },
+
+    { "_note": "Election offices. 'watch': true = also checked every 15 minutes by the election watcher (supabase/election-watch.sql), with a phone alert for new schedules and press notes." },
+    { "enabled": true, "watch": true, "state": "Tripura", "name": "Chief Electoral Officer, Tripura", "kind": "Election office", "pages": ["https://ceotripura.nic.in/press-release", "https://ceotripura.nic.in/notification"] },
+    { "enabled": true, "watch": true, "state": "Tripura", "name": "Tripura State Election Commission", "kind": "Election office", "pages": ["https://sec.tripura.gov.in/press-release", "https://sec.tripura.gov.in/notifications", "https://sec.tripura.gov.in/news"] },
+    { "enabled": true, "watch": true, "state": "Assam", "name": "Chief Electoral Officer, Assam", "kind": "Election office", "pages": ["https://ceoassam.nic.in/"] },
+    { "enabled": true, "watch": true, "state": "Assam", "name": "Assam State Election Commission", "kind": "Election office", "pages": ["https://sec.assam.gov.in/notification"] },
+    { "enabled": true, "watch": true, "state": "Meghalaya", "name": "Chief Electoral Officer, Meghalaya", "kind": "Election office", "pages": ["https://ceomeghalaya.nic.in/"] },
+    { "enabled": true, "watch": true, "state": "Manipur", "name": "Chief Electoral Officer, Manipur", "kind": "Election office", "pages": ["https://ceomanipur.nic.in/"] },
+    { "enabled": true, "watch": true, "state": "Mizoram", "name": "Chief Electoral Officer, Mizoram", "kind": "Election office", "pages": ["https://ceo.mizoram.gov.in/show-all-data/press-release"] },
+    { "enabled": true, "watch": true, "state": "Mizoram", "name": "Mizoram State Election Commission", "kind": "Election office", "pages": ["https://sec.mizoram.gov.in/page/omnotifications"] },
+    { "enabled": true, "watch": true, "state": "Nagaland", "name": "Chief Electoral Officer, Nagaland", "kind": "Election office", "pages": ["https://ceo.nagaland.gov.in/"] },
+    { "enabled": true, "watch": true, "state": "Arunachal Pradesh", "name": "Chief Electoral Officer, Arunachal Pradesh", "kind": "Election office", "pages": ["https://ceoarunachal.nic.in/press-releases"] },
+    { "enabled": true, "watch": true, "state": "Sikkim", "name": "Chief Electoral Officer, Sikkim", "kind": "Election office", "pages": ["https://ceo.sikkim.gov.in/NewsTenderPublic/News", "https://ceo.sikkim.gov.in/NotificationPublic/NotificationList"] }
   ],
 
   "_youtube_help": "Official YouTube channels, read through YouTube's own RSS feed. 'proof' says how we know the channel is real.",

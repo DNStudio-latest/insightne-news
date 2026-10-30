@@ -312,6 +312,29 @@ export function LatestList({ stories, title = "Latest" }) {
   );
 }
 
+// The front page's "Articles" column: byline articles, each with the writer's name and title.
+export function ArticlesList({ stories }) {
+  if (!stories.length) return null;
+  return (
+    <aside className="latest articles">
+      <h3>
+        <a href={categoryUrl("Articles")}>{tr("Articles")}</a>
+      </h3>
+      <ol>
+        {stories.map((s) => (
+          <li key={s.id}>
+            <a className="h-link" href={storyUrl(s)}>{pick(s, "headline")}</a>
+            <span className="article-by">
+              {bylineName(s.author)}
+              {s.author_title && `, ${s.author_title}`}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </aside>
+  );
+}
+
 export function SectionHead({ title, href }) {
   return (
     <div className="section-head">

@@ -2,7 +2,7 @@
 // On the internet this runs at 2 PM, 6 PM and 9 PM India time (see .github/workflows/hunt.yml and supabase/hunter-timer.sql).
 // It finds new government notices, press releases and official videos, and writes drafts for your approval.
 import hunterConfig from "../hunter.json" with { type: "json" };
-import { settings, states } from "../lib/config.js";
+import { settings, states, newsTopics } from "../lib/config.js";
 import { createGeminiCaller } from "../lib/gemini.js";
 import { createHunterAi } from "../lib/hunter/ai.js";
 import { createPoliteFetcher } from "../lib/hunter/polite.js";
@@ -24,8 +24,8 @@ if (!readOnly && !process.env.GEMINI_API_KEY) {
 // Flash-Lite decides what is news (cheap, many requests); the stronger Flash model writes the drafts.
 const quick = createGeminiCaller({ maxOutputTokens: 4000 });
 const writer = createGeminiCaller({ model: process.env.HUNTER_MODEL || "gemini-flash-latest", maxOutputTokens: 4000 });
-const judgeAi = createHunterAi({ generate: quick, states, topics: settings.topics });
-const draftAi = createHunterAi({ generate: writer, states, topics: settings.topics });
+const judgeAi = createHunterAi({ generate: quick, states, topics: newsTopics });
+const draftAi = createHunterAi({ generate: writer, states, topics: newsTopics });
 // If the stronger model's free limit runs out (or it stops answering), the rest of the drafts are written by Flash-Lite.
 let writerDown = false;
 async function draft(docs) {

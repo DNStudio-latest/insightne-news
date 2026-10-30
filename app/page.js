@@ -1,8 +1,8 @@
 import { site } from "../lib/site-cache.js";
-import { settings, generalRegion, states, northeastRegions, widerRegions, topics } from "../lib/config.js";
+import { settings, generalRegion, states, northeastRegions, widerRegions, topics, ARTICLES } from "../lib/config.js";
 import { capitalsWeather } from "../lib/weather.js";
 import { indiaMatch } from "../lib/cricket.js";
-import { LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
+import { LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, ArticlesList, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
 import { LiveUpdates, PollBox } from "./client.js";
 import { initLang, lang } from "../lib/lang.js";
 
@@ -56,8 +56,9 @@ async function readerPoll() {
 }
 
 export default async function HomePage() {
-  const [stories, videos, mostRead, weather, poll, cricket, live] = await Promise.all([
+  const [stories, articles, videos, mostRead, weather, poll, cricket, live] = await Promise.all([
     site.listStories({ status: "approved", limit: 100 }),
+    site.listStories({ status: "approved", topic: ARTICLES, limit: 6 }),
     site.videos(4),
     site.mostRead(1, 5).catch(() => []),
     capitalsWeather(),
@@ -78,7 +79,7 @@ export default async function HomePage() {
   const lead = stories.find((s) => s.is_lead) || stories.find((s) => s.kind === "original" && s.image_url) || stories[0];
   const others = stories.filter((s) => s.id !== lead.id);
   const latest = others.slice(0, 8);
-  const originals = others.filter((s) => s.kind === "original").slice(0, 3);
+  const originals = others.filter((s) => s.kind === "original" && s.topic !== ARTICLES).slice(0, 3); // articles have their own column
   const storiesByState = states.map((state) => [state, others.filter((s) => s.region === state).slice(0, 3)]);
 
   return (
@@ -91,9 +92,10 @@ export default async function HomePage() {
       <WeatherStrip weather={weather} />
       <CricketBox match={cricket} />
 
-      <div className="front-top">
+      <div className={articles.length ? "front-top with-articles" : "front-top"}>
         <LeadStory story={lead} />
         <LatestList stories={latest} />
+        <ArticlesList stories={articles} />
       </div>
 
       {originals.length > 0 && (
@@ -123,7 +125,7 @@ export default async function HomePage() {
 
       <Videos videos={videos} />
 
-      {topics.map((t) => (
+      {topics.filter((t) => t !== ARTICLES).map((t) => (
         <CategoryBlock key={t} title={t} stories={others.filter((s) => s.topic === t).slice(0, 5)} />
       ))}
     </PageShell>

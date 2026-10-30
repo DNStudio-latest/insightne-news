@@ -6,16 +6,16 @@ import { createGeminiAi } from "../lib/gemini.js";
 import { createRulesAi } from "../lib/rules.js";
 import { runPipeline, fillMissingSummaries, fillMissingTranslations } from "../lib/pipeline.js";
 import { addMissingIllustrations } from "../lib/images.js";
-import { settings, states, enabledSources, trustedSourceNames } from "../lib/config.js";
+import { settings, states, enabledSources, trustedSourceNames, newsTopics } from "../lib/config.js";
 
 // With a Claude key, Claude scores and summarizes. With a free Gemini key, simple rules score the news
 // and Gemini writes the summaries. With neither, you write the summaries yourself ("no-AI mode", free).
 const hasClaudeKey = Boolean(process.env.ANTHROPIC_API_KEY || process.env.OPENROUTER_API_KEY);
-const rules = createRulesAi({ topics: settings.topics });
+const rules = createRulesAi({ topics: newsTopics });
 const ai = hasClaudeKey
-  ? createClaudeAi({ topics: settings.topics, states })
+  ? createClaudeAi({ topics: newsTopics, states })
   : process.env.GEMINI_API_KEY
-    ? createGeminiAi({ rules, topics: settings.topics, states })
+    ? createGeminiAi({ rules, topics: newsTopics, states })
     : rules;
 
 console.log(`InsightNE News collector — ${new Date().toISOString()}`);

@@ -67,7 +67,8 @@
   "topics": [
     "Politics",
     "Education",
-    "Sports"
+    "Sports",
+    "Articles"
   ],
   "minimumScore": 6,
   "maxOutsideNortheastPerRun": 15,

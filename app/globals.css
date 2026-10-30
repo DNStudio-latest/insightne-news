@@ -466,3 +466,18 @@ main { padding: 20px 0 40px; }
 .lang-welcome-options button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .lang-welcome-note { margin: 0; font-size: 0.75rem; color: var(--muted); }
 .lang-welcome-close { position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: transparent; color: var(--muted); font-size: 1rem; cursor: pointer; }
+
+/* Justified paragraphs, like a printed newspaper. Headlines, bylines and lists stay left-aligned.
+   Hyphenation stops long words from leaving wide gaps in narrow columns and on phones. */
+.article-body p,
+.article-body blockquote,
+.standfirst,
+.lead p:not(.byline),
+.card p,
+.page p {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  overflow-wrap: break-word;
+}

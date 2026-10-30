@@ -482,40 +482,24 @@ main { padding: 20px 0 40px; }
   overflow-wrap: break-word;
 }
 
-/* 🎧 Listen to today's top news: a highlighted banner, and a one-time pop-up invitation */
-.listen-box {
-  display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 12px 0 18px; padding: 14px 16px;
-  border-radius: var(--radius); background: linear-gradient(120deg, #0f4c5c 0%, #0a3540 70%); color: #fff;
-  border-left: 6px solid #c8553d; box-shadow: 0 6px 18px rgba(15, 76, 92, 0.25);
+/* 🎧 Listen Top News: a tab fixed to the right edge of the screen (stays put while scrolling) */
+.listen-float { position: fixed; right: 0; top: 62%; z-index: 35; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.listen-float-tab {
+  display: flex; align-items: center; gap: 8px; max-width: 132px; min-height: 52px; padding: 8px 12px 8px 10px;
+  border: 0; border-radius: 14px 0 0 14px; background: #d32f2f; color: #fff; cursor: pointer;
+  font: 800 0.92rem/1.15 var(--sans); text-align: left; box-shadow: -3px 4px 14px rgba(0, 0, 0, 0.3);
 }
-.listen-icon {
-  flex: none; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.16); font-size: 1.6rem; animation: listen-pulse 2s ease-out infinite;
+.listen-float-tab:hover { background: #b71c1c; }
+.listen-float-tab:focus-visible { outline: 3px solid #fff; outline-offset: -5px; }
+.listen-float-icon {
+  flex: none; display: grid; place-items: center; width: 30px; height: 30px; border: 2.5px solid #fff; border-radius: 50%;
+  font-size: 0.72rem; padding-left: 2px; animation: listen-pulse 2s ease-out infinite;
 }
-.listen-on .listen-icon { animation-duration: 1s; }
-@keyframes listen-pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5); } 100% { box-shadow: 0 0 0 14px rgba(255, 255, 255, 0); } }
-.listen-text { flex: 1 1 220px; min-width: 0; }
-.listen-title { margin: 0; font: 800 1.08rem/1.3 var(--sans); text-align: left; }
-.listen-sub { margin: 3px 0 0; font-size: 0.92rem; opacity: 0.9; text-align: left; }
-.listen-new {
-  display: inline-block; padding: 1px 8px; margin-right: 4px; border-radius: 999px; background: #c8553d; color: #fff;
-  font: 800 0.72rem/1.6 var(--sans); letter-spacing: 0.04em; vertical-align: 2px;
+.listen-float.is-on .listen-float-icon { padding-left: 0; letter-spacing: -1px; animation-duration: 1s; }
+@keyframes listen-pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6); } 100% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); } }
+.listen-float-stop {
+  width: 32px; height: 32px; margin-right: 8px; border-radius: 50%; border: 0; background: #1b1b1b; color: #fff;
+  font-size: 0.85rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
-.listen-controls { display: flex; gap: 8px; flex-wrap: wrap; }
-.listen-btn {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 10px 18px; border: 0; border-radius: 999px;
-  background: #c8553d; color: #fff; font: 700 1rem var(--sans); cursor: pointer;
-}
-.listen-btn:hover { filter: brightness(1.08); }
-.listen-btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-.listen-stop { background: rgba(255, 255, 255, 0.14); color: #fff; border: 1px solid rgba(255, 255, 255, 0.45); }
-.listen-invite {
-  position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 40; width: min(420px, calc(100% - 24px));
-  background: var(--card); color: var(--text); border: 1px solid var(--line); border-top: 4px solid var(--accent); border-radius: 16px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25); padding: 16px 16px 14px; animation: lang-up 0.35s ease-out;
-}
-.listen-invite-title { margin: 0 28px 4px 0; font-weight: 800; font-size: 1.05rem; line-height: 1.35; text-align: left; }
-.listen-invite-sub { margin: 0 0 12px; font-size: 0.9rem; color: var(--muted); text-align: left; }
-.listen-invite .listen-stop { background: var(--bg); color: var(--text); border-color: var(--line); }
-.listen-invite .listen-btn:focus-visible { outline-color: var(--accent); }
-@media (prefers-reduced-motion: reduce) { .listen-icon, .listen-invite { animation: none; } }
+@media print { .listen-float { display: none; } }
+@media (prefers-reduced-motion: reduce) { .listen-float-icon { animation: none; } }

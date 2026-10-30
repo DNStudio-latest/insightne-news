@@ -4,7 +4,7 @@ import { settings } from "../../lib/config.js";
 import { formatDay } from "../../lib/format.js";
 import { topStories } from "../../lib/top.js";
 import { CopyTextButton } from "../client.js";
-import { TopBriefing, PageShell, SectionHead, Kicker, WhatsAppFollow, EmailSignup, storyUrl } from "../components.js";
+import { PageShell, SectionHead, Kicker, WhatsAppFollow, EmailSignup, storyUrl } from "../components.js";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -35,7 +35,6 @@ export default async function TodayPage() {
       <div className="page" style={{ maxWidth: 740 }}>
         <SectionHead title={`Top ${stories.length || 5} news today`} />
         <p className="note" style={{ marginTop: -4 }}>{formatDay()}</p>
-        <TopBriefing stories={stories} />
         {stories.length ? (
           <ol className="top5">
             {stories.map((s) => (

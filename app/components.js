@@ -449,16 +449,16 @@ export function Byline({ story, link = false }) {
 }
 
 // "Follow us on WhatsApp" box (shown only when the channel link is filled in settings.json).
-// 🎧 "Listen to today's top news": a short spoken briefing of the Top 5, read by the reader's own phone.
+// 🎧 "Listen Top News": a short spoken briefing of the Top 5, read by the reader's own phone (a tab on the right edge of every page).
 const INTRO = "Here are today's top stories from InsightNE News.";
 const OUTRO = "That's all for now. Read the full stories on the InsightNE News website.";
 
-export async function TopBriefing({ stories, invite = false }) {
+export async function TopBriefing({ stories }) {
   const top = stories ?? (await topStories(site).catch(() => []));
   if (!top.length) return null;
   const items = top.map((s) => ({ headline: pick(s, "headline"), summary: pick(s, "summary"), headline_en: s.headline, summary_en: s.summary }));
-  const texts = { intro: tr(INTRO), outro: tr(OUTRO), intro_en: INTRO, outro_en: OUTRO, listen: tr("Listen to today's top news"), sub: tr("Today's top stories, read aloud in about 2 minutes"), isNew: tr("NEW"), listenNow: tr("Listen now"), notNow: tr("Not now"), pause: tr("Pause"), resume: tr("Resume"), stop: tr("Stop") };
-  return <ListenBriefing items={items} lang={lang()} texts={texts} showInvite={invite} />;
+  const texts = { intro: tr(INTRO), outro: tr(OUTRO), intro_en: INTRO, outro_en: OUTRO, listen: tr("Listen Top News"), pause: tr("Pause"), resume: tr("Resume"), stop: tr("Stop") };
+  return <ListenBriefing items={items} lang={lang()} texts={texts} />;
 }
 
 export function WhatsAppFollow() {
@@ -591,6 +591,7 @@ export async function PageShell({ current, children, ticker, updatedAt }) {
       <main className="container">{children}</main>
       <SiteFooter />
       <LanguageWelcome current={lang()} />
+      <TopBriefing />
     </>
   );
 }

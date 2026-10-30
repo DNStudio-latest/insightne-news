@@ -2,7 +2,7 @@ import { site } from "../lib/site-cache.js";
 import { settings, generalRegion, states, northeastRegions, widerRegions, topics, ARTICLES } from "../lib/config.js";
 import { capitalsWeather } from "../lib/weather.js";
 import { indiaMatch } from "../lib/cricket.js";
-import { TopBriefing, LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, ArticlesList, Card, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
+import { LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, ArticlesList, Card, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
 import { LiveUpdates, PollBox } from "./client.js";
 import { initLang, lang } from "../lib/lang.js";
 
@@ -98,7 +98,6 @@ export default async function HomePage() {
       <LivePlayer live={live} />
       <WeatherStrip weather={weather} />
       <CricketBox match={cricket} />
-      <TopBriefing invite />
 
       <div className={hasSide ? "front-top with-side" : "front-top"}>
         <div className="lead-col">

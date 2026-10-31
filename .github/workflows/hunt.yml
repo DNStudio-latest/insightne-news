@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24 # can add Let's Encrypt's newer roots (lib/hunter/extra-roots.js)
           cache: npm
       # Free tools for reading PDFs: pdftotext/pdftoppm (poppler) and Tesseract OCR with English and Bengali.
       - run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ben

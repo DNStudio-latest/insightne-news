@@ -3,6 +3,7 @@
 // Only the Hunter can use it (it must show the password made from the Supabase secret key),
 // and only *.gov.in and *.nic.in pages can be fetched.
 import { relayAllowed, relayToken } from "../../../lib/hunter/relay.js";
+import "../../../lib/hunter/extra-roots.js"; // trust Let's Encrypt's newer roots (needed for megipr.gov.in)
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;

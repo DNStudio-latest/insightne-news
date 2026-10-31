@@ -106,6 +106,16 @@ main { padding: 20px 0 40px; }
 @media (max-width: 899px) { .under-lead { display: none; } } /* on phones these stories are already in Latest, just below */
 @media (min-width: 900px) { .front-top { grid-template-columns: 2fr 1fr; } .front-side { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; align-items: start; } }
 @media (min-width: 1100px) { .front-top.with-side { grid-template-columns: 2fr 1fr 1fr; } .front-side { grid-column: auto; grid-template-columns: 1fr; } }
+/* Equal columns: Latest (and the Articles / Most read column) are exactly as tall as the lead column, so the three
+   bottoms line up. Longer lists scroll inside their box instead of leaving empty space beside the lead. */
+@media (min-width: 900px) {
+  .front-top > .latest { align-self: stretch; contain: size; overflow-y: auto; scrollbar-width: thin; }
+}
+@media (min-width: 1100px) {
+  .front-top.with-side > .front-side { align-self: stretch; contain: size; display: flex; flex-direction: column; gap: 24px; }
+  .front-side > :last-child:not(.articles) { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; } /* Most read fills the column */
+  .front-side > .articles { flex-shrink: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+}
 .articles h3 a { color: inherit; }
 .article-by { display: block; margin-top: 3px; font-size: 0.8rem; font-weight: 700; color: var(--accent); }
 .articles li { display: grid; grid-template-columns: 1fr 64px; gap: 10px; align-items: start; }

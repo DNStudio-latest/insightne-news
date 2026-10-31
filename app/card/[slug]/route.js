@@ -1,6 +1,7 @@
 // A big news-card picture (1080 × 1350) to post in the WhatsApp channel, Facebook or Instagram.
 // /card/<story>?type=live | breaking | news   (English only: Bengali letters don't join correctly in these pictures)
 // Add &format=jpg for a JPEG (Instagram only accepts JPEG pictures).
+import { pictureOf } from "../../../lib/proof-shot.js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
@@ -46,7 +47,7 @@ export async function GET(request, { params }) {
     font("noto-serif-latin-800-normal.woff"),
     font("noto-sans-latin-700-normal.woff"),
     font("noto-sans-latin-500-normal.woff"),
-    photo(story.image_url),
+    photo(pictureOf(story)),
   ]);
   const [first, ...rest] = settings.siteName.split(" ");
   const site = settings.siteUrl.replace(/^https?:\/\/(www\.)?/, "");

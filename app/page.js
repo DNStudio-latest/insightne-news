@@ -5,6 +5,7 @@ import { indiaMatch } from "../lib/cricket.js";
 import { LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, ArticlesList, Card, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "./components.js";
 import { LiveUpdates, PollBox } from "./client.js";
 import { initLang, lang } from "../lib/lang.js";
+import { pictureOf } from "../lib/proof-shot.js";
 
 // A story appears the moment you press APPROVE (the approval page empties the one-minute memory in lib/site-cache.js).
 export const dynamic = "force-dynamic";
@@ -76,7 +77,7 @@ export default async function HomePage() {
     );
   }
 
-  const lead = stories.find((s) => s.is_lead) || stories.find((s) => s.kind === "original" && s.image_url) || stories[0];
+  const lead = stories.find((s) => s.is_lead) || stories.find((s) => s.kind === "original" && pictureOf(s)) || stories[0];
   const others = stories.filter((s) => s.id !== lead.id);
   const latest = others.filter((s) => s.topic !== ARTICLES).slice(0, 8); // articles have their own column
   const ownStories = others.filter((s) => s.kind === "original" && s.topic !== ARTICLES);

@@ -4,6 +4,7 @@ import { settings, generalRegion, states, regions, northeastRegions, widerRegion
 import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js";
 import { CopyLinkButton, NavBar } from "./client.js";
 import { AI_CREDIT } from "../lib/images.js";
+import { pictureOf } from "../lib/proof-shot.js";
 import { initLang, lang, pick, tr } from "../lib/lang.js";
 import { LangSwitch, AlertsButton, NewsletterSignup, LanguageWelcome, ListenBriefing } from "./client.js";
 import { topStories } from "../lib/top.js";
@@ -54,8 +55,9 @@ export function storyCategory(story) {
 
 // Your own photo if the story has one; otherwise a category artwork (never another site's photo).
 export function StoryImage({ story, eager = false }) {
-  if (story.image_url) {
-    const img = <img className="thumb" src={story.image_url} alt={story.image_caption || story.headline} loading={eager ? "eager" : "lazy"} />;
+  const picture = pictureOf(story); // never the screenshot of an official page
+  if (picture) {
+    const img = <img className="thumb" src={picture} alt={story.image_caption || story.headline} loading={eager ? "eager" : "lazy"} />;
     if (story.image_credit !== AI_CREDIT) return img;
     // AI pictures are always labelled, so no reader mistakes them for a real photo.
     return (
@@ -332,8 +334,8 @@ export function ArticlesList({ stories }) {
               </span>
             </div>
             <a href={storyUrl(s)} tabIndex={-1} aria-hidden="true">
-              {s.image_url ? (
-                <img className="article-thumb" src={s.image_url} alt="" loading="lazy" width={64} height={64} />
+              {pictureOf(s) ? (
+                <img className="article-thumb" src={pictureOf(s)} alt="" loading="lazy" width={64} height={64} />
               ) : (
                 <span className="article-thumb article-thumb-pen">✍</span>
               )}

@@ -4,6 +4,7 @@ import { site } from "../../../lib/site-cache.js";
 import { settings, slugify, bylineName } from "../../../lib/config.js";
 import { articleBlocks, formatDate, readingMinutes, uniqueSources } from "../../../lib/format.js";
 import { AI_CREDIT } from "../../../lib/images.js";
+import { pictureOf, proofShotOf, photoGallery } from "../../../lib/proof-shot.js";
 import { ViewCounter } from "../../client.js";
 import { initLang, lang, pick, tr, isTranslated } from "../../../lib/lang.js";
 import { WhatsAppFollow, EmailSignup, PageShell, Kicker, Byline, ShareButtons, StoryGrid, SectionHead, storyUrl, absoluteUrl } from "../../components.js";
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }) {
       description: story.summary,
       url: storyUrl(story),
       publishedTime: story.published_at,
-      ...(story.image_url ? { images: [{ url: story.image_url }] } : {}),
+      ...(pictureOf(story) ? { images: [{ url: pictureOf(story) }] } : {}),
     },
   };
 }
@@ -42,6 +43,10 @@ export default async function StoryPage({ params }) {
   const sources = uniqueSources(story.sources);
   const isOriginal = story.kind === "original";
   const blocks = articleBlocks(pick(story, "body"));
+  // The picture at the top is never a screenshot of an official page; that is shown below the text as proof.
+  const picture = pictureOf(story);
+  const proof = proofShotOf(story);
+  const gallery = photoGallery(story);
 
   // Tells Google this is a news article (helps search and Google News).
   const jsonLd = {
@@ -52,7 +57,7 @@ export default async function StoryPage({ params }) {
     datePublished: story.published_at,
     dateModified: story.updated_at,
     mainEntityOfPage: absoluteUrl(storyUrl(story)),
-    ...(story.image_url ? { image: [story.image_url] } : {}),
+    ...(pictureOf(story) ? { image: [pictureOf(story)] } : {}),
     author: isOriginal ? { "@type": "Person", name: bylineName(story.author), url: `${settings.siteUrl}/author/${slugify(bylineName(story.author))}` } : { "@type": "Organization", name: settings.siteName },
     publisher: { "@type": "Organization", name: settings.siteName, url: settings.siteUrl, logo: { "@type": "ImageObject", url: `${settings.siteUrl}/icon`, width: 192, height: 192 } },
   };
@@ -77,9 +82,9 @@ export default async function StoryPage({ params }) {
           <ShareButtons story={story} />
         </div>
 
-        {story.image_url && (
+        {picture && (
           <figure className="figure">
-            <img src={story.image_url} alt={story.image_caption || story.headline} />
+            <img src={picture} alt={story.image_caption || story.headline} />
             {(story.image_caption || story.image_credit) && (
               <figcaption>
                 {story.image_credit === AI_CREDIT ? (
@@ -119,11 +124,21 @@ export default async function StoryPage({ params }) {
           </div>
         )}
 
-        {story.gallery?.length > 0 && (
+        {proof && (
+          <figure className="proof-shot">
+            <figcaption>{tr("Official notice (screenshot)")}</figcaption>
+            <a href={proof.url} target="_blank" rel="noopener noreferrer">
+              <img src={proof.url} alt={proof.caption} loading="lazy" />
+            </a>
+            <figcaption className="proof-note">{proof.caption.replace(/^Screenshot of the official page:\s*/, "Source: ")} · {tr("Tap to enlarge")}</figcaption>
+          </figure>
+        )}
+
+        {gallery.length > 0 && (
           <section className="gallery" aria-label="Photo gallery">
-            <h2>{tr("Photos")} ({story.gallery.length})</h2>
+            <h2>{tr("Photos")} ({gallery.length})</h2>
             <div className="gallery-strip">
-              {story.gallery.map((g) => (
+              {gallery.map((g) => (
                 <a key={g.url} href={g.url} target="_blank" rel="noopener noreferrer">
                   <img src={g.url} alt={g.caption || pick(story, "headline")} loading="lazy" />
                 </a>

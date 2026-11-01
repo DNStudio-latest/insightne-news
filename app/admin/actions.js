@@ -20,6 +20,7 @@ import { hasCheckMarks } from "../../lib/hunter/checks.js";
 import { settings, regions } from "../../lib/config.js";
 import { currentRole, currentUser, userForPassword, hashPassword, startSession, endSession } from "../../lib/auth.js";
 import { SUB_EDITOR, staffTitle } from "../../lib/staff.js";
+import { researchAndDraft } from "../../lib/research.js";
 import { cleanText } from "../../lib/clean-text.js";
 
 // Any signed-in person. Returns "admin", "editor" or "sub_editor".
@@ -470,6 +471,23 @@ export async function approveHunterDraft(formData) {
   illustrateLater(storyId);
   refreshPages();
   backToHunter("Published on the website");
+}
+
+// ---- Research desk ----
+// Searches the internet for a topic and writes a draft (with your own notes), which waits in News Hunter.
+export async function researchTopic(formData) {
+  await requireAdmin();
+  const topic = text(formData, "topic", 300);
+  const notes = String(formData.get("notes") || "").trim().slice(0, 8000);
+  if (!topic) redirect(`/admin/research?error=${encodeURIComponent("Please write a topic.")}`);
+  let failed = null;
+  try {
+    await researchAndDraft({ topic, notes, store: hunterStore });
+  } catch (err) {
+    failed = err.message;
+  }
+  if (failed) redirect(`/admin/research?error=${encodeURIComponent(`Could not finish: ${failed}`)}`);
+  backToHunter(`Research draft ready: “${topic}”. Check it against the sources, then approve.`);
 }
 
 export async function rejectHunterDraft(formData) {

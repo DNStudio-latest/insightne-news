@@ -70,6 +70,7 @@ export default async function AdminPage({ searchParams }) {
         {admin && (
           <>
             <a href="/admin/hunter">🕵 News Hunter</a>
+            <a href="/admin/research">🔎 Research desk</a>
             <a href="/admin/live">🔴 Live</a>
             <a href="/admin/whatsapp">📲 WhatsApp posts</a>
             <a href="/admin/social">📘 Facebook & Instagram</a>

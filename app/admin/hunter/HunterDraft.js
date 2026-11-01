@@ -4,6 +4,7 @@ import { useState } from "react";
 import { saveHunterDraft, approveHunterDraft, rejectHunterDraft, restoreHunterDraft, setHunterPhoto } from "../actions.js";
 
 const FLAG_LABELS = {
+  research: { text: "Research desk: from web search, check the sources", color: "var(--accent)" },
   check: { text: "Has [CHECK] parts", color: "var(--danger)" },
   deleted: { text: "DELETED POST", color: "var(--danger)" },
   kokborok: { text: "Kokborok source", color: "#8a5a00" },

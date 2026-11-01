@@ -1,22 +1,35 @@
 "use client";
-// The Research desk form. The button shows that the AI is working, because it takes about half a minute.
-import { useState } from "react";
+// The Research desk form. It is sent once only (a second tap does nothing), and while the AI works the button
+// counts the seconds, because searching, reading and writing take about half a minute.
+import { useEffect, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { researchTopic } from "../actions.js";
 
-export default function ResearchForm() {
-  const [busy, setBusy] = useState(false);
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    if (!pending) return setSeconds(0);
+    const timer = setInterval(() => setSeconds((s) => s + 1), 1000);
+    return () => clearInterval(timer);
+  }, [pending]);
+  return (
+    <button className="btn btn-approve" type="submit" disabled={pending}>
+      {pending ? `SEARCHING, READING AND WRITING… ${seconds}s (please wait, about 40 seconds)` : "RESEARCH AND WRITE DRAFT"}
+    </button>
+  );
+}
 
+export default function ResearchForm() {
   return (
     <form
-      action={async (formData) => {
-        setBusy(true);
-        try {
-          await researchTopic(formData);
-        } finally {
-          setBusy(false);
-        }
-      }}
+      action={researchTopic}
       className="editor"
+      onSubmit={(e) => {
+        // A form that is already being sent is not sent again.
+        if (e.currentTarget.dataset.sending) e.preventDefault();
+        else e.currentTarget.dataset.sending = "1";
+      }}
     >
       <label>
         Topic
@@ -27,9 +40,7 @@ export default function ResearchForm() {
         <textarea name="notes" rows={6} maxLength={8000} placeholder="e.g. At the press meet in Agartala today, the SEC said nominations so far: 120. Quote from the SDM: “…”" />
       </label>
       <div className="editor-actions">
-        <button className="btn btn-approve" type="submit" disabled={busy}>
-          {busy ? "SEARCHING AND WRITING… (about 30 seconds)" : "RESEARCH AND WRITE DRAFT"}
-        </button>
+        <SubmitButton />
       </div>
     </form>
   );

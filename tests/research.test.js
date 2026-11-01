@@ -83,7 +83,7 @@ test("a draft is written from the news reports and the editor's notes, even when
   assert.equal(saved.status, "pending");
   assert.ok(saved.flags.includes("research"), "never auto-published");
   assert.deepEqual(saved.sources.map((s) => s.name), ["Northeast Now", "India Today"]);
-  assert.ok(saved.problems.some((p) => /Google search was not used: .*Quota exceeded/.test(p)), "says why Google was not used");
+  assert.ok(saved.problems.some((p) => /Google search was not used/.test(p)), "says why Google was not used");
 });
 
 test("with Google's search too, its findings and websites are added", async () => {

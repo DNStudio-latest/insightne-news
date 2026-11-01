@@ -149,7 +149,7 @@ export default async function StoryPage({ params }) {
 
         {sources.length > 0 && (
           <aside className="source-box">
-            <h2>{tr(isOriginal ? "Also reported by" : "Original reports")}</h2>
+            <h2>{tr(isOriginal ? "Sources" : "Original reports")}</h2>
             <ul>
               {sources.map((s) => (
                 <li key={s.url}>

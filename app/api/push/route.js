@@ -1,13 +1,17 @@
 // A reader's browser signs up for (POST) or stops (DELETE) breaking-news alerts.
 import { db } from "../../../lib/db.js";
 import { validLang } from "../../../lib/languages.js";
+import { isPushServiceUrl } from "../../../lib/push-hosts.js";
+import { clientIp, rateLimit, tooMany } from "../../../lib/rate-limit.js";
 
 export const dynamic = "force-dynamic";
 
-const validEndpoint = (e) => typeof e === "string" && e.startsWith("https://") && e.length < 1000;
+// Only the browser makers' own push services (lib/push-hosts.js): our server sends a message to this address.
+const validEndpoint = (e) => typeof e === "string" && e.length < 1000 && isPushServiceUrl(e);
 
 export async function POST(request) {
   try {
+    if (!(await rateLimit({ key: `push:${clientIp(request.headers)}`, limit: 20, windowSec: 3600 })).ok) return tooMany(3600);
     const { subscription, lang } = await request.json();
     const keys = subscription?.keys;
     if (!validEndpoint(subscription?.endpoint) || typeof keys?.p256dh !== "string" || typeof keys?.auth !== "string") {

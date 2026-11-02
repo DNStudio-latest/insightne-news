@@ -1,10 +1,11 @@
 "use server";
 // What happens when you press a button on the approval page.
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { refreshSite } from "../../lib/site-cache.js";
 import { after } from "next/server";
-import { compressPhoto } from "../../lib/photo.js";
+import { compressPhoto, PhotoError } from "../../lib/photo.js";
 import { sendAlert } from "../../lib/push.js";
 import { shareOnFacebook } from "../../lib/facebook.js";
 import { shareOnInstagram } from "../../lib/instagram.js";
@@ -21,6 +22,8 @@ import { settings, regions } from "../../lib/config.js";
 import { currentRole, currentUser, userForPassword, hashPassword, startSession, endSession } from "../../lib/auth.js";
 import { SUB_EDITOR, staffTitle } from "../../lib/staff.js";
 import { researchAndDraft } from "../../lib/research.js";
+import { clientIp, rateLimit } from "../../lib/rate-limit.js";
+import { totpEnabled, verifyTotp } from "../../lib/totp.js";
 import { cleanText } from "../../lib/clean-text.js";
 
 // Any signed-in person. Returns "admin", "editor" or "sub_editor".
@@ -66,10 +69,14 @@ function editedFields(formData) {
 }
 
 export async function login(formData) {
-  // A short pause makes guessing passwords very slow.
+  // After 10 tries from one address in 15 minutes there are no more guesses for a while.
+  if (!(await rateLimit({ key: `login:${clientIp(await headers())}`, limit: 10, windowSec: 900 })).ok) redirect("/admin/login?limited=1");
+  // A short pause makes guessing passwords slower.
   await new Promise((r) => setTimeout(r, 800));
   const user = await userForPassword(String(formData.get("password") || ""));
-  if (!user) redirect("/admin/login?wrong=1");
+  // Two-step sign-in for the admin (only when ADMIN_TOTP_SECRET is set): the 6-digit code from the authenticator app.
+  const secondStep = !user || user.role !== "admin" || !totpEnabled() || verifyTotp(process.env.ADMIN_TOTP_SECRET, formData.get("code"));
+  if (!user || !secondStep) redirect("/admin/login?wrong=1");
   await startSession(user);
   redirect("/admin");
 }
@@ -107,7 +114,8 @@ async function photoFields(formData, existing, onError) {
   if (file && typeof file === "object" && file.size > 0) {
     if (!/^image\/(jpeg|png|webp)$/.test(file.type)) onError("The photo must be a JPG, PNG or WEBP image.");
     if (file.size > 4 * 1024 * 1024) onError("The photo is too big (over 4 MB).");
-    const photo = await compressPhoto(new Uint8Array(await file.arrayBuffer()), file.type);
+    // The real type is read from the file itself; a file that is not a photo is refused.
+    const photo = await compressPhoto(new Uint8Array(await file.arrayBuffer())).catch((err) => (err instanceof PhotoError ? onError(err.message) : Promise.reject(err)));
     fields.image_url = await db.uploadImage(photo.bytes, photo.contentType);
   }
   return fields;
@@ -203,7 +211,8 @@ export async function saveOriginal(formData) {
   for (const file of formData.getAll("galleryFiles")) {
     if (!file || typeof file !== "object" || !file.size || gallery.length >= 20) continue;
     if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 4 * 1024 * 1024) continue;
-    const photo = await compressPhoto(new Uint8Array(await file.arrayBuffer()), file.type);
+    const photo = await compressPhoto(new Uint8Array(await file.arrayBuffer())).catch((err) => (err instanceof PhotoError ? null : Promise.reject(err)));
+    if (!photo) continue; // not a real photo: skipped
     gallery.push({ url: await db.uploadImage(photo.bytes, photo.contentType), caption: null });
   }
   fields.gallery = gallery;
@@ -341,7 +350,7 @@ export async function addEditor(formData) {
   const name = text(formData, "name", 80);
   const password = String(formData.get("password") || "");
   if (!name) backToEditors("Please write the person's name.");
-  if (password.length < 8) backToEditors("The password must have at least 8 characters.");
+  if (password.length < 10) backToEditors("The password must have at least 10 characters.");
   if (password === process.env.ADMIN_PASSWORD) backToEditors("Please choose a password different from your own.");
   const sub = formData.get("role") === SUB_EDITOR;
   const saved = await db.createEditor({ name, password_hash: hashPassword(password), ...(sub && { role: SUB_EDITOR }) }).then(() => true, () => false);
@@ -365,7 +374,7 @@ export async function changeEditor(formData) {
   }
   if (what === "password") {
     const password = String(formData.get("password") || "");
-    if (password.length < 8) backToEditors("The new password must have at least 8 characters.");
+    if (password.length < 10) backToEditors("The new password must have at least 10 characters.");
     await db.updateEditor(id, { password_hash: hashPassword(password) });
     backToEditors(`New password saved for ${editor.name}.`);
   }
@@ -479,6 +488,8 @@ export async function researchTopic(formData) {
   await requireAdmin();
   const topic = text(formData, "topic", 300);
   const notes = String(formData.get("notes") || "").trim().slice(0, 8000);
+  // Each research uses the free Gemini allowance and fetches other websites.
+  if (!(await rateLimit({ key: "research", limit: 20, windowSec: 3600 })).ok) redirect(`/admin/research?error=${encodeURIComponent("Too many researches in the last hour. Please wait a while.")}`);
   if (!topic) redirect(`/admin/research?error=${encodeURIComponent("Please write a topic.")}`);
   let failed = null;
   try {

@@ -10,6 +10,7 @@ import { refreshSite } from "../../../lib/site-cache.js";
 import { hunterStore } from "../../../lib/hunter/store.js";
 import { publishHunterDraft } from "../../../lib/hunter/publish.js";
 import { autoPublishCheck, safeShot, publishToken } from "../../../lib/hunter/auto.js";
+import { hasBearer } from "../../../lib/tokens.js";
 import { createTelegramAlert } from "../../../lib/hunter/alert.js";
 import { finishPublishing } from "../../../lib/after-publish.js";
 
@@ -24,7 +25,7 @@ const refreshPages = () => {
 
 export async function POST(request) {
   const secret = process.env.SUPABASE_SECRET_KEY;
-  if (!secret || request.headers.get("authorization") !== `Bearer ${publishToken(secret)}`) return Response.json({ reason: "Not allowed" }, { status: 403 });
+  if (!secret || !hasBearer(request, publishToken(secret))) return Response.json({ reason: "Not allowed" }, { status: 403 });
   const { draft: draftId } = await request.json().catch(() => ({}));
   const draft = draftId ? await hunterStore.getDraft(String(draftId).slice(0, 60)) : null;
   if (!draft || draft.status !== "pending") return Response.json({ published: false, reason: "draft not found or already handled" });

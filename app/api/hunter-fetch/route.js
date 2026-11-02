@@ -3,6 +3,8 @@
 // Only the Hunter can use it (it must show the password made from the Supabase secret key),
 // and only *.gov.in and *.nic.in pages can be fetched.
 import { relayAllowed, relayToken } from "../../../lib/hunter/relay.js";
+import { hasBearer } from "../../../lib/tokens.js";
+import { safeFetch } from "../../../lib/safe-fetch.js";
 import "../../../lib/hunter/extra-roots.js"; // trust Let's Encrypt's newer roots (needed for megipr.gov.in)
 
 export const dynamic = "force-dynamic";
@@ -10,7 +12,7 @@ export const maxDuration = 60;
 
 export async function GET(request) {
   const secret = process.env.SUPABASE_SECRET_KEY;
-  if (!secret || request.headers.get("authorization") !== `Bearer ${relayToken(secret)}`) return new Response("Not allowed", { status: 403 });
+  if (!secret || !hasBearer(request, relayToken(secret))) return new Response("Not allowed", { status: 403 });
   const url = new URL(request.url).searchParams.get("url");
   if (!relayAllowed(url)) return new Response("Only government pages", { status: 400 });
 
@@ -22,12 +24,13 @@ export async function GET(request) {
   for (const name of ["User-Agent", "Accept-Language"]) if (asked[name]) headers[name] = String(asked[name]);
 
   try {
-    const res = await fetch(url, { headers, redirect: "follow", signal: AbortSignal.timeout(50000), cache: "no-store" });
-    if (!relayAllowed(res.url || url)) return new Response(null, { headers: { "x-relay-error": "redirected away from a government site" } });
+    // Every step, including each redirect, must be a public government address (never a private network address).
+    const res = await safeFetch(url, { headers, signal: AbortSignal.timeout(50000), cache: "no-store" }, { allow: relayAllowed });
     const out = new Headers({ "x-relay-status": String(res.status), "x-relay-url": res.url || url, "Cache-Control": "no-store" });
     if (res.headers.get("content-type")) out.set("content-type", res.headers.get("content-type"));
     return new Response(res.body, { headers: out });
   } catch (err) {
+    if (err.message === "address not allowed") return new Response(null, { headers: { "x-relay-error": "redirected away from a government site" } });
     return new Response(null, { headers: { "x-relay-error": `fetch failed in Mumbai: ${err.cause?.code || err.message}`.slice(0, 200) } });
   }
 }

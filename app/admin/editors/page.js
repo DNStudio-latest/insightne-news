@@ -49,8 +49,8 @@ export default async function EditorsPage({ searchParams }) {
           <input type="text" name="name" required maxLength={80} placeholder="e.g. Rina Das" />
         </label>
         <label>
-          Password for them <span className="hint">— at least 8 characters, different from yours</span>
-          <input type="text" name="password" required minLength={8} maxLength={100} autoComplete="off" />
+          Password for them <span className="hint">— at least 10 characters (a few words together is best), different from yours</span>
+          <input type="text" name="password" required minLength={10} maxLength={100} autoComplete="off" />
         </label>
         <div className="editor-actions">
           <button className="btn btn-approve" type="submit">ADD PERSON</button>
@@ -102,7 +102,7 @@ export default async function EditorsPage({ searchParams }) {
                 <input type="hidden" name="what" value="password" />
                 <label>
                   New password
-                  <input type="text" name="password" required minLength={8} maxLength={100} autoComplete="off" />
+                  <input type="text" name="password" required minLength={10} maxLength={100} autoComplete="off" />
                 </label>
                 <button className="btn btn-edit" type="submit">SAVE PASSWORD</button>
               </form>

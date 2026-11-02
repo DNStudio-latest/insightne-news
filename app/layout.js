@@ -1,11 +1,11 @@
 import "./globals.css";
-import { Playfair_Display, Noto_Serif_Bengali, Noto_Sans_Bengali, Inter } from "next/font/google";
+import { Roboto, Noto_Serif_Bengali, Noto_Sans_Bengali, Inter } from "next/font/google";
 import { settings } from "../lib/config.js";
 import { SiteAnalytics } from "./client.js";
 import { validLang } from "../lib/languages.js";
 import { cookies } from "next/headers";
 
-const serif = Playfair_Display({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-serif", display: "swap" });
+const headline = Roboto({ subsets: ["latin"], weight: ["700", "800"], variable: "--font-headline", display: "swap" });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 // Bengali letters: loaded with the site, so Bengali looks the same on every phone and computer
 const bnSerif = Noto_Serif_Bengali({ subsets: ["bengali"], weight: ["600", "700"], variable: "--font-bn-serif", display: "swap" });
@@ -27,7 +27,7 @@ export const viewport = { width: "device-width", initialScale: 1, themeColor: "#
 export default async function RootLayout({ children }) {
   const lang = validLang((await cookies()).get("lang")?.value);
   return (
-    <html lang={lang} className={`${serif.variable} ${sans.variable} ${bnSerif.variable} ${bnSans.variable}`}>
+    <html lang={lang} className={`${headline.variable} ${sans.variable} ${bnSerif.variable} ${bnSans.variable}`}>
       <body>
         {children}
         <SiteAnalytics />

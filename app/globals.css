@@ -14,8 +14,8 @@
   --warn: #a8441a;
   --danger: #b3261e;
   --radius: 12px;
-  --serif: var(--font-serif), Georgia, "Noto Serif Bengali", "Times New Roman", serif;
-  --sans: var(--font-sans), system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Bengali", sans-serif;
+  --serif: var(--font-serif), var(--font-bn-serif), Georgia, "Times New Roman", serif;
+  --sans: var(--font-sans), var(--font-bn-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -1,11 +1,11 @@
 import "./globals.css";
-import { Noto_Serif, Noto_Serif_Bengali, Noto_Sans_Bengali, Inter } from "next/font/google";
+import { Playfair_Display, Noto_Serif_Bengali, Noto_Sans_Bengali, Inter } from "next/font/google";
 import { settings } from "../lib/config.js";
 import { SiteAnalytics } from "./client.js";
 import { validLang } from "../lib/languages.js";
 import { cookies } from "next/headers";
 
-const serif = Noto_Serif({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-serif", display: "swap" });
+const serif = Playfair_Display({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-serif", display: "swap" });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 // Bengali letters: loaded with the site, so Bengali looks the same on every phone and computer
 const bnSerif = Noto_Serif_Bengali({ subsets: ["bengali"], weight: ["600", "700"], variable: "--font-bn-serif", display: "swap" });

@@ -6,6 +6,7 @@ import { LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadSt
 import { LiveUpdates, PollBox } from "./client.js";
 import { initLang, lang } from "../lib/lang.js";
 import { pictureOf } from "../lib/proof-shot.js";
+import { pinnedForFront, withoutStories } from "../lib/pins.js";
 
 // A story appears the moment you press APPROVE (the approval page empties the one-minute memory in lib/site-cache.js).
 export const metadata = { alternates: { canonical: "/" } }; // the homepage names itself; other pages set their own
@@ -58,7 +59,7 @@ async function readerPoll() {
 }
 
 export default async function HomePage() {
-  const [stories, articles, videos, mostRead, weather, poll, cricket, live] = await Promise.all([
+  const [stories, articles, videos, mostRead, weather, poll, cricket, live, pinnedRaw] = await Promise.all([
     site.listStories({ status: "approved", limit: 100 }),
     site.listStories({ status: "approved", topic: ARTICLES, limit: 6 }),
     site.videos(4),
@@ -67,6 +68,7 @@ export default async function HomePage() {
     readerPoll(),
     indiaMatch(),
     site.live(),
+    site.pinned().catch(() => []), // stories the editor pinned (empty until the pin column exists)
   ]);
 
   if (!stories.length) {
@@ -80,14 +82,16 @@ export default async function HomePage() {
 
   const lead = stories.find((s) => s.is_lead) || stories.find((s) => s.kind === "original" && pictureOf(s)) || stories[0];
   const others = stories.filter((s) => s.id !== lead.id);
-  const latest = others.filter((s) => s.topic !== ARTICLES).slice(0, 8); // articles have their own column
-  const ownStories = others.filter((s) => s.kind === "original" && s.topic !== ARTICLES);
+  const pinned = pinnedForFront(pinnedRaw, lead); // pinned stories come first, right after the lead
+  const latest = [...pinned.slice(2), ...withoutStories(others.filter((s) => s.topic !== ARTICLES), pinned)].slice(0, 8); // articles have their own column
+  const ownStories = withoutStories(others, pinned).filter((s) => s.kind === "original" && s.topic !== ARTICLES);
   // Under the lead: the newest stories written by our team, sub-editors first (not News Hunter or desk copy).
   const byPerson = ownStories.filter((s) => s.author && s.author !== settings.defaultAuthor);
   const underLead = [...byPerson.filter((s) => s.author_id), ...byPerson.filter((s) => !s.author_id)]
     .filter((s, i, all) => all.findIndex((x) => x.headline === s.headline) === i) // a story saved twice shows once
     .slice(0, 2);
-  const originals = ownStories.filter((s) => !underLead.includes(s)).slice(0, 3);
+  const underLeadTop = [...pinned.slice(0, 2), ...underLead].slice(0, 2); // up to two pinned stories sit under the lead
+  const originals = ownStories.filter((s) => !underLeadTop.includes(s)).slice(0, 3);
   const hasSide = articles.length > 0 || mostRead.length >= 3;
   const storiesByState = states.map((state) => [state, others.filter((s) => s.region === state).slice(0, 3)]);
 
@@ -104,9 +108,9 @@ export default async function HomePage() {
       <div className={hasSide ? "front-top with-side" : "front-top"}>
         <div className="lead-col">
           <LeadStory story={lead} />
-          {underLead.length > 0 && (
+          {underLeadTop.length > 0 && (
             <div className="under-lead">
-              {underLead.map((s) => (
+              {underLeadTop.map((s) => (
                 <Card key={s.id} story={s} showSummary={false} />
               ))}
             </div>

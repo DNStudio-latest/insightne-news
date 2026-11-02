@@ -1,7 +1,7 @@
 "use client";
 // The APPROVE / EDIT / REJECT buttons under each story.
 import { useState } from "react";
-import { approve, reject, saveEdit, unpublish, restore, makeLead, toggleBreaking, notifyReaders, postFacebook, postInstagram } from "./actions.js";
+import { approve, reject, saveEdit, unpublish, restore, makeLead, togglePin, toggleBreaking, notifyReaders, postFacebook, postInstagram } from "./actions.js";
 import { shrinkPhoto } from "./photo.js";
 
 export default function StoryActions({ story, view, regions, topics, facebook = false, instagram = false, admin = true }) {
@@ -95,6 +95,13 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
               {id}
               {story.is_lead && <input type="hidden" name="remove" value="1" />}
               <button className="btn btn-edit" type="submit">{story.is_lead ? "UN-LEAD" : "MAKE LEAD"}</button>
+            </form>
+            <form action={togglePin} style={{ gridColumn: "1 / -1" }}>
+              {id}
+              {story.pinned_at && <input type="hidden" name="remove" value="1" />}
+              <button className={`btn ${story.pinned_at ? "btn-reject" : "btn-edit"}`} type="submit">
+                {story.pinned_at ? "UNPIN FROM FRONT PAGE" : "📌 PIN TO FRONT PAGE"}
+              </button>
             </form>
             <form action={toggleBreaking} style={{ gridColumn: "1 / -1" }}>
               {id}

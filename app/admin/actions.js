@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { refreshSite } from "../../lib/site-cache.js";
+import { MAX_PINNED } from "../../lib/pins.js";
 import { after } from "next/server";
 import { compressPhoto, PhotoError } from "../../lib/photo.js";
 import { sendAlert } from "../../lib/push.js";
@@ -157,6 +158,21 @@ export async function toggleBreaking(formData) {
   const on = !formData.get("remove");
   await db.updateStory(String(formData.get("id")), { is_breaking: on });
   refresh("published", on ? "Breaking banner is on for this story (it switches off by itself after 12 hours)" : "Breaking banner switched off");
+}
+
+// Keeps an older, important story at the top of the front page (or takes it off). The publish date is never changed.
+export async function togglePin(formData) {
+  await requireAdmin();
+  const id = String(formData.get("id"));
+  const remove = Boolean(formData.get("remove"));
+  let failed = false;
+  try {
+    await db.setPinned(id, !remove);
+  } catch {
+    failed = true;
+  }
+  if (failed) refresh("published", "Pinning is not set up yet: run supabase/pin-stories.sql in Supabase first");
+  refresh("published", remove ? "Unpinned from the front page" : `Pinned to the front page (at most ${MAX_PINNED} stay pinned; the oldest pin is released)`);
 }
 
 export async function makeLead(formData) {

@@ -82,16 +82,18 @@ export default async function HomePage() {
 
   const lead = stories.find((s) => s.is_lead) || stories.find((s) => s.kind === "original" && pictureOf(s)) || stories[0];
   const others = stories.filter((s) => s.id !== lead.id);
-  const pinned = pinnedForFront(pinnedRaw, lead); // pinned stories come first, right after the lead
-  const latest = [...pinned.slice(2), ...withoutStories(others.filter((s) => s.topic !== ARTICLES), pinned)].slice(0, 8); // articles have their own column
-  const ownStories = withoutStories(others, pinned).filter((s) => s.kind === "original" && s.topic !== ARTICLES);
+  const pinned = pinnedForFront(pinnedRaw, lead);
+  const isOwn = (s) => s.kind === "original" && s.topic !== ARTICLES;
+  const pinnedOwn = pinned.filter(isOwn); // pinned stories of our own go first in "InsightNE Originals"
+  const pinnedOther = pinned.filter((s) => !isOwn(s)); // other pinned stories lead the Latest list
+  const latest = [...pinnedOther, ...withoutStories(others.filter((s) => s.topic !== ARTICLES), pinned)].slice(0, 8); // articles have their own column
+  const ownStories = withoutStories(others, pinned).filter(isOwn);
   // Under the lead: the newest stories written by our team, sub-editors first (not News Hunter or desk copy).
   const byPerson = ownStories.filter((s) => s.author && s.author !== settings.defaultAuthor);
   const underLead = [...byPerson.filter((s) => s.author_id), ...byPerson.filter((s) => !s.author_id)]
     .filter((s, i, all) => all.findIndex((x) => x.headline === s.headline) === i) // a story saved twice shows once
     .slice(0, 2);
-  const underLeadTop = [...pinned.slice(0, 2), ...underLead].slice(0, 2); // up to two pinned stories sit under the lead
-  const originals = ownStories.filter((s) => !underLeadTop.includes(s)).slice(0, 3);
+  const originals = [...pinnedOwn, ...ownStories.filter((s) => !underLead.includes(s))].slice(0, Math.max(3, pinnedOwn.length));
   const hasSide = articles.length > 0 || mostRead.length >= 3;
   const storiesByState = states.map((state) => [state, others.filter((s) => s.region === state).slice(0, 3)]);
 
@@ -108,9 +110,9 @@ export default async function HomePage() {
       <div className={hasSide ? "front-top with-side" : "front-top"}>
         <div className="lead-col">
           <LeadStory story={lead} />
-          {underLeadTop.length > 0 && (
+          {underLead.length > 0 && (
             <div className="under-lead">
-              {underLeadTop.map((s) => (
+              {underLead.map((s) => (
                 <Card key={s.id} story={s} showSummary={false} />
               ))}
             </div>

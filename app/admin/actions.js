@@ -172,7 +172,7 @@ export async function togglePin(formData) {
     failed = true;
   }
   if (failed) refresh("published", "Pinning is not set up yet: run supabase/pin-stories.sql in Supabase first");
-  refresh("published", remove ? "Unpinned from the front page" : `Pinned to the front page (at most ${MAX_PINNED} stay pinned; the oldest pin is released)`);
+  refresh("published", remove ? "Unpinned from the front page" : `Pinned to the top of the front page sections (at most ${MAX_PINNED} stay pinned; the oldest pin is released)`);
 }
 
 export async function makeLead(formData) {

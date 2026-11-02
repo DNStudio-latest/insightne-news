@@ -52,6 +52,7 @@ export default async function StoryPage({ params }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
+    inLanguage: "en",
     headline: story.headline,
     description: story.summary,
     datePublished: story.published_at,

@@ -8,6 +8,7 @@ import { initLang, lang } from "../lib/lang.js";
 import { pictureOf } from "../lib/proof-shot.js";
 
 // A story appears the moment you press APPROVE (the approval page empties the one-minute memory in lib/site-cache.js).
+export const metadata = { alternates: { canonical: "/" } }; // the homepage names itself; other pages set their own
 export const dynamic = "force-dynamic";
 
 // The newest story from each different state first, so no single state fills the section.

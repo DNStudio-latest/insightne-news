@@ -3,7 +3,7 @@ import { settings } from "../lib/config.js";
 
 export default function robots() {
   return {
-    rules: { userAgent: "*", allow: "/", disallow: ["/admin", "/api"] },
+    rules: { userAgent: "*", allow: "/", disallow: ["/admin", "/api", "/lang/", "/s/"] },
     sitemap: [`${settings.siteUrl}/sitemap.xml`, `${settings.siteUrl}/news-sitemap.xml`],
   };
 }

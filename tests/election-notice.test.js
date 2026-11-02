@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readItemPage } from "../lib/hunter/pages.js";
 import { isElectionNotice } from "../lib/hunter/watch.js";
+import { autoPublishCheck } from "../lib/hunter/auto.js";
 
 // Like sec.tripura.gov.in: the notice is only a PDF link, with a long "What's New" list beside it.
 const NOTICE = `<html><body><div id="content">
@@ -31,8 +32,17 @@ test("election schedules, press notes and the model code are always news; forms 
   assert.equal(notice("Schedule of General Election to the Urban Local Bodies 2026"), true);
   assert.equal(notice("Prees Note on Declaration of Election Schedule"), true);
   assert.equal(notice("Model Code of Conduct (MCC) in connection with General Election"), true);
-  assert.equal(notice("Nomination Form (Form-2) in connection with General Election"), false);
-  assert.equal(notice("List of Final Polling Stations in connection with General Election"), false);
-  assert.equal(notice("ARO Notification for General Election"), false);
+  // every phone-alerted election notice is drafted; the "election" flag keeps it out of auto-publishing
+  assert.equal(notice("Nomination Form (Form-2) in connection with General Election"), true);
+  assert.equal(notice("List of Final Polling Stations in connection with General Election"), true);
+  assert.equal(notice("ARO Notification for General Election"), true);
+  assert.equal(notice("List of Sector Officer in connection with General Election to the Urban Local Bodies 2026"), true);
+  assert.equal(notice("Result for TTAAD Village Committee Election 2026"), true);
   assert.equal(isElectionNotice({ source_name: "CMO Tripura", title: "Schedule of visits", url: "" }), false);
+});
+
+test("an election notice draft is never auto-published, even with a high score", () => {
+  const draft = { headline: "Sector officers named", body: "The letter lists sector officers.", flags: ["election"], score: 9 };
+  assert.equal(autoPublishCheck(draft, { enabled: true, minScore: 7 }).ok, false);
+  assert.equal(autoPublishCheck({ ...draft, flags: [] }, { enabled: true, minScore: 7 }).ok, true);
 });

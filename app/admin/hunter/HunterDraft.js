@@ -9,6 +9,7 @@ const FLAG_LABELS = {
   deleted: { text: "DELETED POST", color: "var(--danger)" },
   kokborok: { text: "Kokborok source", color: "#8a5a00" },
   ocr: { text: "Scanned document (OCR)", color: "#8a5a00" },
+  election: { text: "Election notice: editor checks before publishing", color: "var(--accent)" },
   video: { text: "From a video", color: "#555" },
   sensitive: { text: "Sensitive: crime, court, communal or deaths", color: "var(--danger)" },
 };

@@ -570,3 +570,42 @@ export function ListenBriefing({ items, lang = "en", texts }) {
     </div>
   );
 }
+
+// A simple cookie notice. It remembers the reader's choice in the browser so it shows only once.
+// It does not block anything: the site uses only essential cookies today. When ads are switched on,
+// the reader's "Decline" choice is what ad code should check before loading non-essential cookies.
+const COOKIE_TEXT = {
+  en: { msg: "We use cookies to run this site and understand what readers like. You can accept or decline non-essential cookies.", ok: "Accept", no: "Decline", more: "Privacy policy" },
+  bn: { msg: "এই সাইট চালাতে এবং পাঠকরা কী পছন্দ করেন তা বুঝতে আমরা কুকি ব্যবহার করি। আপনি অ-আবশ্যকীয় কুকি গ্রহণ বা প্রত্যাখ্যান করতে পারেন।", ok: "গ্রহণ করুন", no: "প্রত্যাখ্যান", more: "গোপনীয়তা নীতি" },
+  hi: { msg: "यह साइट चलाने और पाठकों की पसंद समझने के लिए हम कुकीज़ का उपयोग करते हैं। आप गैर-आवश्यक कुकीज़ स्वीकार या अस्वीकार कर सकते हैं।", ok: "स्वीकार करें", no: "अस्वीकार करें", more: "गोपनीयता नीति" },
+  as: { msg: "এই ছাইট চলাবলৈ আৰু পাঠকে কি ভাল পায় বুজিবলৈ আমি কুকি ব্যৱহাৰ কৰোঁ। আপুনি অ-আৱশ্যকীয় কুকি গ্ৰহণ বা প্ৰত্যাখ্যান কৰিব পাৰে।", ok: "গ্ৰহণ", no: "প্ৰত্যাখ্যান", more: "গোপনীয়তা নীতি" },
+  ne: { msg: "यो साइट चलाउन र पाठकले के मन पराउँछन् बुझ्न हामी कुकिज प्रयोग गर्छौं। तपाईं गैर-आवश्यक कुकिज स्वीकार वा अस्वीकार गर्न सक्नुहुन्छ।", ok: "स्वीकार", no: "अस्वीकार", more: "गोपनीयता नीति" },
+};
+
+export function CookieNotice({ current = "en" }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem("cookie-choice")) setShow(true);
+    } catch {}
+  }, []);
+  const decide = (choice) => {
+    try {
+      localStorage.setItem("cookie-choice", choice);
+    } catch {}
+    setShow(false);
+  };
+  if (!show) return null;
+  const t = COOKIE_TEXT[current] || COOKIE_TEXT.en;
+  return (
+    <div className="cookie-notice" role="dialog" aria-label="Cookie notice">
+      <p className="cookie-notice-text">
+        🍪 {t.msg} <a href="/privacy">{t.more}</a>
+      </p>
+      <div className="cookie-notice-actions">
+        <button type="button" className="cookie-decline" onClick={() => decide("declined")}>{t.no}</button>
+        <button type="button" className="cookie-accept" onClick={() => decide("accepted")}>{t.ok}</button>
+      </div>
+    </div>
+  );
+}

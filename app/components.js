@@ -6,7 +6,7 @@ import { CopyLinkButton, NavBar } from "./client.js";
 import { AI_CREDIT } from "../lib/images.js";
 import { pictureOf } from "../lib/proof-shot.js";
 import { initLang, lang, pick, tr } from "../lib/lang.js";
-import { LangSwitch, AlertsButton, NewsletterSignup, LanguageWelcome, ListenBriefing } from "./client.js";
+import { LangSwitch, AlertsButton, NewsletterSignup, LanguageWelcome, ListenBriefing, CookieNotice } from "./client.js";
 import { topStories } from "../lib/top.js";
 import { newsletterReady } from "../lib/newsletter.js";
 import { pushPublicKey } from "../lib/push.js";
@@ -594,6 +594,7 @@ export async function PageShell({ current, children, ticker, updatedAt }) {
       <main className="container">{children}</main>
       <SiteFooter />
       <LanguageWelcome current={lang()} />
+      <CookieNotice current={lang()} />
       <TopBriefing />
     </>
   );

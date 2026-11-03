@@ -542,3 +542,13 @@ main { padding: 20px 0 40px; }
 .proof-shot figcaption { font-size: 0.85rem; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
 .proof-shot .proof-note { font-weight: 500; margin: 8px 0 0; }
 .proof-shot img { width: 100%; max-height: 360px; object-fit: cover; object-position: top; border-radius: 6px; border: 1px solid var(--line); display: block; }
+
+/* Cookie notice: a small bar at the bottom. Shown once, until the reader accepts or declines. */
+.cookie-notice { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 50; margin: 0 auto; max-width: 720px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.22); padding: 12px 14px; }
+.cookie-notice-text { margin: 0; flex: 1 1 260px; font-size: 0.86rem; line-height: 1.45; }
+.cookie-notice-text a { color: var(--brand); font-weight: 600; }
+.cookie-notice-actions { display: flex; gap: 8px; flex: none; }
+.cookie-notice button { font: inherit; font-size: 0.85rem; font-weight: 700; padding: 8px 16px; border-radius: 999px; cursor: pointer; border: 1px solid var(--line); }
+.cookie-decline { background: var(--card); color: var(--text); }
+.cookie-accept { background: var(--accent); color: #fff; border-color: var(--accent); }
+@media (max-width: 480px) { .cookie-notice-actions { flex: 1 1 100%; } .cookie-notice button { flex: 1; } }

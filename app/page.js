@@ -94,7 +94,10 @@ export default async function HomePage() {
     .filter((s, i, all) => all.findIndex((x) => x.headline === s.headline) === i) // a story saved twice shows once
     .slice(0, 2);
   const originals = [...pinnedOwn, ...ownStories.filter((s) => !underLead.includes(s))].slice(0, Math.max(3, pinnedOwn.length));
-  const hasSide = articles.length > 0 || mostRead.length >= 3;
+  // "Top news of the day": the most read today; until three stories have reads, the newest stories fill it (up to five).
+  const readToday = mostRead.filter((s) => s.id !== lead.id);
+  const topNews = (readToday.length >= 3 ? readToday : others.filter((s) => s.topic !== ARTICLES)).slice(0, 5);
+  const hasSide = articles.length > 0 || topNews.length > 0;
   const storiesByState = states.map((state) => [state, others.filter((s) => s.region === state).slice(0, 3)]);
 
   return (
@@ -122,7 +125,7 @@ export default async function HomePage() {
         {hasSide && (
           <div className="front-side">
             <ArticlesList stories={articles} />
-            {mostRead.length >= 3 && <LatestList stories={mostRead} title="Most read today" />}
+            {topNews.length > 0 && <LatestList stories={topNews} title="Top news of the day" className="top-news" />}
           </div>
         )}
       </div>

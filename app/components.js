@@ -299,9 +299,9 @@ export function WeatherStrip({ weather }) {
   );
 }
 
-export function LatestList({ stories, title = "Latest" }) {
+export function LatestList({ stories, title = "Latest", className = "" }) {
   return (
-    <aside className="latest">
+    <aside className={`latest ${className}`.trim()}>
       <h3>{tr(title)}</h3>
       <ol>
         {stories.map((s) => (

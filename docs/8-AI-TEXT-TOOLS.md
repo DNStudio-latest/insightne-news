@@ -14,15 +14,15 @@ All the work happens in the reader's browser. No text is sent to the website, to
 - **English only.** The phrase list and the contraction and first-person measures are for English. Bengali and Kokborok text is tokenised but not scored meaningfully.
 - **The style editor does not hide AI use.** It improves clarity. If AI helped write a text, disclose that as your university or publisher requires.
 
-## Use it on your PC (no internet needed)
+## Use it on your PC (no internet, nothing to install)
 
-You need either Python 3 or Node.js. In the project folder, run:
+Use the single-file version, `ai-text-checker.html`. Save it anywhere (for example, Documents) and double-click it to open it in Chrome, Edge or Firefox. It contains the whole tool, so it needs no Python, Node or web server.
+
+To rebuild that file after changing `engine.js` or `index.html`, run:
 
 ```bash
-python3 -m http.server 8080 -d public/ai-tools
+node scripts/ai-text-standalone.js ai-text-checker.html
 ```
-
-Then open `http://localhost:8080` in your browser. (Opening `index.html` by double-clicking does not work, because browsers block the engine file from loading that way.)
 
 ## Train a model on your own data (for research)
 
@@ -70,6 +70,7 @@ The model is logistic regression on these standardised features. With a trained 
 | `public/ai-tools/engine.js` | Features, scoring and style editor (one file, no dependencies) |
 | `public/ai-tools/index.html` | The web page |
 | `scripts/ai-text-train.js` | Training and cross-validation |
+| `scripts/ai-text-standalone.js` | Builds the single-file version for use on a PC |
 | `tests/ai-text.test.js` | Tests (`npm test`) |
 
 To add or remove stock phrases, edit `AI_PHRASES` in `engine.js`. To add automatic replacements, edit `SAFE_REPLACEMENTS`. Only add a replacement if it can never change the meaning.

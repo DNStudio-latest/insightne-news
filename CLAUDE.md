@@ -16,7 +16,7 @@ A Next.js news website for Tripura and Northeast India, deployed on Vercel from 
 | Public AI-text checker (runs in the browser) | `public/ai-tools/` (`index.html`, `engine.js`, trained `model.js`) |
 | Admin AI checker (side-by-side boxes, "What changed", headlines and intro) | `app/admin/ai-check/` |
 | Senior news editor (the AI rewrite, server side) | `lib/news-editor.js`; length targets in `lib/editor-lengths.js` |
-| Teach the AI (desk lessons for the editor, summaries, research drafts and checker) | `app/admin/ai-lessons/`, `lib/ai-lessons.js`, `lib/ai-lessons-store.js` |
+| Teach the AI (desk lessons for the editor, summaries, Research desk and News Hunter drafts, and checker) | `app/admin/ai-lessons/`, `lib/ai-lessons.js`, `lib/ai-lessons-store.js` |
 | Training, corpus and evaluation scripts | `scripts/ai-text-*.js` |
 | Guides | `docs/8-AI-TEXT-TOOLS.md` (tools, results), `docs/9-NEWS-WRITING-STANDARDS.md` (the newsroom study behind the editor) |
 
@@ -30,7 +30,7 @@ A Next.js news website for Tripura and Northeast India, deployed on Vercel from 
 - Headline set: main headline of 55–70 characters with key words first, short headline of 30–45 characters, two alternatives, and a one-sentence present-tense intro of 20–30 words.
 - `AI_PHRASES` in `engine.js` is one of the trained model's features: do not edit it without retraining. Add editing advice to `PHRASE_ADVICE` or `PATTERNS` instead.
 
-The owner reviews live edits and reports phrases that sound machine-written. Simple phrase corrections can now be made by the desk itself in **Admin → 🧠 Teach the AI** (`/admin/ai-lessons`, `lib/ai-lessons.js`): an approved lesson is added to the instructions of the senior editor, the daily summaries and the Research desk, and flagged in the admin checker, with no code change. Lessons are stored in the `ai_lessons` site setting; staff lessons wait for the admin's approval. Reports that need more than a phrase swap (a structural rule, like the ", prompting…" rule) still become a rule in `EDITOR_SYSTEM` (with the real example as a before/after), a `PATTERNS` entry in `engine.js` where a rule-based flag helps, and a test.
+The owner reviews live edits and reports phrases that sound machine-written. Simple phrase corrections can now be made by the desk itself in **Admin → 🧠 Teach the AI** (`/admin/ai-lessons`, `lib/ai-lessons.js`): an approved lesson is added to the instructions of the senior editor, the daily summaries and the drafts writer (Research desk and News Hunter), and flagged in the admin checker, with no code change. A News Hunter draft that still uses a banned phrase gets the `lesson` flag and is never auto-published. Lessons are stored in the `ai_lessons` site setting; staff lessons wait for the admin's approval. Reports that need more than a phrase swap (a structural rule, like the ", prompting…" rule) still become a rule in `EDITOR_SYSTEM` (with the real example as a before/after), a `PATTERNS` entry in `engine.js` where a rule-based flag helps, and a test.
 
 ## Open items
 

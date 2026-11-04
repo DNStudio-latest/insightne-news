@@ -12,6 +12,7 @@ const FLAG_LABELS = {
   election: { text: "Election notice: editor checks before publishing", color: "var(--accent)" },
   video: { text: "From a video", color: "#555" },
   sensitive: { text: "Sensitive: crime, court, communal or deaths", color: "var(--danger)" },
+  lesson: { text: "Uses a phrase from Teach the AI", color: "#8a5a00" },
 };
 
 const when = (iso) => new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" });

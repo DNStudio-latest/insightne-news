@@ -593,3 +593,8 @@ main { padding: 20px 0 40px; }
 .aic-col textarea[readonly] { background: var(--bg); color: var(--muted); }
 .aic-actions .btn:disabled { opacity: 0.55; cursor: default; }
 @media (max-width: 860px) { .aic-compare { grid-template-columns: 1fr; } .aic-col textarea.body { min-height: 260px; } }
+/* AI checker: word-by-word changes between the original and the edit. */
+.aic-diff del { color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); text-decoration: line-through; }
+.aic-diff ins { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); text-decoration: none; font-weight: 600; }
+.aic-key del { color: var(--danger); text-decoration: line-through; }
+.aic-key ins { color: var(--ok); text-decoration: none; font-weight: 600; margin-left: 6px; }

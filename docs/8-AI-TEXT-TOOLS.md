@@ -22,7 +22,18 @@ On `/admin/ai-check`, **📰 Edit like a senior news editor** rewrites the paste
 - plain, neutral Indian English, with no clichés, hype or stock AI phrasing;
 - a sentence-case headline of 8 to 14 words.
 
-The editor's version goes into **Edited text** with the headline on top. The page also shows the **editor's notes**: questions for the reporter, such as a missing source, date or the other side's response. It lists what the editor changed and the AI-check score before and after.
+The editor also runs the **desk checks** a senior editor makes on every story. Problems go into the editor's notes:
+
+- **consistency:** do names, numbers and descriptions agree throughout?
+- **sourcing:** whose account is this: police, the complainant, an FIR?
+- **fairness:** was the other side asked for a response?
+- **clarity** and **legal risk**.
+
+It keeps the dateline ("AGARTALA, Nov 4:") and tightens wordy sentences. Clean copy is changed only where it can be improved, so a well-written report may come back with few changes and useful notes.
+
+The editor's version goes into the right-hand box with the headline on top. Under the two boxes, **What changed** shows every word removed (struck through, red) and added (green). The page also shows the **editor's notes**: questions for the reporter, such as a missing source, date or the other side's response. It lists what the editor changed and the AI-check score before and after.
+
+The editor's rules come from a study of Reuters, AP, PTI, IANS, UNI, the BBC, The Economist and the Press Council of India's norms: see [9-NEWS-WRITING-STANDARDS.md](9-NEWS-WRITING-STANDARDS.md).
 
 **It must not add facts.** The instructions forbid new names, figures, quotes, dates or claims; anything missing becomes a note. As a safety net, any figure in the edit that is not in the original is listed at the top of the notes. Always compare the edit with your source before publishing.
 

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { scoreText, styleEdit, applyAlternative, tokenize } from "../../../public/ai-tools/engine.js";
 import { HANDOFF_KEY } from "./handoff.js";
 import { editAsSeniorEditor } from "./actions.js";
+import { wordDiff, diffCounts } from "./diff.js";
 
 const HANDOFF_MAX_AGE = 10 * 60 * 1000;
 
@@ -17,6 +18,32 @@ function takeHandoff() {
   } catch {
     return "";
   }
+}
+
+// The edited text compared with the original: removed words struck through, added words highlighted.
+function Changes({ before, after }) {
+  const segments = wordDiff(before, after);
+  if (!segments) return <p className="note">The texts are too long to compare word by word.</p>;
+  const { removed, added } = diffCounts(segments);
+  return (
+    <>
+      <p className="note">
+        {removed || added ? `${removed} words removed, ${added} words added.` : "No words changed."}{" "}
+        <span className="aic-key"><del>removed</del> <ins>added</ins></span>
+      </p>
+      <div className="aic-marked aic-diff">
+        {segments.map((s, i) =>
+          // A paragraph break on its own is shown as a break, not as a highlighted change.
+          !s.text.trim() ? <span key={i}>{s.type === "del" ? " " : s.text}</span>
+            : s.type === "del" ? <del key={i}>{s.text}</del> : s.type === "ins" ? <ins key={i}>{s.text}</ins> : <span key={i}>{s.text}</span>
+        ).flatMap((el, i) => {
+          // A space between segments, but none next to a paragraph break.
+          const touchesBreak = i && (segments[i - 1].text.endsWith("\n") || segments[i].text.startsWith("\n"));
+          return i && !touchesBreak ? [" ", el] : [el];
+        })}
+      </div>
+    </>
+  );
 }
 
 // The edited text with AI-like sentences highlighted.
@@ -166,6 +193,13 @@ export default function AiCheck() {
           {copied && <p className="note">{copied}</p>}
         </div>
       </div>
+
+      {edit && (
+        <section className="story aic-result">
+          <h2>What changed</h2>
+          <Changes before={input} after={edit.text} />
+        </section>
+      )}
 
       <p className="note">
         The senior editor rewrites the report to international wire-service standard: the most important fact

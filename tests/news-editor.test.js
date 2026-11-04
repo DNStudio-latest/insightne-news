@@ -60,3 +60,36 @@ test("Claude is used when the site has a Claude key, otherwise Gemini", () => {
   assert.equal(editorProvider({ GEMINI_API_KEY: "g" }), "gemini");
   assert.equal(editorProvider({}), null);
 });
+
+// ---- desk checks in the style guide, and the "What changed" comparison ----
+import { wordDiff, diffCounts } from "../app/admin/ai-check/diff.js";
+
+test("the style guide keeps datelines and asks for consistency, sourcing and fairness checks", () => {
+  assert.match(EDITOR_SYSTEM, /dateline.*keep it/is);
+  assert.match(EDITOR_SYSTEM, /Consistency/);
+  assert.match(EDITOR_SYSTEM, /Sourcing/);
+  assert.match(EDITOR_SYSTEM, /EDIT ACTIVELY/);
+  assert.ok(!/No headline, dateline or byline/.test(EDITOR_SYSTEM), "the dateline is no longer dropped");
+});
+
+test("the comparison shows removed and added words and keeps paragraphs", () => {
+  const before = "AGARTALA, Nov 4: Government Railway Police (GRP) detained a woman. The incident occurred before the train.";
+  const after = "AGARTALA, Nov 4: Government Railway Police detained a woman.\n\nIt happened before the train.";
+  const d = wordDiff(before, after);
+  assert.deepEqual(d.filter((s) => s.type === "del").map((s) => s.text), ["(GRP)", "The incident occurred"]);
+  assert.ok(d.some((s) => s.type === "ins" && s.text.includes("It happened")));
+  assert.ok(d.some((s) => s.text.includes("\n\n")), "paragraph break kept");
+  assert.deepEqual(diffCounts(d), { removed: 4, added: 2 });
+  assert.deepEqual(diffCounts(wordDiff("same text", "same text")), { removed: 0, added: 0 });
+});
+
+test("the style guide follows the news-writing study: dateline, lead, attribution, PCI norms, ending", () => {
+  assert.match(EDITOR_SYSTEM, /keep it exactly as\s+written/);
+  assert.match(EDITOR_SYSTEM, /Never add a dateline/);
+  assert.match(EDITOR_SYSTEM, /20 to 35 words/);
+  assert.match(EDITOR_SYSTEM, /Do not write "occurred"/);
+  assert.match(EDITOR_SYSTEM, /Never name or identify a victim of rape/);
+  assert.match(EDITOR_SYSTEM, /Press Council of India/);
+  assert.match(EDITOR_SYSTEM, /ENDING/);
+  assert.match(EDITOR_SYSTEM, /"stated", "noted", "commented", "informed", "opined"/);
+});

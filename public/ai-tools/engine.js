@@ -708,6 +708,18 @@ export function applyAlternative(text, suggestion, alternative) {
   return before + matchCase(alternative, original) + after;
 }
 
+// Only the automatic corrections (SAFE_REPLACEMENTS), without suggestions or scoring. Used by the website's AI
+// tools on their own answers (lib/house-style.js). Returns { text, changes: [{ from, to, index }] }.
+export function applySafeReplacements(text) {
+  const changes = [];
+  const out = String(text || "").replace(REPLACE_RE, (match, offset) => {
+    const to = matchCase(SAFE_REPLACEMENTS[normKey(match)], match);
+    changes.push({ from: match, to, index: offset });
+    return to;
+  });
+  return { text: out, changes };
+}
+
 // Returns the edited text (when apply is true), each automatic change, and suggestions the author
 // should review. Only SAFE_REPLACEMENTS are applied automatically. Suggestion indexes refer to the
 // returned text. Pass a trained model to also mark sentences that read as AI-written.

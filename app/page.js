@@ -93,7 +93,7 @@ export default async function HomePage() {
   const underLead = [...byPerson.filter((s) => s.author_id), ...byPerson.filter((s) => !s.author_id)]
     .filter((s, i, all) => all.findIndex((x) => x.headline === s.headline) === i) // a story saved twice shows once
     .slice(0, 2);
-  const originals = [...pinnedOwn, ...ownStories.filter((s) => !underLead.includes(s))].slice(0, Math.max(3, pinnedOwn.length));
+  const originals = [...pinnedOwn, ...ownStories.filter((s) => !underLead.includes(s))].slice(0, Math.max(6, pinnedOwn.length)); // six: two full rows of three
   const hasSide = articles.length > 0 || mostRead.length >= 3;
   const storiesByState = states.map((state) => [state, others.filter((s) => s.region === state).slice(0, 3)]);
 

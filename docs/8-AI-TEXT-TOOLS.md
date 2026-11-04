@@ -13,6 +13,23 @@ Signed-in staff (admin, editors and sub-editors) also have the tool at **`/admin
 
 In **✍ Write story**, the **🤖 Check this text for AI** button (under the story text) opens the checker in a new tab, with the intro and story text already filled in. The story itself is not saved or changed. Copy any edits you want back into the story.
 
+### Edit like a senior news editor (admin panel only)
+
+On `/admin/ai-check`, **📰 Edit like a senior news editor** rewrites the pasted report to international wire-service standard, in the house style of agencies such as Reuters, AFP, AP and PTI:
+
+- the most important new fact first (inverted pyramid), with a one-sentence lead that says who, what, where and when;
+- every claim attributed with "said"; allegations kept as allegations;
+- plain, neutral Indian English, with no clichés, hype or stock AI phrasing;
+- a sentence-case headline of 8 to 14 words.
+
+The editor's version goes into **Edited text** with the headline on top. The page also shows the **editor's notes**: questions for the reporter, such as a missing source, date or the other side's response. It lists what the editor changed and the AI-check score before and after.
+
+**It must not add facts.** The instructions forbid new names, figures, quotes, dates or claims; anything missing becomes a note. As a safety net, any figure in the edit that is not in the original is listed at the top of the notes. Always compare the edit with your source before publishing.
+
+This button is the only part of the checker that leaves the device: the text is sent to the website's AI, which costs a little per edit. It uses Claude when the site has `ANTHROPIC_API_KEY` or `OPENROUTER_API_KEY`, and otherwise Gemini (`GEMINI_API_KEY`). Each person can use it 30 times an hour. To use a stronger Claude model for editing than for the daily summaries, set `CLAUDE_EDITOR_MODEL` (for example `claude-sonnet-5-5`); for Gemini, `GEMINI_EDITOR_MODEL`.
+
+The public `/ai-tools/` page does not have this button, so visitors cannot spend the site's AI budget.
+
 ## Read this first
 
 - **A score is not proof.** The built-in model is right on about 9 in 10 test texts, but it wrongly flags about 1 in 13 human texts. Formal academic prose and writing by non-native English speakers are flagged in error more often (Liang et al., 2023, "GPT detectors are biased against non-native English writers", *Patterns*). Never use a score alone as evidence against a person.
@@ -204,6 +221,7 @@ AUC is the usual figure to report: 0.5 means chance and 1.0 means perfect separa
 | `scripts/ai-text-train.js` | Training and evaluation |
 | `scripts/ai-text-experiments.js` | Baselines and unseen-model / unseen-domain tests |
 | `scripts/ai-text-gemini.js` | Adds Gemini texts to the corpus (API or by hand) |
+| `lib/news-editor.js` | The "senior news editor" instructions and rewrite (admin panel) |
 | `scripts/ai-text-new-model-eval.js` | How well the detector catches a new AI model (zero-shot and 5-fold) |
 | `scripts/ai-text-standalone.js` | Builds the single-file version for use on a PC |
 | `tests/ai-text.test.js` | Tests (`npm test`) |

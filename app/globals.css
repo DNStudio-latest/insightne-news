@@ -581,3 +581,7 @@ main { padding: 20px 0 40px; }
 .aic ins { color: var(--ok); text-decoration: none; }
 .editor .aic-open { width: auto; justify-self: start; padding: 8px 14px; }
 @media (max-width: 480px) { .aic-actions-3 { grid-template-columns: 1fr; } }
+.aic-pro { margin-top: -4px; }
+.aic-pro:disabled { opacity: 0.7; cursor: wait; }
+.aic-beforeafter { font-size: 0.95rem; margin: 4px 0; }
+.aic-notes li { color: var(--warn); }

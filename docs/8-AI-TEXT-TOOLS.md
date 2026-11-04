@@ -57,7 +57,7 @@ The public `/ai-tools/` page does not have this button, so visitors cannot spend
 |---|---|
 | Senior news editor | Added to the editor's instructions. If the edit still uses the phrase, the editor's notes say so. |
 | Daily news summaries | Added to the summary instructions (Claude or Gemini). A summary that still uses the phrase is written once more; if the phrase is still there, the story is marked for an extra check on the approval page. |
-| Research desk drafts | Added to the writer's instructions. A draft that still uses the phrase lists it under problems in News Hunter. |
+| Research desk and News Hunter drafts | Both are written by the same writer, so one tick covers both. The lesson is added to the writer's instructions. A draft that still uses the phrase lists it under problems in News Hunter and shows the badge "Uses a phrase from Teach the AI". Such a News Hunter draft is never auto-published: it waits for the editor. |
 | AI checker flags | The admin AI checker flags the phrase under "For you to review", with the better wording as a one-click replacement. |
 
 **Approval.** A lesson from an editor or sub-editor waits under "Waiting for approval" until the admin approves it. The admin's own lessons are used at once. The admin can switch a lesson off, switch it on again or delete it. At most 80 lessons can be in use, and only the newest that fit (about 6,000 characters) are sent to the AI, so the main rules always come first.
@@ -66,7 +66,7 @@ The public `/ai-tools/` page does not have this button, so visitors cannot spend
 
 **Where lessons are kept.** In the site setting `ai_lessons` (the `site_settings` table), so no database change is needed. The code is in `lib/ai-lessons.js` (rules) and `lib/ai-lessons-store.js` (saving). If the database cannot be read, the tools carry on without lessons.
 
-**What lessons cannot do.** They do not retrain the detector's model (that needs the training scripts below), and the public `/ai-tools/` page does not use them, because it runs without the website. The News Hunter's automatic drafts (`scripts/hunt.js`) do not use them yet.
+**What lessons cannot do.** They do not retrain the detector's model (that needs the training scripts below), and the public `/ai-tools/` page does not use them, because it runs without the website.
 
 ## Read this first
 
@@ -260,7 +260,7 @@ AUC is the usual figure to report: 0.5 means chance and 1.0 means perfect separa
 | `scripts/ai-text-experiments.js` | Baselines and unseen-model / unseen-domain tests |
 | `scripts/ai-text-gemini.js` | Adds Gemini texts to the corpus (API or by hand) |
 | `lib/news-editor.js` | The "senior news editor" instructions and rewrite (admin panel) |
-| `lib/ai-lessons.js`, `lib/ai-lessons-store.js` | Teach the AI: lessons from the desk for the editor, summaries, research drafts and checker |
+| `lib/ai-lessons.js`, `lib/ai-lessons-store.js` | Teach the AI: lessons from the desk for the editor, summaries, Research desk and News Hunter drafts, and checker |
 | `scripts/ai-text-new-model-eval.js` | How well the detector catches a new AI model (zero-shot and 5-fold) |
 | `scripts/ai-text-standalone.js` | Builds the single-file version for use on a PC |
 | `tests/ai-text.test.js` | Tests (`npm test`) |

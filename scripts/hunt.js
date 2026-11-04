@@ -13,6 +13,8 @@ import { runHunter } from "../lib/hunter/run.js";
 import { createTelegramAlert } from "../lib/hunter/alert.js";
 import { createPublisher } from "../lib/hunter/auto.js";
 import { db } from "../lib/db.js";
+import { lessonsPrompt, activeFor } from "../lib/ai-lessons.js";
+import { loadLessons } from "../lib/ai-lessons-store.js";
 
 // "--read-only" tests finding and reading items without AI (no key needed, no drafts written).
 const readOnly = process.argv.includes("--read-only");
@@ -24,8 +26,11 @@ if (!readOnly && !process.env.GEMINI_API_KEY) {
 // Flash-Lite decides what is news (cheap, many requests); the stronger Flash model writes the drafts.
 const quick = createGeminiCaller({ maxOutputTokens: 4000 });
 const writer = createGeminiCaller({ model: process.env.HUNTER_MODEL || "gemini-flash-latest", maxOutputTokens: 4000 });
-const judgeAi = createHunterAi({ generate: quick, states, topics: newsTopics });
-const draftAi = createHunterAi({ generate: writer, states, topics: newsTopics });
+// The lessons approved in Admin → Teach the AI go to the draft writer (both models), and each draft is checked for them.
+const lessons = readOnly ? [] : await loadLessons(db, console.log);
+const lessonText = lessonsPrompt(lessons, "research");
+const judgeAi = createHunterAi({ generate: quick, states, topics: newsTopics, lessons: lessonText });
+const draftAi = createHunterAi({ generate: writer, states, topics: newsTopics, lessons: lessonText });
 // If the stronger model's free limit runs out (or it stops answering), the rest of the drafts are written by Flash-Lite.
 let writerDown = false;
 async function draft(docs) {
@@ -45,13 +50,13 @@ const ai = { judge: judgeAi.judge, draft };
 // On GitHub (in the USA), government websites are fetched through the website's Mumbai server.
 const fetchFn = process.env.GITHUB_ACTIONS ? createRelayFetch() : fetch;
 
-console.log(`InsightNE News Hunter — ${new Date().toISOString()}`);
+console.log(`InsightNE News Hunter — ${new Date().toISOString()}. Desk lessons for drafts: ${activeFor(lessons, "research").length}`);
 // Screenshots of the source pages (proof). Not used in the read-only test.
 const proof = readOnly ? null : createProofCapturer();
 // Urgent items are sent to the editor's phone (Telegram), if the secrets are set.
 const alert = readOnly ? null : createTelegramAlert({ token: process.env.TELEGRAM_BOT_TOKEN, chatId: process.env.TELEGRAM_CHAT_ID });
 if (!readOnly && !alert) console.log("Urgent phone alerts are off: TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are not set.");
-const run = await runHunter({ store: hunterStore, get: createPoliteFetcher({ fetchFn }), ai, generate: quick, config: hunterConfig, readOnly, proof, site: db, alert, publish: readOnly ? null : createPublisher() });
+const run = await runHunter({ store: hunterStore, get: createPoliteFetcher({ fetchFn }), ai, generate: quick, config: hunterConfig, readOnly, proof, site: db, alert, publish: readOnly ? null : createPublisher(), lessons });
 await proof?.close();
 console.log("Done.", JSON.stringify({ ...run, pages_failed: run.pages_failed.map((f) => `${f.name}: ${f.error}`) }, null, 1));
 process.exit(run.error ? 1 : 0);

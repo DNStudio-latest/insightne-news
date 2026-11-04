@@ -190,3 +190,38 @@ test("a research draft that still uses a banned phrase lists it under problems",
   });
   assert.ok(saved.problems.some((p) => /still wrote "rushed to the spot"/.test(p)), saved.problems.join(" | "));
 });
+
+test("News Hunter drafts: a banned phrase is listed, flagged, and the draft is never auto-published", async () => {
+  const { runHunter } = await import("../lib/hunter/run.js");
+  const { createLocalHunterStore } = await import("../lib/hunter/store.js");
+  const day = new Date();
+  const dateline = `${day.getUTCDate()} ${day.toLocaleString("en", { month: "long", timeZone: "UTC" })} ${day.getUTCFullYear()}`;
+  const pages = {
+    "https://lokbhavan.tripura.gov.in/press-release": '<html><body><div class="content"><a href="/press-release/governor-meets-students-2026">Governor meets students of Tripura University</a></div></body></html>',
+    "https://lokbhavan.tripura.gov.in/press-release/governor-meets-students-2026": `<html><body><h1>Governor meets students</h1><div class="field--name-body"><p>Agartala, ${dateline}</p><p>The Governor met 120 students of Tripura University at Lok Bhavan. He asked them to work hard for the state and to take part in social service activities in their villages.</p></div></body></html>`,
+  };
+  const get = async (url) => (pages[url] ? { ok: true, type: "text/html", bytes: Buffer.from(pages[url]), text: pages[url], url } : { ok: false, reason: "HTTP 404" });
+  const ai = {
+    judge: async (items) => new Map(items.map((i) => [i.id, { id: i.id, newsworthy: true, score: 9, routine: false, state: "Tripura", language: "en", event: "Governor meets students", same_as: null, reason: "Governor activity" }])),
+    draft: async () => ({ headline: "Governor meets 120 students of Tripura University", paragraphs: ["In a significant development, the Governor met 120 students at Lok Bhavan, according to a press release.", "He asked them to take part in social service activities in their villages."], attribution: "This is according to a press release from Lok Bhavan Tripura.", state: "Tripura", topic: null, sensitive: false }),
+  };
+  const config = { sites: [{ enabled: true, state: "Tripura", name: "Lok Bhavan Tripura", pages: ["https://lokbhavan.tripura.gov.in/press-release"] }], youtube: [], autoPublish: { enabled: true, minScore: 8 } };
+  const runWith = async (lessons) => {
+    const store = createLocalHunterStore(path.join(fs.mkdtempSync(path.join(os.tmpdir(), "hunter-lessons-")), "h.json"));
+    const published = [];
+    await runHunter({ store, get, ai, config, lessons, publish: async (id) => (published.push(id), { published: true, url: "x" }), fetchFn: async () => new Response("{}"), log: () => {} });
+    const [draft] = await store.listDrafts({ status: "pending" });
+    return { draft, published };
+  };
+
+  const without = await runWith([]);
+  assert.equal(without.published.length, 1, "control: the same clean draft is auto-published when there is no lesson");
+
+  const withLesson = await runWith([lesson({ tools: ["research"] })]);
+  assert.equal(withLesson.published.length, 0, "a draft with a banned phrase waits for the editor");
+  assert.ok(withLesson.draft.flags.includes("lesson"));
+  assert.ok(withLesson.draft.problems.some((p) => /still wrote "In a significant development"/.test(p)));
+
+  const otherTool = await runWith([lesson({ tools: ["editor"] })]);
+  assert.equal(otherTool.published.length, 1, "a lesson for another tool does not hold the draft back");
+});

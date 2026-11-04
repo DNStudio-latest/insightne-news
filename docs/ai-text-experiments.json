@@ -1,0 +1,124 @@
+{
+  "corpus": {
+    "texts": 33824,
+    "train": 28659,
+    "test": 5165
+  },
+  "settings": {
+    "l2": 0.00001,
+    "keep": 25000,
+    "epochs": 12
+  },
+  "builtin_uncalibrated": {
+    "n": 5165,
+    "accuracy": 0.5909,
+    "auc": 0.6434,
+    "precision": 0.627,
+    "recall": 0.4633,
+    "f1": 0.5328,
+    "falsePositiveRate": 0.2796
+  },
+  "style_only": {
+    "n": 5165,
+    "accuracy": 0.691,
+    "auc": 0.7555,
+    "precision": 0.7024,
+    "recall": 0.6705,
+    "f1": 0.6861,
+    "falsePositiveRate": 0.2882
+  },
+  "full": {
+    "n": 5165,
+    "accuracy": 0.9069,
+    "auc": 0.9701,
+    "precision": 0.9223,
+    "recall": 0.89,
+    "f1": 0.9059,
+    "falsePositiveRate": 0.0761
+  },
+  "unseen_generator": {
+    "chatgpt": {
+      "n": 2929,
+      "accuracy": 0.9259,
+      "auc": 0.9842,
+      "precision": 0.6355,
+      "recall": 0.9507,
+      "f1": 0.7618,
+      "falsePositiveRate": 0.0776
+    },
+    "claude": {
+      "n": 3022,
+      "accuracy": 0.859,
+      "auc": 0.8248,
+      "precision": 0.5408,
+      "recall": 0.4629,
+      "f1": 0.4988,
+      "falsePositiveRate": 0.0702
+    },
+    "davinci": {
+      "n": 2947,
+      "accuracy": 0.9125,
+      "auc": 0.9088,
+      "precision": 0.6543,
+      "recall": 0.6919,
+      "f1": 0.6726,
+      "falsePositiveRate": 0.0546
+    },
+    "cohere": {
+      "n": 2946,
+      "accuracy": 0.9067,
+      "auc": 0.9135,
+      "precision": 0.6334,
+      "recall": 0.6649,
+      "f1": 0.6488,
+      "falsePositiveRate": 0.0573
+    },
+    "dolly": {
+      "n": 2898,
+      "accuracy": 0.882,
+      "auc": 0.8268,
+      "precision": 0.4851,
+      "recall": 0.3892,
+      "f1": 0.4319,
+      "falsePositiveRate": 0.0538
+    }
+  },
+  "unseen_domain": {
+    "arxiv": {
+      "n": 863,
+      "accuracy": 0.7648,
+      "auc": 0.8473,
+      "precision": 0.7751,
+      "recall": 0.7483,
+      "f1": 0.7615,
+      "falsePositiveRate": 0.2186
+    },
+    "gb-essay": {
+      "n": 635,
+      "accuracy": 0.5543,
+      "auc": 0.6604,
+      "precision": 0.5241,
+      "recall": 0.9484,
+      "f1": 0.6751,
+      "falsePositiveRate": 0.8215
+    },
+    "peerread": {
+      "n": 135,
+      "accuracy": 0.8963,
+      "auc": 0.9619,
+      "precision": 1,
+      "recall": 0.7705,
+      "f1": 0.8704,
+      "falsePositiveRate": 0
+    },
+    "wikipedia": {
+      "n": 708,
+      "accuracy": 0.5833,
+      "auc": 0.6561,
+      "precision": 0.5665,
+      "recall": 0.6997,
+      "f1": 0.6261,
+      "falsePositiveRate": 0.5324
+    }
+  }
+}

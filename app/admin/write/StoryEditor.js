@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { saveOriginal } from "../actions.js";
 import { shrinkPhoto } from "../photo.js";
+import { HANDOFF_KEY } from "../ai-check/handoff.js";
 
 export default function StoryEditor({ story, regions, topics, defaultAuthor, role = "admin", editorsPublish = false }) {
   const admin = role === "admin";
@@ -50,6 +51,24 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor, rol
         <span className="hint">Leave an empty line between paragraphs. Start a line with “## ” for a subheading, or “&gt; ” for a quote.</span>
         <textarea className="body" name="body" defaultValue={story?.body || ""} placeholder="Write the full report here…" />
       </label>
+
+      <button
+        type="button"
+        className="btn btn-plain aic-open"
+        onClick={(e) => {
+          // Hands the intro and story text to the AI checker, which opens in a new tab.
+          const form = e.currentTarget.form;
+          const text = [form.elements.summary?.value, form.elements.body?.value].filter((t) => t?.trim()).join("\n\n");
+          try {
+            localStorage.setItem(HANDOFF_KEY, JSON.stringify({ text, at: Date.now() }));
+          } catch {
+            /* storage blocked: the checker opens empty */
+          }
+          window.open("/admin/ai-check", "_blank");
+        }}
+      >
+        🤖 Check this text for AI
+      </button>
 
       <details className="bn-fields" open={Boolean(story?.translations?.trp?.summary)}>
         <summary>Kokborok version (Latin script, optional)</summary>

@@ -253,3 +253,10 @@ test("an answers file saved by Excel as Windows-1252 keeps its dashes and quotes
   writeText(utf8, '"a—b’c"');
   assert.equal(readAnyText(utf8), '"a—b’c"');
 });
+
+test("', prompting …' and similar result clauses are flagged for splitting", () => {
+  const text = "She began recording the altercation on her phone, prompting the staffer to allegedly push both women. Prices rose, leading to protests.";
+  const hits = styleEdit(text).suggestions.filter((s) => s.kind === "pattern" && /prompting/.test(s.message));
+  assert.equal(hits.length, 2);
+  assert.equal(styleEdit("The prompting was clear. Police led the march.").suggestions.filter((s) => /prompting/.test(s.message)).length, 0, "no comma, no flag");
+});

@@ -115,8 +115,8 @@ main { padding: 20px 0 40px; }
 }
 @media (min-width: 1100px) {
   .front-top.with-side > .front-side { align-self: stretch; contain: size; display: flex; flex-direction: column; gap: 24px; }
-  .front-side > :last-child:not(.articles) { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; } /* Most read fills the column */
-  .front-side > .articles { flex-shrink: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+  .front-side > :last-child:not(.articles) { flex: 3 1 0; min-height: 0; overflow-y: auto; scrollbar-width: thin; } /* Most read: 3 parts */
+  .front-side > .articles { flex: 2 1 0; min-height: 0; overflow-y: auto; scrollbar-width: thin; } /* Articles: 2 parts, so Articles : Most read = 2 : 3 */
 }
 .articles h3 a { color: inherit; }
 .article-by { display: block; margin-top: 3px; font-size: 0.8rem; font-weight: 700; color: var(--accent); }

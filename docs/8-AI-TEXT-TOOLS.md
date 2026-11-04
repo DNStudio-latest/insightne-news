@@ -7,6 +7,12 @@ A research tool with two parts:
 
 All the work happens in the reader's browser. No text is sent to the website, to Claude or to any other service. The page is at **`/ai-tools/`** on the website (`https://www.insightnenews.in/ai-tools/`). It is hidden from search engines (`noindex`) and does not appear in the site menu.
 
+## In the admin panel
+
+Signed-in staff (admin, editors and sub-editors) also have the tool at **`/admin/ai-check`**: the **🤖 AI checker** tab on the approval page. It works the same way as the public page and also runs in the browser. Use it to check a press release, a contributor's submission or your own draft before publishing.
+
+In **✍ Write story**, the **🤖 Check this text for AI** button (under the story text) opens the checker in a new tab, with the intro and story text already filled in. The story itself is not saved or changed. Copy any edits you want back into the story.
+
 ## Read this first
 
 - **A score is not proof.** The built-in model is right on about 9 in 10 test texts, but it wrongly flags about 1 in 13 human texts. Formal academic prose and writing by non-native English speakers are flagged in error more often (Liang et al., 2023, "GPT detectors are biased against non-native English writers", *Patterns*). Never use a score alone as evidence against a person.

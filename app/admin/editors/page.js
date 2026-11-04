@@ -67,7 +67,7 @@ export default async function EditorsPage({ searchParams }) {
               <span>Added {formatDate(e.created_at)}</span>
             </div>
             <h2>
-              {e.name} <span className="score" title="Published stories with their byline">📰 {counts[e.id]} {counts[e.id] === 1 ? "story" : "stories"}</span>
+              {e.name} <code className="hint" title="Use this ID in settings.json kokborokEditors.ids">{e.id}</code> <span className="score" title="Published stories with their byline">📰 {counts[e.id]} {counts[e.id] === 1 ? "story" : "stories"}</span>
             </h2>
             <div className="actions">
               <form action={changeEditor}>

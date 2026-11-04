@@ -141,10 +141,10 @@ export async function saveEdit(formData) {
   const view = String(formData.get("view") || "pending");
   const existing = await db.getStory(id);
   const fail = (message) => refresh(view, message);
-  // Sub-editors may change their own stories. A sub-editor named in settings.json "kokborokEditors" may also change
+  // Sub-editors may change their own stories. A sub-editor whose ID is in settings.json "kokborokEditors" may also change
   // the Kokborok version of any other story, and nothing else on it.
   const kokOnly = role === SUB_EDITOR && existing?.author_id !== user?.id;
-  if (kokOnly && !(existing && canEditKokborok(user, settings.kokborokEditors?.names))) fail("You can edit only your own stories");
+  if (kokOnly && !(existing && canEditKokborok(user, settings.kokborokEditors?.ids))) fail("You can edit only your own stories");
   const kok = kokborokFrom(formData, fail);
   if (kokOnly) {
     await db.updateStory(id, { translations: translationsAfterEdit(existing, false, kok) });

@@ -35,8 +35,8 @@ export default async function AdminPage({ searchParams }) {
   const admin = user.role === "admin";
   // A sub-editor sees only the stories they wrote.
   const sub = user.role === SUB_EDITOR;
-  // A sub-editor named in settings.json "kokborokEditors" sees every story (to edit its Kokborok version).
-  const kokborokEditor = sub && canEditKokborok(user, settings.kokborokEditors?.names);
+  // A sub-editor whose ID is in settings.json "kokborokEditors" sees every story (to edit its Kokborok version).
+  const kokborokEditor = sub && canEditKokborok(user, settings.kokborokEditors?.ids);
   const mine = sub && !kokborokEditor ? { authorId: user.id } : {};
   const params = await searchParams;
   const view = VIEWS[params.view] && (admin || params.view !== "rejected") ? params.view : "pending";

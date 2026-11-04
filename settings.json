@@ -83,8 +83,8 @@
     "canPublish": true
   },
   "kokborokEditors": {
-    "_help": "Sub-editors named here (exactly as their name appears on /admin/editors, letter case does not matter) may also edit the Kokborok version of every story. On other people's stories they can change only the Kokborok headline and summary, not the English text.",
-    "names": ["Elisa", "Anita", "Mary John"]
+    "_help": "Sub-editors whose ID is listed here may also edit the Kokborok version of every story. Copy each ID from the Editors page in the admin panel (it is shown under the name, for the admin only). Names are not used, so no staff names are kept in the code. On other people's stories they can change only the Kokborok headline and summary, not the English text.",
+    "ids": []
   },
   "facebook": {
     "_help": "Posting to your Facebook page. Needs FACEBOOK_PAGE_ID and FACEBOOK_PAGE_TOKEN in Vercel (see docs/5-FACEBOOK.md). autoPost: \"originals\" = your own reports are posted automatically when published; true = every story you approve; false = only with the POST TO FACEBOOK button.",

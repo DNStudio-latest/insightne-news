@@ -90,3 +90,94 @@ test("training learns to separate two writing styles and reports cross-validatio
   assert.ok(scoreText(rows[0].text, model).score > scoreText(rows[1].text, model).score);
   assert.throws(() => trainModel(rows.slice(0, 4)), /Need at least/);
 });
+
+// ---- trained model, sentence scoring, humanizer v2, corpus cleaning ----
+import { scoreSentences, applyAlternative, ngramCounts } from "../public/ai-tools/engine.js";
+import { TRAINED_MODEL } from "../public/ai-tools/model.js";
+import { trainWithSplits, metrics } from "../scripts/ai-text-train.js";
+import { clean, looksLikePromptLeak, leadSection } from "../scripts/ai-text-corpus.js";
+
+const AI_ESSAY =
+  "In today's fast-paced world, technology plays a crucial role in education. Moreover, digital tools enhance learning outcomes for students across the globe. Additionally, online platforms provide access to a wide range of resources. In conclusion, embracing technology in education is essential for preparing students for the future. Overall, the integration of technology offers numerous benefits that cannot be ignored.";
+const HUMAN_NOTE =
+  "Honestly I wasn't sure the bus would come. We waited forty minutes in the rain, my shoes soaked through, and then two showed up at once — typical. Raj said he'd walk next time. I said he'd said that last week too. Anyway we got to the lab late and the centrifuge was booked till four, so that was the afternoon gone.";
+
+test("the built-in model is a valid trained model with word/phrase weights and test results", () => {
+  validateModel(TRAINED_MODEL);
+  assert.equal(TRAINED_MODEL.kind, "trained-ngram");
+  assert.ok(Object.keys(TRAINED_MODEL.ngrams).length > 1000);
+  assert.ok(TRAINED_MODEL.training.test_metrics.accuracy > 0.85);
+  assert.equal(typeof TRAINED_MODEL.sentenceThreshold, "number");
+});
+
+test("the trained model separates a stock AI paragraph from casual human writing and names the phrases", () => {
+  const ai = scoreText(AI_ESSAY, TRAINED_MODEL);
+  const human = scoreText(HUMAN_NOTE, TRAINED_MODEL);
+  assert.ok(ai.score > 70, `AI ${ai.score}`);
+  assert.ok(human.score < 30, `human ${human.score}`);
+  assert.ok(ai.phrases.ai.length > 0);
+  assert.ok(ai.notes.some((n) => n.includes("test texts")));
+});
+
+test("word and two-word phrase counts are lower case", () => {
+  assert.deepEqual([...ngramCounts("The cat. The cat!")], [["the", 2], ["the cat", 2], ["cat", 2], ["cat the", 1]]);
+});
+
+test("sentences are scored, located and flagged with their cues", () => {
+  const sentences = scoreSentences(AI_ESSAY, TRAINED_MODEL);
+  assert.equal(sentences.length, 5);
+  for (const s of sentences) assert.equal(AI_ESSAY.slice(s.index, s.index + s.sentence.length), s.sentence);
+  assert.ok(sentences.some((s) => s.aiLike && s.cues.length));
+  assert.deepEqual(scoreSentences(AI_ESSAY), [], "a model without phrase weights does not score sentences");
+});
+
+test("style edit offers alternatives, flags patterns and AI-like sentences", () => {
+  const r = styleEdit(`${AI_ESSAY} It is not just a tool, it is a revolution. Not only does it help, but also it inspires.`, { model: TRAINED_MODEL });
+  const kinds = new Set(r.suggestions.map((s) => s.kind));
+  for (const k of ["phrase", "pattern", "sentence"]) assert.ok(kinds.has(k), k);
+  const crucial = r.suggestions.find((s) => s.phrase?.toLowerCase().includes("crucial"));
+  assert.ok(crucial.alternatives.length > 0);
+  for (const s of r.suggestions.filter((x) => x.phrase)) {
+    assert.equal(r.text.slice(s.index, s.index + s.length).toLowerCase(), s.phrase.toLowerCase(), "indexes point into the returned text");
+  }
+});
+
+test("more wordy phrases are fixed automatically without changing grammar", () => {
+  const r = styleEdit("The majority of the samples were tested prior to analysis. We are able to make use of a large number of tools.");
+  assert.equal(r.text, "Most of the samples were tested before analysis. We can use many tools.");
+});
+
+test("an alternative replaces the phrase; Delete removes an opener and fixes capitals", () => {
+  const text = "Results were clear. Moreover, the method is crucial here.";
+  const r = styleEdit(text);
+  const moreover = r.suggestions.find((s) => s.phrase === "Moreover,");
+  assert.equal(applyAlternative(r.text, moreover, ""), "Results were clear. The method is crucial here.");
+  const crucial = r.suggestions.find((s) => s.phrase === "crucial");
+  assert.equal(applyAlternative(r.text, crucial, "key"), "Results were clear. Moreover, the method is key here.");
+});
+
+test("corpus cleaning removes prompt echoes, encoding junk and Wikipedia sections", () => {
+  assert.equal(clean("Write an abstract for a Wikipedia article with a title: \"X\". Abstract:\nX is a town."), "X is a town.");
+  assert.equal(clean("ĠHelloĠworld"), "Hello world");
+  assert.equal(clean("The prompt here is long enough. Then the answer.", { prompt: "The prompt here is long enough." }), "Then the answer.");
+  assert.ok(looksLikePromptLeak("Write a detailed response for the question. Use approximately 200 tokens."));
+  assert.ok(!looksLikePromptLeak("We measured the response of the cells."));
+  const article = "Alpha is a village in the north of the district with a long history of farming and trade.\nIt has two schools, a market and a temple that draws visitors in spring each year from nearby towns.\nHistory\nAlpha was founded in 1820.";
+  assert.ok(!leadSection(article).includes("History"));
+});
+
+test("training with a split column reports held-out test metrics", () => {
+  const ai = ["Furthermore, it is important to note that this approach is comprehensive.", "Moreover, the framework plays a crucial role in fostering robust outcomes.", "Additionally, stakeholders must navigate the complexities of this landscape."];
+  const hu = ["I didn't expect that.", "We went home early because it rained!", "My sister laughed, she's like that.", "Honestly, I can't say."];
+  const rows = [];
+  for (let i = 0; i < 80; i++) {
+    const split = i % 10 < 7 ? "train" : i % 10 < 8 ? "dev" : "test";
+    rows.push({ label: 1, split, domain: "x", generator: "g", text: `${ai[i % 3]} ${ai[(i + 1) % 3]} Item ${i}.` });
+    rows.push({ label: 0, split, domain: "x", generator: "human", text: `${hu[i % 4]} ${hu[(i + 2) % 4]} Item ${i}.` });
+  }
+  const { model } = trainWithSplits(rows, { grid: [{ l2: 1e-4, keep: 200, epochs: 4, minDf: 2 }] });
+  validateModel(model);
+  assert.ok(model.training.test_metrics.accuracy > 0.9);
+  assert.ok(Object.keys(model.ngrams).length <= 200);
+  assert.deepEqual(metrics([0.9, 0.1], [1, 0]).accuracy, 1);
+});

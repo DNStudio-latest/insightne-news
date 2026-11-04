@@ -5,16 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>AI text checker</title>
-<meta name="description" content="Check writing-style signals associated with AI-generated text and get plain-language style suggestions. Runs in your browser.">
+<meta name="description" content="Check whether a text reads as AI-generated, see the words and sentences behind the score, and get plain-language editing suggestions. Runs in your browser.">
 <style>
   :root {
     --bg: #f7f7f5; --card: #ffffff; --ink: #1d1d1b; --muted: #5f5f5a; --line: #deddd8;
     --accent: #1f5fa8; --ai: #b4442c; --human: #2f7d4f; --mid: #a07614; --soft: #eef2f7;
+    --mark: #fbe3dc; --chip: #f0efeb;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #151514; --card: #1f1f1d; --ink: #ecebe6; --muted: #a6a59e; --line: #3a3a36;
       --accent: #7fb0ea; --ai: #e88a73; --human: #7cc79a; --mid: #e0b75a; --soft: #26303b;
+      --mark: #4a2a22; --chip: #2b2b28;
     }
   }
   * { box-sizing: border-box; }
@@ -22,6 +24,7 @@
   main { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
   h1 { font-size: 1.6rem; margin: 0 0 4px; }
   h2 { font-size: 1.15rem; margin: 0 0 12px; }
+  h3 { font-size: 1rem; margin: 16px 0 6px; }
   p { margin: 0 0 10px; }
   .lede { color: var(--muted); margin-bottom: 18px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px; margin-bottom: 18px; }
@@ -32,10 +35,11 @@
   button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   @media (prefers-color-scheme: dark) { button.primary { color: #10233a; } }
   button:focus-visible, .file:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+  button.alt { padding: 2px 10px; font-size: .88rem; border-radius: 999px; background: var(--chip); }
   .file input { position: absolute; opacity: 0; width: 1px; height: 1px; }
   .muted { color: var(--muted); font-size: .9rem; }
   .count { margin-left: auto; }
-  .score { display: flex; align-items: baseline; gap: 12px; margin: 6px 0 8px; }
+  .score { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin: 6px 0 8px; }
   .score b { font-size: 2.4rem; line-height: 1; }
   .bar { height: 10px; border-radius: 5px; background: linear-gradient(90deg, var(--human), var(--mid), var(--ai)); position: relative; margin: 8px 0 4px; }
   .bar i { position: absolute; top: -5px; width: 4px; height: 20px; background: var(--ink); border-radius: 2px; transform: translateX(-2px); }
@@ -45,9 +49,14 @@
   th { color: var(--muted); font-weight: 600; }
   td.num { white-space: nowrap; }
   .ai { color: var(--ai); } .human { color: var(--human); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; padding: 0; list-style: none; }
+  .chips li { margin: 0; padding: 2px 10px; border-radius: 999px; background: var(--chip); font-size: .88rem; }
   ul { margin: 6px 0 0; padding-left: 20px; }
-  li { margin-bottom: 6px; }
+  li { margin-bottom: 8px; }
   .excerpt { display: block; color: var(--muted); font-size: .88rem; }
+  .alts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; align-items: center; }
+  .marked { white-space: pre-wrap; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); max-height: 420px; overflow: auto; }
+  mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 1px; }
   del { color: var(--ai); } ins { color: var(--human); text-decoration: none; }
   .error { color: var(--ai); }
   [hidden] { display: none !important; }
@@ -56,10 +65,10 @@
 <body>
 <main>
   <h1>AI text checker and style editor</h1>
-  <p class="lede">Measures writing-style signals often associated with AI-generated text, and suggests plainer wording. Your text stays in your browser. Nothing is uploaded.</p>
+  <p class="lede">Estimates whether a text reads as AI-generated, shows the words and sentences behind the score, and suggests plainer wording. Your text stays in your browser. Nothing is uploaded.</p>
 
   <div class="warn">
-    <strong>Read before use.</strong> A score is a statistical estimate, not proof of who wrote a text. Formal academic prose and writing by non-native English speakers can be flagged in error. Do not use a score alone to accuse anyone. The tool is designed for English text.
+    <strong>Read before use.</strong> A score is a statistical estimate, not proof of who wrote a text. The built-in model was right on about 9 in 10 test texts, but it wrongly flagged about 1 in 13 human texts, and it is less accurate on newer AI models and on unfamiliar genres. Formal academic prose and writing by non-native English speakers can be flagged in error. Do not use a score alone to accuse anyone. The tool is designed for English text.
   </div>
 
   <section class="card" aria-labelledby="check-h">
@@ -73,9 +82,9 @@
       <span class="count muted" id="count">0 words</span>
     </div>
     <div class="row">
-      <label class="file">Use a trained model (.json)<input type="file" id="model" accept=".json,application/json"></label>
-      <button id="reset-model" hidden>Use default model</button>
-      <span class="muted" id="model-name">Model: built-in default (uncalibrated)</span>
+      <label class="file">Use another model (.json)<input type="file" id="model" accept=".json,application/json"></label>
+      <button id="reset-model" hidden>Use built-in model</button>
+      <span class="muted" id="model-name"></span>
     </div>
     <p class="error" id="error" role="alert" hidden></p>
   </section>
@@ -85,8 +94,14 @@
     <div class="score"><b id="score"></b><span id="band"></span></div>
     <div class="bar"><i id="marker"></i></div>
     <div class="scale"><span>More human-like</span><span>More AI-like</span></div>
+    <div id="phrase-box" hidden>
+      <h3>Words and phrases that raised the score</h3>
+      <ul class="chips ai" id="phrases-ai"></ul>
+      <h3>Words and phrases that lowered it</h3>
+      <ul class="chips human" id="phrases-human"></ul>
+    </div>
     <table>
-      <thead><tr><th>Strongest signals</th><th>Value</th><th>Effect</th></tr></thead>
+      <thead><tr><th>Style measures with the most weight</th><th>Value</th><th>Effect</th></tr></thead>
       <tbody id="signals"></tbody>
     </table>
     <ul id="notes" class="muted"></ul>
@@ -95,14 +110,22 @@
   <section class="card" id="edits" hidden aria-live="polite">
     <h2>2. Style suggestions</h2>
     <p class="muted" id="disclaimer"></p>
-    <h3 class="muted">Changed automatically (<span id="change-count">0</span>)</h3>
+
+    <h3>Changed automatically (<span id="change-count">0</span>)</h3>
+    <p class="muted">Wordy phrases with an exact plain equivalent.</p>
     <ul id="changes"></ul>
-    <h3 class="muted">For you to review (<span id="sugg-count">0</span>)</h3>
-    <p class="muted">Phrases listed here often appear in machine-written prose. Keep any that are the correct term in your field.</p>
+
+    <h3>Your text, with AI-like sentences marked (<span id="sent-count">0</span>)</h3>
+    <div class="marked" id="marked"></div>
+
+    <h3>For you to review (<span id="sugg-count">0</span>)</h3>
+    <p class="muted">Click an option to apply it to the edited text below. Keep any word that is the correct term in your field. "Delete" removes the word or opener.</p>
     <ul id="suggestions"></ul>
-    <label for="output" class="muted">Edited text</label>
+
+    <label for="output"><h3>Edited text</h3></label>
     <textarea id="output"></textarea>
     <div class="row">
+      <button id="refresh">Update suggestions</button>
       <button id="copy">Copy edited text</button>
       <button id="use">Check edited text</button>
       <span class="muted" id="copied"></span>
@@ -111,11 +134,13 @@
 </main>
 
 <script type="module">
-import { scoreText, styleEdit, tokenize, validateModel, DEFAULT_MODEL } from "./engine.js";
+import { scoreText, styleEdit, applyAlternative, tokenize, validateModel } from "./engine.js";
+import { TRAINED_MODEL } from "./model.js";
 
 const $ = (id) => document.getElementById(id);
 const input = $("input");
-let model = DEFAULT_MODEL;
+const output = $("output");
+let model = TRAINED_MODEL;
 
 const el = (tag, text, cls) => {
   const node = document.createElement(tag);
@@ -127,6 +152,12 @@ const el = (tag, text, cls) => {
 function showError(message) {
   $("error").textContent = message;
   $("error").hidden = !message;
+}
+
+function showModelName() {
+  const tm = model.training?.test_metrics;
+  $("model-name").textContent = `Model: ${model.name || "custom"}` + (tm ? ` (test accuracy ${(tm.accuracy * 100).toFixed(1)}%, AUC ${tm.auc})` : "");
+  $("reset-model").hidden = model === TRAINED_MODEL;
 }
 
 function updateCount() {
@@ -142,31 +173,83 @@ function check(text) {
   $("band").textContent = r.bandText;
   $("band").className = r.band === "more-ai" ? "ai" : r.band === "more-human" ? "human" : "";
   $("marker").style.left = `${r.score}%`;
-  const rows = $("signals");
-  rows.replaceChildren();
-  for (const s of r.signals) {
+  const hasPhrases = r.phrases.ai.length + r.phrases.human.length > 0;
+  $("phrase-box").hidden = !hasPhrases;
+  $("phrases-ai").replaceChildren(...r.phrases.ai.map((p) => el("li", p)));
+  $("phrases-human").replaceChildren(...r.phrases.human.map((p) => el("li", p)));
+  $("signals").replaceChildren(...r.signals.map((s) => {
     const tr = el("tr");
     tr.append(el("td", s.label), el("td", String(s.value), "num"), el("td", s.effect, s.contribution > 0 ? "ai" : "human"));
-    rows.append(tr);
-  }
+    return tr;
+  }));
   $("notes").replaceChildren(...r.notes.map((n) => el("li", n)));
   $("result").hidden = false;
+}
+
+// Shows the edited text with AI-like sentences highlighted (built from text nodes only).
+function renderMarked(text, suggestions) {
+  const spans = suggestions.filter((s) => s.kind === "sentence").sort((a, b) => a.index - b.index);
+  const box = $("marked");
+  box.replaceChildren();
+  let at = 0;
+  for (const s of spans) {
+    if (s.index < at) continue;
+    box.append(text.slice(at, s.index));
+    const m = el("mark", text.slice(s.index, s.index + s.length));
+    m.title = s.cues?.length ? `Model cues: ${s.cues.join(", ")}` : "Reads as AI-written";
+    box.append(m);
+    at = s.index + s.length;
+  }
+  box.append(text.slice(at));
+  $("sent-count").textContent = spans.length;
+}
+
+function renderSuggestions(text, suggestions) {
+  $("sugg-count").textContent = suggestions.length;
+  renderMarked(text, suggestions);
+  if (!suggestions.length) {
+    $("suggestions").replaceChildren(el("li", "No suggestions.", "muted"));
+    return;
+  }
+  $("suggestions").replaceChildren(...suggestions.map((s) => {
+    const li = el("li", s.message);
+    if (s.excerpt && s.kind !== "sentence") li.append(el("span", s.excerpt, "excerpt"));
+    if (s.kind === "sentence") li.append(el("span", `“${s.excerpt}”`, "excerpt"));
+    if (s.alternatives?.length) {
+      const alts = el("div", undefined, "alts");
+      alts.append(el("span", "Replace with:", "muted"));
+      for (const a of s.alternatives) {
+        const b = el("button", a === "" ? "Delete" : a, "alt");
+        b.type = "button";
+        b.addEventListener("click", () => {
+          output.value = applyAlternative(output.value, s, a);
+          refresh();
+        });
+        alts.append(b);
+      }
+      li.append(alts);
+    }
+    return li;
+  }));
+}
+
+// Recomputes suggestions for the current edited text (no further automatic changes).
+function refresh() {
+  const r = styleEdit(output.value, { apply: false, model });
+  renderSuggestions(output.value, r.suggestions);
 }
 
 function edit() {
   showError("");
   if (!tokenize(input.value).length) { showError("Paste some text first."); return; }
-  const r = styleEdit(input.value);
+  const r = styleEdit(input.value, { model });
   $("disclaimer").textContent = r.disclaimer;
   $("change-count").textContent = r.changes.length;
-  $("sugg-count").textContent = r.suggestions.length;
   $("changes").replaceChildren(...(r.changes.length
     ? r.changes.map((c) => { const li = el("li"); li.append(el("del", c.from), " → ", el("ins", c.to)); return li; })
-    : [el("li", "No filler phrases found.", "muted")]));
-  $("suggestions").replaceChildren(...(r.suggestions.length
-    ? r.suggestions.map((s) => { const li = el("li", s.message); if (s.excerpt) li.append(el("span", s.excerpt, "excerpt")); return li; })
-    : [el("li", "No suggestions.", "muted")]));
-  $("output").value = r.text;
+    : [el("li", "No wordy phrases found.", "muted")]));
+  output.value = r.text;
+  renderSuggestions(r.text, r.suggestions);
   $("copied").textContent = "";
   $("edits").hidden = false;
 }
@@ -174,39 +257,40 @@ function edit() {
 input.addEventListener("input", updateCount);
 $("check").addEventListener("click", () => check(input.value));
 $("edit").addEventListener("click", edit);
+$("refresh").addEventListener("click", refresh);
 $("clear").addEventListener("click", () => {
   input.value = ""; updateCount(); showError("");
   $("result").hidden = true; $("edits").hidden = true;
 });
 $("use").addEventListener("click", () => {
-  input.value = $("output").value; updateCount(); check(input.value);
+  input.value = output.value; updateCount(); check(input.value);
   $("result").scrollIntoView({ behavior: "smooth" });
 });
 $("copy").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText($("output").value); $("copied").textContent = "Copied."; }
-  catch { $("output").select(); $("copied").textContent = "Press Ctrl+C to copy."; }
+  try { await navigator.clipboard.writeText(output.value); $("copied").textContent = "Copied."; }
+  catch { output.select(); $("copied").textContent = "Press Ctrl+C to copy."; }
 });
 $("model").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
   try {
     model = validateModel(JSON.parse(await file.text()));
-    const cv = model.training?.cv;
-    $("model-name").textContent = `Model: ${model.name || file.name}` + (cv ? ` (cross-validated AUC ${cv.auc})` : "");
-    $("reset-model").hidden = false;
+    showModelName();
     showError("");
     if (!$("result").hidden) check(input.value);
+    if (!$("edits").hidden) refresh();
   } catch (err) {
     showError(err instanceof SyntaxError ? "That file is not valid JSON." : err.message);
   }
   e.target.value = "";
 });
 $("reset-model").addEventListener("click", () => {
-  model = DEFAULT_MODEL;
-  $("model-name").textContent = "Model: built-in default (uncalibrated)";
-  $("reset-model").hidden = true;
+  model = TRAINED_MODEL;
+  showModelName();
   if (!$("result").hidden) check(input.value);
+  if (!$("edits").hidden) refresh();
 });
+showModelName();
 updateCount();
 </script>
 </body>

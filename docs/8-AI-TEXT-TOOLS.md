@@ -33,6 +33,8 @@ It keeps the dateline ("AGARTALA, Nov 4:") and tightens wordy sentences. Clean c
 
 The editor's version goes into the right-hand box with the headline on top. Under the two boxes, **What changed** shows every word removed (struck through, red) and added (green). The page also shows the **editor's notes**: questions for the reporter, such as a missing source, date or the other side's response. It lists what the editor changed and the AI-check score before and after.
 
+The editor's rules come from a study of Reuters, AP, PTI, IANS, UNI, the BBC, The Economist and the Press Council of India's norms: see [9-NEWS-WRITING-STANDARDS.md](9-NEWS-WRITING-STANDARDS.md).
+
 **It must not add facts.** The instructions forbid new names, figures, quotes, dates or claims; anything missing becomes a note. As a safety net, any figure in the edit that is not in the original is listed at the top of the notes. Always compare the edit with your source before publishing.
 
 This button is the only part of the checker that leaves the device: the text is sent to the website's AI, which costs a little per edit. It uses Claude when the site has `ANTHROPIC_API_KEY` or `OPENROUTER_API_KEY`, and otherwise Gemini (`GEMINI_API_KEY`). Each person can use it 30 times an hour. To use a stronger Claude model for editing than for the daily summaries, set `CLAUDE_EDITOR_MODEL` (for example `claude-sonnet-5-5`); for Gemini, `GEMINI_EDITOR_MODEL`.

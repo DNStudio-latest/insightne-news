@@ -42,6 +42,7 @@ Add `OPENROUTER_API_KEY` or `ANTHROPIC_API_KEY` later and Claude takes over agai
 | [docs/2-NEWS-SOURCES.md](docs/2-NEWS-SOURCES.md) | Adding, removing, or fixing news sources |
 | [docs/3-APPROVAL-PAGE.md](docs/3-APPROVAL-PAGE.md) | Using your approval page every day |
 | [docs/8-AI-TEXT-TOOLS.md](docs/8-AI-TEXT-TOOLS.md) | The AI text checker and style editor at `/ai-tools/` (research tool) |
+| [docs/9-NEWS-WRITING-STANDARDS.md](docs/9-NEWS-WRITING-STANDARDS.md) | How wire services write headlines, datelines, leads, bodies and endings (the rules behind the senior news editor) |
 
 ## The files you may edit yourself
 

@@ -82,3 +82,14 @@ test("the comparison shows removed and added words and keeps paragraphs", () => 
   assert.deepEqual(diffCounts(d), { removed: 4, added: 2 });
   assert.deepEqual(diffCounts(wordDiff("same text", "same text")), { removed: 0, added: 0 });
 });
+
+test("the style guide follows the news-writing study: dateline, lead, attribution, PCI norms, ending", () => {
+  assert.match(EDITOR_SYSTEM, /keep it exactly as\s+written/);
+  assert.match(EDITOR_SYSTEM, /Never add a dateline/);
+  assert.match(EDITOR_SYSTEM, /20 to 35 words/);
+  assert.match(EDITOR_SYSTEM, /Do not write "occurred"/);
+  assert.match(EDITOR_SYSTEM, /Never name or identify a victim of rape/);
+  assert.match(EDITOR_SYSTEM, /Press Council of India/);
+  assert.match(EDITOR_SYSTEM, /ENDING/);
+  assert.match(EDITOR_SYSTEM, /"stated", "noted", "commented", "informed", "opined"/);
+});

@@ -7,6 +7,7 @@ import { readability } from "../lib/hunter/pdf.js";
 import { createLocalHunterStore } from "../lib/hunter/store.js";
 import { runHunter } from "../lib/hunter/run.js";
 import os from "node:os";
+import dns from "node:dns/promises";
 import path from "node:path";
 
 const SOURCE = `The Chief Minister said, “We will open 25 new schools in Dhalai district by March 2027.”
@@ -106,6 +107,10 @@ test("on GitHub, government pages go through the website's Mumbai server; only w
   const { GET } = await import("../app/api/hunter-fetch/route.js");
   const upstream = [];
   const realFetch = globalThis.fetch;
+  // The relay's safety check looks up each site's internet address. A made-up public address is used here,
+  // so the test does not need the internet (cloud sessions and some computers cannot look up outside sites).
+  const realLookup = dns.lookup;
+  dns.lookup = async () => [{ address: "164.100.1.1", family: 4 }];
   globalThis.fetch = async (url, init) => {
     upstream.push({ url, ua: init.headers["User-Agent"] });
     return Object.defineProperty(new Response("<p>press release</p>", { status: 200, headers: { "content-type": "text/html" } }), "url", { value: url });
@@ -124,6 +129,7 @@ test("on GitHub, government pages go through the website's Mumbai server; only w
     assert.equal(relayAllowed("https://evil.com/?x=.gov.in"), false);
   } finally {
     globalThis.fetch = realFetch;
+    dns.lookup = realLookup;
   }
 });
 

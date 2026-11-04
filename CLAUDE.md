@@ -4,7 +4,7 @@ A Next.js news website for Tripura and Northeast India, deployed on Vercel from 
 
 ## Working on this repository
 
-- Tests: `npm test` (Node's built-in test runner, `tests/*.test.js`). One test, "on GitHub, government pages go through the website's Mumbai server…" in `tests/hunter.test.js`, already fails on `main`. It is unrelated to the AI tools; do not treat it as a regression.
+- Tests: `npm test` (Node's built-in test runner, `tests/*.test.js`). All tests should pass, including without internet access.
 - Build: `npx next build`. Three "Dynamic filesystem access" warnings from the News Hunter's local database are expected.
 - Run locally without real services: `ADMIN_PASSWORD=… SESSION_SECRET=<32+ chars> LOCAL_DB_FILE=<file> npx next start`. The admin panel is at `/admin`.
 - Publishing: commit to a branch, open a pull request, and merge it only when the owner says to publish.

@@ -13,6 +13,23 @@ Signed-in staff (admin, editors and sub-editors) also have the tool at **`/admin
 
 In **✍ Write story**, the **🤖 Check this text for AI** button (under the story text) opens the checker in a new tab, with the intro and story text already filled in. The story itself is not saved or changed. Copy any edits you want back into the story.
 
+### Edit like a senior news editor (admin panel only)
+
+On `/admin/ai-check`, **📰 Edit like a senior news editor** rewrites the pasted report to international wire-service standard, in the house style of agencies such as Reuters, AFP, AP and PTI:
+
+- the most important new fact first (inverted pyramid), with a one-sentence lead that says who, what, where and when;
+- every claim attributed with "said"; allegations kept as allegations;
+- plain, neutral Indian English, with no clichés, hype or stock AI phrasing;
+- a sentence-case headline of 8 to 14 words.
+
+The editor's version goes into **Edited text** with the headline on top. The page also shows the **editor's notes**: questions for the reporter, such as a missing source, date or the other side's response. It lists what the editor changed and the AI-check score before and after.
+
+**It must not add facts.** The instructions forbid new names, figures, quotes, dates or claims; anything missing becomes a note. As a safety net, any figure in the edit that is not in the original is listed at the top of the notes. Always compare the edit with your source before publishing.
+
+This button is the only part of the checker that leaves the device: the text is sent to the website's AI, which costs a little per edit. It uses Claude when the site has `ANTHROPIC_API_KEY` or `OPENROUTER_API_KEY`, and otherwise Gemini (`GEMINI_API_KEY`). Each person can use it 30 times an hour. To use a stronger Claude model for editing than for the daily summaries, set `CLAUDE_EDITOR_MODEL` (for example `claude-sonnet-5-5`); for Gemini, `GEMINI_EDITOR_MODEL`.
+
+The public `/ai-tools/` page does not have this button, so visitors cannot spend the site's AI budget.
+
 ## Read this first
 
 - **A score is not proof.** The built-in model is right on about 9 in 10 test texts, but it wrongly flags about 1 in 13 human texts. Formal academic prose and writing by non-native English speakers are flagged in error more often (Liang et al., 2023, "GPT detectors are biased against non-native English writers", *Patterns*). Never use a score alone as evidence against a person.
@@ -98,7 +115,62 @@ npm run ai-text-train -- corpus.csv --out public/ai-tools/model.js --name "M4 + 
 node scripts/ai-text-experiments.js corpus.csv --out experiments.json
 ```
 
-## Use it on your PC (no internet, nothing to install)
+## Teach it Gemini's writing
+
+The built-in model has never seen Google Gemini text, and AI models it has not seen are its weak spot. In tests, it caught only 39–69% of texts from a left-out model. Adding Gemini texts to the training data fixes that for Gemini. `scripts/ai-text-gemini.js` pairs each chosen human text with a Gemini text of the same genre, length and topic, and gives both the same train/test group, so the test stays fair.
+
+**Your Gemini subscription and the API.** A Google AI Pro (Gemini app) subscription covers the Gemini app and the AI Studio website. It does not include a Gemini API key or API usage. A separate API key from **aistudio.google.com → Get API key** is free and has a daily free quota for some models; check the current limits in AI Studio. Before you publish results, check Google's Gemini API terms on using its output.
+
+**A) Automatic, with an API key (recommended: hundreds of texts).**
+
+1. Create a free key at aistudio.google.com. Use a separate key from the website's `GEMINI_API_KEY`, so research runs do not use up the website's free summaries.
+2. Make the key available as `GEMINI_API_KEY`. On your PC, put `GEMINI_API_KEY=your-key` in a `.env` file in the project folder. Never commit that file. In a Claude Code cloud session, add it as an environment variable in the environment settings, and start a new session. Never paste the key into a chat.
+3. Build the corpus (see "How the corpus was cleaned"), then run:
+
+   ```bash
+   node --env-file=.env scripts/ai-text-gemini.js corpus.csv --out gemini.csv --per-domain 150
+   ```
+
+   This asks for 1,200 texts, 150 in each of the 8 genres. It uses `gemini-flash-latest` unless you add `--model`. Free-tier keys allow only a limited number of requests a day. When the limit is reached the script stops and says so; run the same command the next day and it continues where it stopped.
+4. Retrain on both files and test:
+
+   ```bash
+   npm run ai-text-train -- corpus.csv gemini.csv --out public/ai-tools/model.js --name "M4 + Ghostbuster + Gemini"
+   ```
+
+   ```bash
+   node scripts/ai-text-experiments.js corpus.csv gemini.csv --out experiments.json
+   ```
+
+   The experiment report now includes "Unseen generator: gemini": how much Gemini text the detector catches without having seen Gemini. That figure is worth reporting on its own.
+
+**First results (November 2026, 77 texts written in the Gemini app).** Each Gemini text was matched to a human text of the same genre and topic. 79 of the 80 prompts were answered, and 2 answers were dropped as too short (under 50 words). Full figures are in `docs/ai-text-gemini-eval.json`; reproduce them with `node scripts/ai-text-new-model-eval.js corpus.csv gemini.csv`.
+
+| Gemini texts caught | Zero-shot (built-in model, never saw Gemini) | After adding Gemini texts to training (5-fold) |
+|---|---|---|
+| **All genres** | **34 / 77 (44%)**, AUC 0.81 | **45 / 77 (58%)** |
+| Student essays | 9 / 10 | 10 / 10 |
+| News | 8 / 10 | 8 / 10 |
+| Short stories | 8 / 10 | 8 / 10 |
+| WikiHow | 7 / 10 | 7 / 10 |
+| Peer reviews | 1 / 10 | 5 / 10 |
+| arXiv abstracts | 0 / 10 | 5 / 10 |
+| Wikipedia | 1 / 8 | 2 / 8 |
+| Reddit ELI5 | 0 / 9 | 0 / 9 |
+
+Human texts wrongly flagged stayed at 7.6–8.0% in all five folds. With only about 10 texts per genre, each genre figure is a rough estimate: one text is 10 percentage points. Training a full model on the corpus plus the 77 texts gave 90.5% test accuracy and an 8.2% false-positive rate, compared with 90.9% and 7.6% for the built-in model. So the built-in model was kept unchanged until more Gemini texts are available, through route A.
+
+What this shows: Gemini's academic and explanatory writing (abstracts, peer reviews, ELI5 answers) usually passes as human to a detector trained on older AI models. A few dozen examples help in some genres but are not enough.
+
+**B) By hand, in the Gemini app (about 50–100 texts).**
+
+1. Export a prompt sheet: `node scripts/ai-text-gemini.js corpus.csv --prompts-out gemini-prompts.csv --per-domain 10` (80 prompts).
+2. Open it in Google Sheets or Excel. Paste each prompt into a new Gemini chat and paste the reply into the **answer** column of the same row. Rows you leave empty are skipped.
+3. Save it as CSV (Excel's plain "CSV" and "CSV UTF-8" both work) and import it: `node scripts/ai-text-gemini.js corpus.csv --import gemini-prompts.csv --out gemini.csv`. Use the same `corpus.csv` and `--per-domain` as in step 1, so the answers match their prompts.
+
+A hand-made set is too small to train on well, but it makes a good **test** of how much Gemini text the current model catches. Use a new chat for each prompt, so earlier answers do not shape later ones.
+
+
 
 Use the single-file version, `ai-text-checker.html`. Save it anywhere (for example, Documents) and double-click it to open it in Chrome, Edge or Firefox. It contains the whole tool and the built-in model, so it needs no Python, Node or web server.
 
@@ -148,6 +220,9 @@ AUC is the usual figure to report: 0.5 means chance and 1.0 means perfect separa
 | `scripts/ai-text-corpus.js` | Builds the cleaned corpus from M4 and Ghostbuster |
 | `scripts/ai-text-train.js` | Training and evaluation |
 | `scripts/ai-text-experiments.js` | Baselines and unseen-model / unseen-domain tests |
+| `scripts/ai-text-gemini.js` | Adds Gemini texts to the corpus (API or by hand) |
+| `lib/news-editor.js` | The "senior news editor" instructions and rewrite (admin panel) |
+| `scripts/ai-text-new-model-eval.js` | How well the detector catches a new AI model (zero-shot and 5-fold) |
 | `scripts/ai-text-standalone.js` | Builds the single-file version for use on a PC |
 | `tests/ai-text.test.js` | Tests (`npm test`) |
 

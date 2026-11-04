@@ -1,6 +1,6 @@
 // Trains the AI-text detector on labelled texts and reports how well it works.
 //
-//   npm run ai-text-train -- data.csv [--out model.json] [--name "My model"]
+//   npm run ai-text-train -- data.csv [more.csv …] [--out model.json] [--name "My model"]
 //
 // data.csv needs a header row with the columns "label" and "text".
 //   label: ai / 1 / machine / llm  (machine-written)   or   human / 0  (human-written)
@@ -24,25 +24,50 @@ const HUMAN_LABELS = new Set(["human", "0", "person"]);
 // ---------- CSV ----------
 
 // RFC 4180 CSV: quoted fields may hold commas, newlines and doubled quotes ("").
+// Fields are copied as whole slices (not character by character), so large corpora fit in memory.
 export function parseCsv(text) {
   const rows = [];
   let row = [];
-  let field = "";
-  let quoted = false;
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
-    if (quoted) {
-      if (ch === '"' && text[i + 1] === '"') { field += '"'; i++; }
-      else if (ch === '"') quoted = false;
-      else field += ch;
-    } else if (ch === '"') quoted = true;
-    else if (ch === ",") { row.push(field); field = ""; }
-    else if (ch === "\n" || ch === "\r") {
-      if (ch === "\r" && text[i + 1] === "\n") i++;
-      row.push(field); rows.push(row); row = []; field = "";
-    } else field += ch;
+  let i = 0;
+  const n = text.length;
+  while (i < n) {
+    let field;
+    if (text[i] === '"') {
+      const parts = [];
+      let from = i + 1;
+      for (;;) {
+        const q = text.indexOf('"', from);
+        if (q < 0) { parts.push(text.slice(from)); i = n; break; }
+        parts.push(text.slice(from, q));
+        if (text[q + 1] === '"') { parts.push('"'); from = q + 2; continue; }
+        i = q + 1;
+        break;
+      }
+      field = parts.join("");
+      // Anything between the closing quote and the next separator is kept, as lenient parsers do.
+      let j = i;
+      while (j < n && text[j] !== "," && text[j] !== "\n" && text[j] !== "\r") j++;
+      if (j > i) field += text.slice(i, j);
+      i = j;
+    } else {
+      let j = i;
+      while (j < n && text[j] !== "," && text[j] !== "\n" && text[j] !== "\r") j++;
+      field = text.slice(i, j);
+      i = j;
+    }
+    row.push(field);
+    if (i >= n) { rows.push(row); break; }
+    const sep = text[i];
+    if (sep === ",") {
+      i++;
+      if (i >= n) { row.push(""); rows.push(row); }
+      continue;
+    }
+    // Line end (\n, \r or \r\n).
+    i += sep === "\r" && text[i + 1] === "\n" ? 2 : 1;
+    rows.push(row);
+    row = [];
   }
-  if (field !== "" || row.length) { row.push(field); rows.push(row); }
   return rows.filter((r) => r.some((c) => c.trim() !== ""));
 }
 
@@ -386,12 +411,14 @@ function main(argv) {
     const i = args.indexOf(flag);
     return i >= 0 ? args[i + 1] : fallback;
   };
-  const file = args.find((a, i) => !a.startsWith("--") && !(i > 0 && args[i - 1].startsWith("--")));
+  // One or more CSV files (for example the corpus and a file of Gemini texts).
+  const files = args.filter((a, i) => !a.startsWith("--") && !(i > 0 && args[i - 1].startsWith("--")));
+  const file = files[0];
   if (!file) {
-    console.log("Usage: npm run ai-text-train -- data.csv [--out model.json] [--name NAME] [--folds 5] [--l2 0.01]");
+    console.log("Usage: npm run ai-text-train -- data.csv [more.csv …] [--out model.json] [--name NAME] [--folds 5] [--l2 0.01]");
     process.exit(1);
   }
-  const rows = loadRows(readFileSync(file, "utf8"));
+  const rows = files.flatMap((f) => loadRows(readFileSync(f, "utf8")));
   const out = opt("--out", "ai-text-model.json");
   const name = opt("--name", `Trained on ${file}`);
 

@@ -49,6 +49,21 @@ This button is the only part of the checker that leaves the device: the text is 
 
 The public `/ai-tools/` page does not have this button, so visitors cannot spend the site's AI budget.
 
+## House style on every AI tool
+
+Every AI tool that writes for the website follows the senior editor's writing rules and gets the AI checker's automatic corrections:
+
+| AI tool | Senior editor's rules in its instructions | Automatic corrections on its answer |
+|---|---|---|
+| Senior news editor | Yes (its full instructions) | Headline, short headline, other headlines, intro and body |
+| Daily news summaries (Claude or Gemini) | Yes | Headline and summary |
+| Research desk and News Hunter drafts | Yes, after the writer's own rules on facts and quotes | Headline, paragraphs and attribution |
+
+- **The rules** are the senior editor's sections on attribution, plain words, and crime and fairness: "said", no "occurred", no ", prompting…" clauses, allegations kept as allegations, the Press Council of India norms and Indian English style. They are kept once, in `lib/house-style.js`, and the senior editor's instructions include them from there, so changing a rule changes it for every tool.
+- **The automatic corrections** are the AI checker's safe replacements (`SAFE_REPLACEMENTS` in `public/ai-tools/engine.js`, for example "in order to" → "to", "prior to" → "before"). They are made on the AI's answer before it is saved. Words inside quotation marks are never changed, so quotes stay word for word and the News Hunter's quote check still works.
+- **Cost:** the rules add about 1,100 tokens to each summary and draft request.
+- **Not changed:** Bengali and other translations, the News Hunter's news judgement, and the Gemini texts collected for training the detector (`scripts/ai-text-gemini.js`), which must stay as Gemini wrote them.
+
 ## Teach the AI (admin panel)
 
 **🧠 Teach the AI** (`/admin/ai-lessons`, also linked from the AI checker) lets the desk correct the AI tools without a code change. A lesson is a phrase the AI should stop using, an optional better wording, and an optional one-sentence reason. Tick the tools that should learn it:
@@ -260,6 +275,7 @@ AUC is the usual figure to report: 0.5 means chance and 1.0 means perfect separa
 | `scripts/ai-text-experiments.js` | Baselines and unseen-model / unseen-domain tests |
 | `scripts/ai-text-gemini.js` | Adds Gemini texts to the corpus (API or by hand) |
 | `lib/news-editor.js` | The "senior news editor" instructions and rewrite (admin panel) |
+| `lib/house-style.js` | The senior editor's writing rules and the automatic corrections, shared by every AI tool |
 | `lib/ai-lessons.js`, `lib/ai-lessons-store.js` | Teach the AI: lessons from the desk for the editor, summaries, Research desk and News Hunter drafts, and checker |
 | `scripts/ai-text-new-model-eval.js` | How well the detector catches a new AI model (zero-shot and 5-fold) |
 | `scripts/ai-text-standalone.js` | Builds the single-file version for use on a PC |

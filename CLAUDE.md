@@ -16,11 +16,14 @@ A Next.js news website for Tripura and Northeast India, deployed on Vercel from 
 | Public AI-text checker (runs in the browser) | `public/ai-tools/` (`index.html`, `engine.js`, trained `model.js`) |
 | Admin AI checker (side-by-side boxes, "What changed", headlines and intro) | `app/admin/ai-check/` |
 | Senior news editor (the AI rewrite, server side) | `lib/news-editor.js`; length targets in `lib/editor-lengths.js` |
+| Shared house style (editor's writing rules + automatic corrections for every AI tool) | `lib/house-style.js` |
 | Teach the AI (desk lessons for the editor, summaries, Research desk and News Hunter drafts, and checker) | `app/admin/ai-lessons/`, `lib/ai-lessons.js`, `lib/ai-lessons-store.js` |
 | Training, corpus and evaluation scripts | `scripts/ai-text-*.js` |
 | Guides | `docs/8-AI-TEXT-TOOLS.md` (tools, results), `docs/9-NEWS-WRITING-STANDARDS.md` (the newsroom study behind the editor) |
 
-**House rules the owner has set for the senior editor.** They are already in `EDITOR_SYSTEM`; keep them when changing it:
+**House style on every AI tool (owner's instruction, November 2026).** The senior editor's writing rules (`WRITING_RULES` in `lib/house-style.js`, included in `EDITOR_SYSTEM`) are also given to the daily summaries and to the Research desk and News Hunter drafts. The AI checker's `SAFE_REPLACEMENTS` are applied to every AI answer, never inside quotation marks. A new AI tool that writes for the website must use both. Do not apply them to translations or to the Gemini training texts.
+
+**House rules the owner has set for the senior editor.** They are already in `EDITOR_SYSTEM` (the writing rules through `lib/house-style.js`); keep them when changing it:
 
 - Never add a fact. Anything missing becomes an editor's note. Figures that appear only in the edit are flagged automatically.
 - Dateline house style: `Agartala, Nov 4:`, with the place in normal capitals (`houseDateline()` enforces this). Keep the reporter's dateline and never add one.

@@ -17,7 +17,7 @@ This is the study behind the "senior news editor" in the admin AI checker (`lib/
 
 Rules:
 - The dateline says where the news was gathered. Reuters uses one only when its own staff or stringers are at that place (Reuters Handbook).
-- Each publication keeps one house form. InsightNE's form is `AGARTALA, Nov 4:`. **The editor keeps the reporter's dateline as written and never adds one.** A place and date are facts.
+- Each publication keeps one house form. **InsightNE's form is `Agartala, Nov 4:`**: the place in normal capitals, as PTI, IANS and UNI write it, not `AGARTALA`. The editor keeps the reporter's place, date and punctuation, writes the place in normal capitals, and never adds a dateline. A place and date are facts.
 
 ## 2. Headline
 

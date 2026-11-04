@@ -29,7 +29,7 @@ The editor also runs the **desk checks** a senior editor makes on every story. P
 - **fairness:** was the other side asked for a response?
 - **clarity** and **legal risk**.
 
-It keeps the dateline ("AGARTALA, Nov 4:") and tightens wordy sentences. Clean copy is changed only where it can be improved, so a well-written report may come back with few changes and useful notes.
+It keeps the dateline in the house style "Agartala, Nov 4:" (place in normal capitals) and tightens wordy sentences. Clean copy is changed only where it can be improved, so a well-written report may come back with few changes and useful notes.
 
 The editor's version goes into the right-hand box with the headline on top. Under the two boxes, **What changed** shows every word removed (struck through, red) and added (green). The page also shows the **editor's notes**: questions for the reporter, such as a missing source, date or the other side's response. It lists what the editor changed and the AI-check score before and after.
 

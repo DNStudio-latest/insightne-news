@@ -585,3 +585,11 @@ main { padding: 20px 0 40px; }
 .aic-pro:disabled { opacity: 0.7; cursor: wait; }
 .aic-beforeafter { font-size: 0.95rem; margin: 4px 0; }
 .aic-notes li { color: var(--warn); }
+/* AI checker: original and edited text side by side (stacked on phones). */
+.wrap.aic-wide { max-width: 1240px; }
+.aic-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.aic-col { display: grid; gap: 10px; min-width: 0; }
+.aic-col textarea.body { min-height: 420px; }
+.aic-col textarea[readonly] { background: var(--bg); color: var(--muted); }
+.aic-actions .btn:disabled { opacity: 0.55; cursor: default; }
+@media (max-width: 860px) { .aic-compare { grid-template-columns: 1fr; } .aic-col textarea.body { min-height: 260px; } }

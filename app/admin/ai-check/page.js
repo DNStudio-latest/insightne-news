@@ -11,7 +11,7 @@ export default async function AiCheckPage() {
   if (!user) redirect("/admin/login");
 
   return (
-    <div className="wrap">
+    <div className="wrap aic-wide">
       <div className="admin-bar">
         <h1>🤖 AI checker</h1>
         <a className="btn btn-plain" href="/admin">← Back</a>

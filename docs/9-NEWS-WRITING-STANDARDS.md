@@ -34,6 +34,46 @@ Rules:
 - **A strong active verb in the first sentence.** Do not open with a question, with "as expected", or with "It has been suggested that…": state the fact and then attribute it. Source: BBC News Styleguide ([copy](https://www.peteburns.com/downloads/BBC%20news%20styleguide.pdf)).
 - The Five Ws (who, what, when, where, why) are the checklist ([Wikipedia, Five Ws](https://en.wikipedia.org/wiki/Five_Ws)). Leaving the main point out of the first paragraph is "burying the lead" ([Wikipedia, Lead paragraph](https://en.wikipedia.org/wiki/Lead_paragraph)).
 
+## 3a. Headlines and intros for digital news (study of November 2026)
+
+**Real headlines and leads from Indian agencies this week** (short quotations for study):
+
+| Agency | Headline | Lead (as reported) | What a wire desk keeps / changes |
+|---|---|---|---|
+| ANI, 3 Nov | "3 BSF jawans injured in brutal attack by smugglers in Tripura's Boxanagar; tension grips Ashabari" | "Three Border Security Force (BSF) jawans were brutally assaulted by a group of alleged smugglers in the Ashabari area under Boxanagar in Tripura on Monday." | Keeps: number first, place in headline, abbreviation spelled out, "alleged". Changes: "brutal"/"brutally" (judgement word), passive lead, second clause after the semicolon. ([ANI](https://www.aninews.in/news/national/general-news/3-bsf-jawans-injured-in-brutal-attack-by-smugglers-in-tripura8217s-boxanagar-tension-grips-ashabari20261103022328/)) |
+| ANI, 3 Nov | "8 arrested for assault on BSF personnel in Tripura's Ashabari; CM Manik Saha assures strict action" | — | Number first; a follow-up headline leads with the new development (arrests). ([ANI](https://aninews.in/news/national/general-news/8-arrested-for-assault-on-bsf-personnel-in-tripuras-ashabari-cm-manik-saha-assures-strict-action20261103101417/)) |
+| PTI, 4 Nov | "Two youths held with three pistols, 50 cartridges in Tripura" | "…were arrested with three sophisticated pistols and 50 cartridges in Agartala on Wednesday, police said." | Short, factual, place in headline, attribution at the end of the lead. ([ThePrint/PTI](https://theprint.in/india/two-youths-held-with-three-pistols-50-cartridges-in-tripura/3090893/)) |
+
+**Headline length and wording online**
+
+- Google sets no maximum title length, but it cuts the title link to fit the device, usually about 600 pixels, or roughly 55–60 characters on desktop. It advises against long, wordy titles ([Google Search Central](https://developers.google.com/search/docs/appearance/title-link); [Zyppy](https://zyppy.com/title-tags/meta-title-tag-length/)). Google may rewrite titles, so put the important words first.
+- Google News: headlines should be clear and accurate, and the page title should match the headline ([Google Publisher Center](https://support.google.com/news/publisher-center/answer/9607104?hl=en); [Search Engine Land](https://searchengineland.com/google-shares-tips-for-success-in-google-news-search-results-310702)).
+- The BBC News website introduced **two headlines** per story: a short one of 31–33 characters for the front page and mobile, and a longer one of up to 55 characters for the story page and search ([journalism.co.uk](https://www.journalism.co.uk/bbc-news-site-introduces-dual-headlines-for-seo/)). BBC headlines averaged 5 words and 34 characters ([Nielsen Norman Group](https://www.nngroup.com/articles/worlds-best-headlines-bbc-news/)).
+- **Front-load key words:** readers scan the first words of a headline ([Nielsen Norman Group](https://www.nngroup.com/articles/headings-pickup-lines/)). For news, place a main key word and at most one secondary phrase near the start, without keyword stuffing ([SEO for Journalism](https://www.seoforjournalism.com/p/three-tips-to-write-effective-seo)).
+- **Attribution in headlines:** relying only on "police say" frames a story around one side ([Nieman Reports](https://niemanreports.org/articles/kansas-city-police-community-reporting)). Keep attribution or "alleged" in headlines on allegations, and seek other sources.
+
+**The intro (summary or standfirst)**
+
+- The BBC website's summaries are a single sentence in the present tense with the most important facts ([BBC website writing guide](https://www.slideshare.net/slideshow/guide-for-journos-writing-for-bbc-website/10074152)). A standfirst links the headline to the story ([Guardian Foundation glossary](https://theguardianfoundation.org/assets/files/behind-the-headlines-resources/behind-the-headlines-newspaper-terminology-aug-2021.pdf)).
+
+**Types of lead**
+
+- There are two families: **direct** (summary) leads for hard news, and **delayed** leads for features ([Columbia, Mencher](https://www.columbia.edu/itc/journalism/isaacs/client_edit/Mencher.html); [Poynter](https://www.poynter.org/educators-students/2017/2-types-of-leads-that-get-right-to-the-news/)).
+- A **summary lead** gives the main news value and usually answers the Five Ws ([Ohio State](https://ohiostate.pressbooks.pub/stratcommwriting/chapter/summary-lead/)).
+- A **delayed-identification lead** describes a person who is not well known and names them later. Well-known people are named first ([Intro to Journalism, ch. 8](https://pressbooks.pub/introjournalism/chapter/chapter-8-leads/)).
+- **Impact leads** say how readers are affected; **updated leads** advance a known story ([Fiveable](https://fiveable.me/lists/types-of-news-leads)).
+
+**How the senior editor uses this**
+
+It writes:
+- a **main headline** of 55–70 characters with key words first;
+- a **short headline** of 30–45 characters;
+- **two alternative headlines**;
+- an **intro** of one sentence, 20–30 words, in the present tense, that does not repeat the headline;
+- a **lead** of 20–35 words, of the type that fits the story (summary, delayed identification, attribution at the end, decision, statement, toll first, or follow-up).
+
+These targets are in `lib/editor-lengths.js`.
+
 ## 4. Body
 
 - **Inverted pyramid:** facts in descending order of importance ([Poynter](https://www.poynter.org/reporting-editing/2025/journalism-words-reporting-terms-off-the-record/), [Wikipedia](https://en.wikipedia.org/wiki/Inverted_pyramid_(journalism))).

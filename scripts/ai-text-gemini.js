@@ -143,9 +143,20 @@ export function writePrompts(rows, { file, perDomain }) {
   return picked.length;
 }
 
+// Excel's plain "CSV" format saves in Windows-1252, not UTF-8. Such a file is decoded as Windows-1252,
+// so curly quotes and dashes in the answers survive.
+export function readAnyText(file) {
+  const bytes = readFileSync(file);
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+  } catch {
+    return new TextDecoder("windows-1252").decode(bytes);
+  }
+}
+
 export function importAnswers(rows, { answers, out, perDomain }) {
   const byId = new Map(pickHumanTexts(rows, perDomain).map((h) => [idFor(h), h]));
-  const [header, ...body] = parseCsv(readFileSync(answers, "utf8").replace(/^﻿/, ""));
+  const [header, ...body] = parseCsv(readAnyText(answers).replace(/^\uFEFF/, ""));
   const cols = header.map((h) => h.trim().toLowerCase());
   const ii = cols.indexOf("id");
   // The filled-in prompts file (answer column) or a plain id,text file.

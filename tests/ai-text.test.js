@@ -186,7 +186,7 @@ test("training with a split column reports held-out test metrics", () => {
 import { mkdtempSync, readFileSync as readText, writeFileSync as writeText } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { pickHumanTexts, promptFor, tidy, generateWithApi, writePrompts, importAnswers } from "../scripts/ai-text-gemini.js";
+import { pickHumanTexts, promptFor, tidy, generateWithApi, writePrompts, importAnswers, readAnyText } from "../scripts/ai-text-gemini.js";
 
 const humanRows = ["arxiv", "gb-essay"].flatMap((domain) =>
   Array.from({ length: 4 }, (_, i) => ({
@@ -242,4 +242,14 @@ test("manual mode: prompts out, answers in", () => {
   const r = importAnswers(humanRows, { answers, out: join(dir, "gemini.csv"), perDomain: 1 });
   assert.equal(r.saved, 1);
   assert.deepEqual(r.problems, ["unknown id nope"]);
+});
+
+test("an answers file saved by Excel as Windows-1252 keeps its dashes and quotes", () => {
+  const dir = mkdtempSync(join(tmpdir(), "gem-"));
+  const cp1252 = join(dir, "excel.csv");
+  writeText(cp1252, Buffer.from([0x22, 0x61, 0x97, 0x62, 0x92, 0x63, 0x22])); // "a—b’c" in Windows-1252
+  assert.equal(readAnyText(cp1252), '"a—b’c"');
+  const utf8 = join(dir, "utf8.csv");
+  writeText(utf8, '"a—b’c"');
+  assert.equal(readAnyText(utf8), '"a—b’c"');
 });

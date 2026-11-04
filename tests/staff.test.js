@@ -20,3 +20,15 @@ test("stories count for a person by id, or by byline name for older stories", ()
   assert.deepEqual(storyCounts(rows, editors), { a: 3, b: 1 });
   assert.deepEqual(storyCounts([], editors), { a: 0, b: 0 });
 });
+
+test("Kokborok editing: editors and admin always; sub-editors only when named, letter case and spacing ignored", async () => {
+  const { canEditKokborok } = await import("../lib/staff.js");
+  const names = ["Elisa", "Anita", "Mary John"];
+  assert.equal(canEditKokborok({ role: "admin", name: "Admin" }, []), true);
+  assert.equal(canEditKokborok({ role: "editor", name: "Rina" }, []), true);
+  assert.equal(canEditKokborok({ role: SUB_EDITOR, name: "elisa" }, names), true);
+  assert.equal(canEditKokborok({ role: SUB_EDITOR, name: "  Mary   John " }, names), true);
+  assert.equal(canEditKokborok({ role: SUB_EDITOR, name: "Mary" }, names), false);
+  assert.equal(canEditKokborok({ role: SUB_EDITOR, name: "Amit Paul" }, names), false);
+  assert.equal(canEditKokborok(null, names), false);
+});

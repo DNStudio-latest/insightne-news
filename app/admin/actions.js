@@ -21,7 +21,8 @@ import { hunterStore } from "../../lib/hunter/store.js";
 import { hasCheckMarks } from "../../lib/hunter/checks.js";
 import { settings, regions } from "../../lib/config.js";
 import { currentRole, currentUser, userForPassword, hashPassword, startSession, endSession } from "../../lib/auth.js";
-import { SUB_EDITOR, staffTitle } from "../../lib/staff.js";
+import { SUB_EDITOR, staffTitle, canEditKokborok } from "../../lib/staff.js";
+import { translationsAfterEdit } from "../../lib/languages.js";
 import { researchAndDraft } from "../../lib/research.js";
 import { clientIp, rateLimit } from "../../lib/rate-limit.js";
 import { totpEnabled, verifyTotp } from "../../lib/totp.js";
@@ -122,16 +123,36 @@ async function photoFields(formData, existing, onError) {
   return fields;
 }
 
+// The Kokborok version typed in the editor. Both boxes empty = none (Gemini writes it again at the next run).
+// Returns undefined when the form has no Kokborok boxes at all.
+function kokborokFrom(formData, fail) {
+  if (!formData.has("headline_trp")) return undefined;
+  const headline = String(formData.get("headline_trp") || "").trim().slice(0, 300);
+  const summary = String(formData.get("summary_trp") || "").trim().slice(0, 2000);
+  if (Boolean(headline) !== Boolean(summary)) fail("Fill in both Kokborok boxes, or leave both empty");
+  return headline ? { headline, summary } : null;
+}
+
 export async function saveEdit(formData) {
   const role = await requireLogin();
+  const user = await currentUser();
   const id = String(formData.get("id"));
   const view = String(formData.get("view") || "pending");
   const existing = await db.getStory(id);
-  // Sub-editors may change only the stories they wrote.
-  if (role === SUB_EDITOR && (!existing || existing.author_id !== (await currentUser())?.id)) refresh(view, "You can edit only your own stories");
-  const fields = { ...editedFields(formData), ...(await photoFields(formData, existing, (message) => refresh(view, message))) };
+  const fail = (message) => refresh(view, message);
+  // Sub-editors may change their own stories. A sub-editor named in settings.json "kokborokEditors" may also change
+  // the Kokborok version of any other story, and nothing else on it.
+  const kokOnly = role === SUB_EDITOR && existing?.author_id !== user?.id;
+  if (kokOnly && !(existing && canEditKokborok(user, settings.kokborokEditors?.names))) fail("You can edit only your own stories");
+  const kok = kokborokFrom(formData, fail);
+  if (kokOnly) {
+    await db.updateStory(id, { translations: translationsAfterEdit(existing, false, kok) });
+    refresh(view, "Kokborok version saved");
+  }
+  const fields = { ...editedFields(formData), ...(await photoFields(formData, existing, fail)) };
   // If the English text changed, the Hindi/Assamese/Nepali versions are made again at the next collector run.
-  if (fields.headline !== existing?.headline || fields.summary !== existing?.summary) fields.translations = {};
+  const englishChanged = fields.headline !== existing?.headline || fields.summary !== existing?.summary;
+  if (englishChanged || kok !== undefined) fields.translations = translationsAfterEdit(existing, englishChanged, kok);
   if (formData.get("andApprove") && role === "admin") {
     await db.updateStory(id, { ...fields, status: "approved", published_at: new Date().toISOString() });
     illustrateLater(id);
@@ -199,6 +220,7 @@ export async function saveOriginal(formData) {
   const editorSends = !canPublish && formData.get("intent") === "publish" && existing?.status !== "approved";
   const publish = canPublish ? formData.get("intent") === "publish" || (role !== "admin" && existing?.status === "approved") : existing?.status === "approved";
   const backToEditor = (message) => redirect(`/admin/write?${id ? `id=${id}&` : ""}error=${encodeURIComponent(message)}`);
+  const kok = kokborokFrom(formData, backToEditor);
 
   const fields = {
     kind: "original",
@@ -217,7 +239,8 @@ export async function saveOriginal(formData) {
   // A sub-editor's story is theirs: it counts for them and shows their title under the byline.
   if (sub) Object.assign(fields, { author_id: user.id, author_title: staffTitle({ role }) });
   if (!fields.headline) backToEditor("Please write a headline.");
-  if (existing && (fields.headline !== existing.headline || fields.summary !== existing.summary)) fields.translations = {};
+  const englishChanged = Boolean(existing) && (fields.headline !== existing.headline || fields.summary !== existing.summary);
+  if (englishChanged || kok !== undefined) fields.translations = translationsAfterEdit(existing, englishChanged, kok);
   if (publish && (!fields.summary || !fields.body)) backToEditor("Please write the intro and the story text before publishing.");
   Object.assign(fields, await photoFields(formData, existing, backToEditor));
 

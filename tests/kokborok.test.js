@@ -37,3 +37,14 @@ test("Kokborok translation asks for Latin script and keeps the answer in the rig
   assert.match(prompt, /"trp" = Kokborok/);
   assert.match(prompt, /Latin script/);
 });
+
+test("saving keeps or replaces the Kokborok version; changed English clears the machine versions", async () => {
+  const { translationsAfterEdit } = await import("../lib/languages.js");
+  const existing = { translations: { hi: { headline: "h", summary: "s" }, trp: { headline: "old", summary: "old" } } };
+  assert.deepEqual(translationsAfterEdit(existing, false, undefined), existing.translations, "no Kokborok boxes: unchanged");
+  assert.deepEqual(translationsAfterEdit(existing, false, { headline: "new", summary: "new" }).trp, { headline: "new", summary: "new" });
+  assert.deepEqual(translationsAfterEdit(existing, false, null), { hi: { headline: "h", summary: "s" } }, "empty boxes remove the Kokborok version");
+  assert.deepEqual(translationsAfterEdit(existing, true, undefined), {}, "changed English clears the machine versions");
+  assert.deepEqual(translationsAfterEdit(existing, true, { headline: "k", summary: "k" }), { trp: { headline: "k", summary: "k" } }, "a Kokborok version typed in the same save is kept");
+  assert.deepEqual(translationsAfterEdit(null, false, { headline: "k", summary: "k" }), { trp: { headline: "k", summary: "k" } });
+});

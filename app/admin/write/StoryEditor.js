@@ -51,6 +51,18 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor, rol
         <textarea className="body" name="body" defaultValue={story?.body || ""} placeholder="Write the full report here…" />
       </label>
 
+      <details className="bn-fields" open={Boolean(story?.translations?.trp?.summary)}>
+        <summary>Kokborok version (Latin script, optional)</summary>
+        <label>
+          Kokborok headline
+          <input type="text" name="headline_trp" lang="trp" defaultValue={story?.translations?.trp?.headline || ""} maxLength={300} />
+        </label>
+        <label>
+          Kokborok intro <span className="hint">— leave both boxes empty and Gemini will write it again at the next run</span>
+          <textarea name="summary_trp" lang="trp" defaultValue={story?.translations?.trp?.summary || ""} maxLength={2000} rows={3} />
+        </label>
+      </details>
+
       <details className="bn-fields" open={Boolean(story?.headline_bn)}>
         <summary>বাংলা (Bengali version, optional)</summary>
         <label>

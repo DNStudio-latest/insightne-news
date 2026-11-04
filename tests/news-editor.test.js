@@ -145,3 +145,8 @@ test("a very long headline and a figure invented in the intro are flagged", asyn
   assert.ok(r.notes.some((n) => /Check these figures.*3/.test(n)));
   assert.ok(r.notes.some((n) => /90 characters/.test(n)));
 });
+
+test("the style guide forbids trailing '-ing' result clauses such as ', prompting'", () => {
+  assert.match(EDITOR_SYSTEM, /No trailing "-ing" result clauses/);
+  assert.match(EDITOR_SYSTEM, /", prompting…"/);
+});

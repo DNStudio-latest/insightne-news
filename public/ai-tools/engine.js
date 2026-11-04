@@ -565,6 +565,11 @@ function excerpt(text, index, length) {
 const PATTERNS = [
   {
     kind: "pattern",
+    re: /,\s+(?:prompting|leading to|resulting in|sparking|triggering|causing|highlighting|underscoring|signalling|signaling|marking|raising concerns|fuelling|fueling|reflecting)\b[^.!?]{0,120}/gi,
+    message: 'A comma followed by "prompting", "leading to", "resulting in" or similar is a common machine-writing pattern. It chains two events and implies a cause. Split it into two sentences in time order, and attribute any cause.',
+  },
+  {
+    kind: "pattern",
     re: /\bnot only\b[^.!?]{1,120}?\bbut also\b/gi,
     message: '"Not only … but also" is a common machine-writing pattern. A plain "and" or two short sentences often reads better.',
   },

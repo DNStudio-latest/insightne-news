@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import { currentUser } from "../../../lib/auth.js";
 import AiCheck from "./AiCheck.js";
+import { loadLessons } from "../../../lib/ai-lessons-store.js";
+import { activeFor } from "../../../lib/ai-lessons.js";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "AI checker", robots: { index: false, follow: false } };
 
 // The AI checker for staff: estimates whether a text reads as AI-generated and suggests plainer wording.
@@ -9,12 +12,17 @@ export const metadata = { title: "AI checker", robots: { index: false, follow: f
 export default async function AiCheckPage() {
   const user = await currentUser();
   if (!user) redirect("/admin/login");
+  // Phrases the desk has asked the AI tools to avoid (Admin → Teach the AI) are flagged in the checker too.
+  const lessons = activeFor(await loadLessons(), "checker").map(({ id, phrase, better, why, tools, status }) => ({ id, phrase, better, why, tools, status }));
 
   return (
     <div className="wrap aic-wide">
       <div className="admin-bar">
         <h1>🤖 AI checker</h1>
-        <a className="btn btn-plain" href="/admin">← Back</a>
+        <span>
+          <a className="btn btn-plain" href="/admin/ai-lessons">🧠 Teach the AI</a>{" "}
+          <a className="btn btn-plain" href="/admin">← Back</a>
+        </span>
       </div>
       <p className="note">
         Paste a story, a press release or a reader&apos;s submission. The checker estimates whether it reads as AI-generated,
@@ -26,7 +34,7 @@ export default async function AiCheckPage() {
         newer AI models and on kinds of writing it was not trained on, such as Indian English news copy. Do not accuse
         a contributor on a score alone: ask them, and check the facts.
       </div>
-      <AiCheck />
+      <AiCheck lessons={lessons} />
     </div>
   );
 }

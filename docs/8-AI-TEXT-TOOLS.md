@@ -98,7 +98,44 @@ npm run ai-text-train -- corpus.csv --out public/ai-tools/model.js --name "M4 + 
 node scripts/ai-text-experiments.js corpus.csv --out experiments.json
 ```
 
-## Use it on your PC (no internet, nothing to install)
+## Teach it Gemini's writing
+
+The built-in model has never seen Google Gemini text, and AI models it has not seen are its weak spot. In tests, it caught only 39–69% of texts from a left-out model. Adding Gemini texts to the training data fixes that for Gemini. `scripts/ai-text-gemini.js` pairs each chosen human text with a Gemini text of the same genre, length and topic, and gives both the same train/test group, so the test stays fair.
+
+**Your Gemini subscription and the API.** A Google AI Pro (Gemini app) subscription covers the Gemini app and the AI Studio website. It does not include a Gemini API key or API usage. A separate API key from **aistudio.google.com → Get API key** is free and has a daily free quota for some models; check the current limits in AI Studio. Before you publish results, check Google's Gemini API terms on using its output.
+
+**A) Automatic, with an API key (recommended: hundreds of texts).**
+
+1. Create a free key at aistudio.google.com. Use a separate key from the website's `GEMINI_API_KEY`, so research runs do not use up the website's free summaries.
+2. Make the key available as `GEMINI_API_KEY`. On your PC, put `GEMINI_API_KEY=your-key` in a `.env` file in the project folder. Never commit that file. In a Claude Code cloud session, add it as an environment variable in the environment settings, and start a new session. Never paste the key into a chat.
+3. Build the corpus (see "How the corpus was cleaned"), then run:
+
+   ```bash
+   node --env-file=.env scripts/ai-text-gemini.js corpus.csv --out gemini.csv --per-domain 150
+   ```
+
+   This asks for 1,200 texts, 150 in each of the 8 genres. It uses `gemini-flash-latest` unless you add `--model`. Free-tier keys allow only a limited number of requests a day. When the limit is reached the script stops and says so; run the same command the next day and it continues where it stopped.
+4. Retrain on both files and test:
+
+   ```bash
+   npm run ai-text-train -- corpus.csv gemini.csv --out public/ai-tools/model.js --name "M4 + Ghostbuster + Gemini"
+   ```
+
+   ```bash
+   node scripts/ai-text-experiments.js corpus.csv gemini.csv --out experiments.json
+   ```
+
+   The experiment report now includes "Unseen generator: gemini": how much Gemini text the detector catches without having seen Gemini. That figure is worth reporting on its own.
+
+**B) By hand, in the Gemini app (about 50–100 texts).**
+
+1. Export a prompt sheet: `node scripts/ai-text-gemini.js corpus.csv --prompts-out gemini-prompts.csv --per-domain 10` (80 prompts).
+2. Open it in Google Sheets or Excel. Paste each prompt into a new Gemini chat and paste the reply into the **answer** column of the same row. Rows you leave empty are skipped.
+3. Save it as CSV and import it: `node scripts/ai-text-gemini.js corpus.csv --import gemini-prompts.csv --out gemini.csv`. Use the same `corpus.csv` and `--per-domain` as in step 1, so the answers match their prompts.
+
+A hand-made set is too small to train on well, but it makes a good **test** of how much Gemini text the current model catches. Use a new chat for each prompt, so earlier answers do not shape later ones.
+
+
 
 Use the single-file version, `ai-text-checker.html`. Save it anywhere (for example, Documents) and double-click it to open it in Chrome, Edge or Firefox. It contains the whole tool and the built-in model, so it needs no Python, Node or web server.
 
@@ -148,6 +185,7 @@ AUC is the usual figure to report: 0.5 means chance and 1.0 means perfect separa
 | `scripts/ai-text-corpus.js` | Builds the cleaned corpus from M4 and Ghostbuster |
 | `scripts/ai-text-train.js` | Training and evaluation |
 | `scripts/ai-text-experiments.js` | Baselines and unseen-model / unseen-domain tests |
+| `scripts/ai-text-gemini.js` | Adds Gemini texts to the corpus (API or by hand) |
 | `scripts/ai-text-standalone.js` | Builds the single-file version for use on a PC |
 | `tests/ai-text.test.js` | Tests (`npm test`) |
 

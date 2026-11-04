@@ -16,6 +16,7 @@ import { createReadStream, readdirSync, statSync, readFileSync, writeFileSync, e
 import { createInterface } from "node:readline";
 import { join, relative } from "node:path";
 import { createHash } from "node:crypto";
+import { pathToFileURL } from "node:url";
 
 const MAX_WORDS = 400;
 const MIN_WORDS = 50;
@@ -200,4 +201,4 @@ async function main() {
   console.log("Split sizes:", splits);
 }
 
-if (process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, "/").split("/").pop())) main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();

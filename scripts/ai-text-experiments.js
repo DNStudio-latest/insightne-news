@@ -1,6 +1,6 @@
 // Evaluation experiments for the AI-text detector, on a corpus made by scripts/ai-text-corpus.js.
 //
-//   node scripts/ai-text-experiments.js corpus.csv [--out report.json]
+//   node scripts/ai-text-experiments.js corpus.csv [more.csv …] [--out report.json]
 //
 // 1. Baselines on the test split: the built-in uncalibrated model, and a style-only trained model.
 // 2. Full model (style + word/phrase weights) on the test split.
@@ -19,9 +19,9 @@ function run(train, test, opts = {}) {
 }
 
 const args = process.argv.slice(2);
-const file = args[0];
+const files = args.filter((a, i) => !a.startsWith("--") && !(i > 0 && args[i - 1] === "--out"));
 const out = args.includes("--out") ? args[args.indexOf("--out") + 1] : "ai-text-experiments.json";
-const docs = prepare(loadRows(readFileSync(file, "utf8")));
+const docs = prepare(files.flatMap((f) => loadRows(readFileSync(f, "utf8"))));
 const trainAll = docs.filter((d) => d.split === "train" || d.split === "dev");
 const test = docs.filter((d) => d.split === "test");
 const report = { corpus: { texts: docs.length, train: trainAll.length, test: test.length }, settings: SETTINGS };
@@ -36,7 +36,11 @@ report.full = run(trainAll, test);
 log("Full model (style + phrases)", report.full);
 
 report.unseen_generator = {};
-for (const gen of ["chatgpt", "claude", "davinci", "cohere", "dolly"]) {
+// Every AI model with enough test texts (Gemini is included automatically when its texts are added).
+const generators = [...new Set(test.filter((d) => d.label === 1).map((d) => d.generator))]
+  .filter((g) => test.filter((d) => d.generator === g).length >= 30)
+  .sort();
+for (const gen of generators) {
   const train = trainAll.filter((d) => d.generator !== gen);
   const t = test.filter((d) => d.generator === gen || d.label === 0);
   report.unseen_generator[gen] = run(train, t);

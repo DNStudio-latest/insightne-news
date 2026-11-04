@@ -181,3 +181,65 @@ test("training with a split column reports held-out test metrics", () => {
   assert.ok(Object.keys(model.ngrams).length <= 200);
   assert.deepEqual(metrics([0.9, 0.1], [1, 0]).accuracy, 1);
 });
+
+// ---- Gemini corpus step (Gemini itself is replaced by a stand-in; no network) ----
+import { mkdtempSync, readFileSync as readText, writeFileSync as writeText } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { pickHumanTexts, promptFor, tidy, generateWithApi, writePrompts, importAnswers } from "../scripts/ai-text-gemini.js";
+
+const humanRows = ["arxiv", "gb-essay"].flatMap((domain) =>
+  Array.from({ length: 4 }, (_, i) => ({
+    label: 0, domain, split: i % 2 ? "test" : "train", group: `${domain}:${i}`,
+    text: `Human ${domain} text number ${i} about river floods and farming in the hills. `.repeat(8),
+  })),
+);
+const longAnswer = "## Title\n**Floods** shape farming in hill regions in many ways. ".concat("Farmers adapt their crops and calendars to the rains each year. ".repeat(10));
+
+test("Gemini prompts name the genre and length, and forbid copying", () => {
+  const p = promptFor(humanRows[0]);
+  assert.match(p, /abstract of a scientific research paper/);
+  assert.match(p, /about \d+ words/);
+  assert.match(p, /do not copy/);
+  assert.equal(pickHumanTexts(humanRows, 2).length, 4, "the same number from each genre");
+});
+
+test("Gemini answers lose Markdown, and short or prompt-like answers are dropped", () => {
+  assert.ok(!tidy(longAnswer).includes("#") && !tidy(longAnswer).includes("**"));
+});
+
+test("API mode saves each Gemini text with its human text's group and split, and resumes", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "gem-"));
+  const out = join(dir, "gemini.csv");
+  let calls = 0;
+  const generate = async () => { calls++; return calls === 2 ? "Too short." : longAnswer; };
+  const first = await generateWithApi(humanRows, { out, perDomain: 2, model: "stand-in", generate, log: () => {} });
+  assert.deepEqual(first, { saved: 3, skipped: 1 });
+  const rows = loadRows(readText(out, "utf8"));
+  assert.ok(rows.every((r) => r.label === 1 && r.generator === "gemini"));
+  const again = await generateWithApi(humanRows, { out, perDomain: 2, model: "stand-in", generate: async () => longAnswer, log: () => {} });
+  assert.equal(again.saved, 1, "only the text that failed before is written again");
+});
+
+test("API mode stops cleanly when the daily limit is reached", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "gem-"));
+  const logs = [];
+  const r = await generateWithApi(humanRows, {
+    out: join(dir, "g.csv"), perDomain: 2, model: "stand-in", log: (m) => logs.push(m),
+    generate: async () => { throw new Error("Gemini error 429: the free daily limit of x is used up"); },
+  });
+  assert.equal(r.saved, 0);
+  assert.ok(logs.some((l) => l.includes("tomorrow")));
+});
+
+test("manual mode: prompts out, answers in", () => {
+  const dir = mkdtempSync(join(tmpdir(), "gem-"));
+  const prompts = join(dir, "prompts.csv");
+  assert.equal(writePrompts(humanRows, { file: prompts, perDomain: 1 }), 2);
+  const ids = parseCsv(readText(prompts, "utf8")).slice(1).map((r) => r[0]);
+  const answers = join(dir, "answers.csv");
+  writeText(answers, `id,text\n${ids[0]},"${longAnswer}"\nnope,"x"\n`);
+  const r = importAnswers(humanRows, { answers, out: join(dir, "gemini.csv"), perDomain: 1 });
+  assert.equal(r.saved, 1);
+  assert.deepEqual(r.problems, ["unknown id nope"]);
+});

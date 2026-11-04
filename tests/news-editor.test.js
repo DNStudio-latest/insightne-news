@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { editLikeSeniorEditor, editorProvider, newNumbers, EDITOR_SYSTEM, MAX_INPUT_CHARS } from "../lib/news-editor.js";
+import { editLikeSeniorEditor, editorProvider, newNumbers, houseDateline, EDITOR_SYSTEM, MAX_INPUT_CHARS } from "../lib/news-editor.js";
 
 const REPORT =
   "In a major boost for the state, the Tripura government on Tuesday rushed to approve a flood relief package of Rs 50 crore. " +
@@ -84,7 +84,7 @@ test("the comparison shows removed and added words and keeps paragraphs", () => 
 });
 
 test("the style guide follows the news-writing study: dateline, lead, attribution, PCI norms, ending", () => {
-  assert.match(EDITOR_SYSTEM, /keep it exactly as\s+written/);
+  assert.match(EDITOR_SYSTEM, /"Agartala, Nov 4:"/);
   assert.match(EDITOR_SYSTEM, /Never add a dateline/);
   assert.match(EDITOR_SYSTEM, /20 to 35 words/);
   assert.match(EDITOR_SYSTEM, /Do not write "occurred"/);
@@ -92,4 +92,16 @@ test("the style guide follows the news-writing study: dateline, lead, attributio
   assert.match(EDITOR_SYSTEM, /Press Council of India/);
   assert.match(EDITOR_SYSTEM, /ENDING/);
   assert.match(EDITOR_SYSTEM, /"stated", "noted", "commented", "informed", "opined"/);
+});
+
+test("the dateline place is written in normal capitals (house style)", async () => {
+  assert.equal(houseDateline("AGARTALA, Nov 4: Police detained a woman."), "Agartala, Nov 4: Police detained a woman.");
+  assert.equal(houseDateline("NEW DELHI, Nov 4: Text"), "New Delhi, Nov 4: Text");
+  assert.equal(houseDateline("Agartala, Nov 4: Text"), "Agartala, Nov 4: Text", "already right");
+  assert.equal(houseDateline("GRP detained a woman, police said."), "GRP detained a woman, police said.", "not a dateline: no comma right after the capitals");
+  assert.equal(houseDateline("UN, Nov 4: Text"), "UN, Nov 4: Text", "short abbreviations stay");
+  const r = await editLikeSeniorEditor("AGARTALA, Nov 4: Police detained a woman on Wednesday.", {
+    generate: async () => JSON.stringify({ headline: "Police detain woman", body: "AGARTALA, Nov 4: Police detained a woman on Wednesday.", notes: [], changes: [] }),
+  });
+  assert.ok(r.body.startsWith("Agartala, Nov 4:"));
 });

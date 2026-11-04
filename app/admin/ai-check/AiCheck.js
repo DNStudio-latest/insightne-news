@@ -3,21 +3,21 @@
 // The model (about 500 KB) loads only when this page opens.
 import { useEffect, useState } from "react";
 import { scoreText, styleEdit, applyAlternative, tokenize } from "../../../public/ai-tools/engine.js";
-import { HANDOFF_KEY } from "./handoff.js";
+import { HANDOFF_KEY, DRAFT_KEY, leave, take } from "./handoff.js";
 import { editAsSeniorEditor } from "./actions.js";
 import { wordDiff, diffCounts } from "./diff.js";
-
-const HANDOFF_MAX_AGE = 10 * 60 * 1000;
+import { LENGTHS } from "./lengths.js";
 
 function takeHandoff() {
-  try {
-    const raw = localStorage.getItem(HANDOFF_KEY);
-    localStorage.removeItem(HANDOFF_KEY);
-    const { text, at } = JSON.parse(raw || "null") || {};
-    return typeof text === "string" && Date.now() - at < HANDOFF_MAX_AGE ? text : "";
-  } catch {
-    return "";
-  }
+  const value = take(HANDOFF_KEY);
+  return typeof value?.text === "string" ? value.text : "";
+}
+
+// Character count with the target range, e.g. "62 characters (target 55–70)".
+function Count({ text, range, unit = "characters" }) {
+  const n = unit === "words" ? text.split(/\s+/).filter(Boolean).length : text.length;
+  const ok = n >= range[0] && n <= range[1];
+  return <span className={ok ? "aic-human" : "aic-warn"}>{n} {unit} (target {range[0]}–{range[1]})</span>;
 }
 
 // The edited text compared with the original: removed words struck through, added words highlighted.
@@ -130,8 +130,47 @@ export default function AiCheck() {
     try { before = scoreText(input, model).score; } catch { /* too short to score */ }
     try { after = scoreText(text, model).score; } catch { /* too short to score */ }
     const s = styleEdit(text, { apply: false, model });
-    setEdit({ text, changes: [], suggestions: s.suggestions, disclaimer: s.disclaimer, pro: { notes: r.notes, changes: r.changes, before, after } });
+    setEdit({
+      text,
+      changes: [],
+      suggestions: s.suggestions,
+      disclaimer: s.disclaimer,
+      pro: { notes: r.notes, changes: r.changes, before, after, shortHeadline: r.shortHeadline, headlineOptions: r.headlineOptions, intro: r.intro },
+    });
     setCopied("");
+  }
+
+  // The edited text's first paragraph is the main headline; the rest is the story.
+  const splitEdited = (text) => {
+    const [first, ...rest] = String(text).split(/\n\s*\n/);
+    return { headline: (first || "").trim(), body: rest.join("\n\n").trim() };
+  };
+
+  // Makes an alternative headline the main one (the old main headline becomes an option).
+  function useHeadline(option) {
+    const { headline, body } = splitEdited(edit.text);
+    const options = edit.pro.headlineOptions.map((h) => (h === option ? headline : h));
+    const text = `${option}\n\n${body}`;
+    const s = styleEdit(text, { apply: false, model });
+    setEdit((e) => ({ ...e, text, suggestions: s.suggestions, pro: { ...e.pro, headlineOptions: options } }));
+  }
+
+  async function copyText(text, label) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(`${label} copied.`);
+    } catch {
+      setCopied("Select the text and press Ctrl+C to copy.");
+    }
+  }
+
+  // Opens Write story in a new tab with the headline, intro and story filled in.
+  function openAsStory() {
+    const { headline, body } = splitEdited(edit.text);
+    if (!leave(DRAFT_KEY, { headline, summary: edit.pro.intro || "", body })) {
+      return setError("Your browser blocked the hand-over. Copy the headline, intro and text instead.");
+    }
+    window.open("/admin/write", "_blank");
   }
 
   // Suggestions for the edited text as it stands now (no further automatic changes).
@@ -193,6 +232,47 @@ export default function AiCheck() {
           {copied && <p className="note">{copied}</p>}
         </div>
       </div>
+
+      {edit?.pro && (
+        <section className="story aic-result aic-heads">
+          <h2>Headlines and intro</h2>
+          <div className="aic-head">
+            <h3>Main headline <Count text={splitEdited(edit.text).headline} range={LENGTHS.headline} /></h3>
+            <p className="aic-headline">{splitEdited(edit.text).headline}</p>
+            <button type="button" className="aic-mini" onClick={() => copyText(splitEdited(edit.text).headline, "Headline")}>Copy</button>
+          </div>
+          {edit.pro.shortHeadline && (
+            <div className="aic-head">
+              <h3>Short headline: homepage, mobile, social <Count text={edit.pro.shortHeadline} range={LENGTHS.short_headline} /></h3>
+              <p className="aic-headline">{edit.pro.shortHeadline}</p>
+              <button type="button" className="aic-mini" onClick={() => copyText(edit.pro.shortHeadline, "Short headline")}>Copy</button>
+            </div>
+          )}
+          {edit.pro.headlineOptions.length > 0 && (
+            <div className="aic-head">
+              <h3>Other headlines</h3>
+              <ul className="aic-list">
+                {edit.pro.headlineOptions.map((h) => (
+                  <li key={h}>
+                    {h} <span className="note">({h.length} characters)</span>{" "}
+                    <button type="button" className="aic-mini" onClick={() => useHeadline(h)}>Use as main headline</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {edit.pro.intro && (
+            <div className="aic-head">
+              <h3>Intro: shown under the headline and on the front page <Count text={edit.pro.intro} range={LENGTHS.intro} unit="words" /></h3>
+              <p>{edit.pro.intro}</p>
+              <button type="button" className="aic-mini" onClick={() => copyText(edit.pro.intro, "Intro")}>Copy</button>
+            </div>
+          )}
+          <button type="button" className="btn btn-approve aic-open-story" onClick={openAsStory}>✍ OPEN AS A NEW STORY IN WRITE STORY</button>
+          <p className="note">Opens Write story in a new tab with the headline, intro and story filled in. Nothing is saved or published until you send it there.</p>
+          {copied && <p className="note">{copied}</p>}
+        </section>
+      )}
 
       {edit && (
         <section className="story aic-result">

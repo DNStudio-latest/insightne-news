@@ -31,6 +31,14 @@ The editor also runs the **desk checks** a senior editor makes on every story. P
 
 It keeps the dateline in the house style "Agartala, Nov 4:" (place in normal capitals) and tightens wordy sentences. Clean copy is changed only where it can be improved, so a well-written report may come back with few changes and useful notes.
 
+It also prepares the story for the website. Under the two boxes, **Headlines and intro** shows:
+- a main headline of 55–70 characters, the length Google shows;
+- a short headline of 30–45 characters for the homepage, mobile and social media;
+- two alternative headlines, with **Use as main headline**;
+- a one-sentence intro of 20–30 words for the Intro field.
+
+Each comes with its length and a Copy button. **✍ Open as a new story in Write story** opens a new story with the headline, intro and text filled in, ready to check and send. Nothing is saved until you send it.
+
 The editor's version goes into the right-hand box with the headline on top. Under the two boxes, **What changed** shows every word removed (struck through, red) and added (green). The page also shows the **editor's notes**: questions for the reporter, such as a missing source, date or the other side's response. It lists what the editor changed and the AI-check score before and after.
 
 The editor's rules come from a study of Reuters, AP, PTI, IANS, UNI, the BBC, The Economist and the Press Council of India's norms: see [9-NEWS-WRITING-STANDARDS.md](9-NEWS-WRITING-STANDARDS.md).

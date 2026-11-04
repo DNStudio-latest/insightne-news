@@ -105,3 +105,43 @@ test("the dateline place is written in normal capitals (house style)", async () 
   });
   assert.ok(r.body.startsWith("Agartala, Nov 4:"));
 });
+
+// ---- digital headline set, intro and lead types ----
+import { LENGTHS } from "../lib/news-editor.js";
+
+test("the style guide asks for a headline set, an intro and the right lead for the story", () => {
+  assert.match(EDITOR_SYSTEM, /"short_headline"/);
+  assert.match(EDITOR_SYSTEM, /"headline_options"/);
+  assert.match(EDITOR_SYSTEM, /"intro": one sentence, 20 to 30 words, present tense/);
+  assert.match(EDITOR_SYSTEM, /55 to 70 characters/);
+  assert.match(EDITOR_SYSTEM, /describe them first and name them later/);
+  assert.match(EDITOR_SYSTEM, /the human toll first/);
+  assert.deepEqual(LENGTHS.headline, [55, 70]);
+});
+
+test("the editor returns the headline set and intro, and old-style answers still work", async () => {
+  const r = await editLikeSeniorEditor("Police detained a woman on Wednesday in Agartala for allegedly assaulting an officer.", {
+    generate: reply({
+      headline: "Agartala parking attendant detained for allegedly assaulting officer",
+      short_headline: "Parking attendant detained in Agartala",
+      headline_options: ["Officer allegedly assaulted at Agartala station; attendant held", "Agartala parking attendant detained for allegedly assaulting officer"],
+      intro: "Police detain a woman for allegedly assaulting an officer at Agartala Railway Station on Wednesday.",
+      body: "Police detained a woman on Wednesday.",
+      notes: [],
+      changes: [],
+    }),
+  });
+  assert.equal(r.shortHeadline, "Parking attendant detained in Agartala");
+  assert.equal(r.headlineOptions.length, 1, "an option equal to the main headline is dropped");
+  assert.match(r.intro, /^Police detain/);
+  const old = await editLikeSeniorEditor("Police detained a woman.", { generate: reply({ headline: "Police detain woman", body: "Police detained a woman.", notes: [], changes: [] }) });
+  assert.deepEqual([old.shortHeadline, old.headlineOptions, old.intro], ["", [], ""]);
+});
+
+test("a very long headline and a figure invented in the intro are flagged", async () => {
+  const r = await editLikeSeniorEditor("Police detained a woman on Wednesday.", {
+    generate: reply({ headline: "x".repeat(90), intro: "Police detain 3 women on Wednesday.", body: "Police detained a woman on Wednesday.", notes: [], changes: [] }),
+  });
+  assert.ok(r.notes.some((n) => /Check these figures.*3/.test(n)));
+  assert.ok(r.notes.some((n) => /90 characters/.test(n)));
+});

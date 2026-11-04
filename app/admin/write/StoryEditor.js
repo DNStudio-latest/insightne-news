@@ -1,9 +1,9 @@
 "use client";
 // The "Write a story" form. Photos are made smaller on your phone before they are uploaded.
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { saveOriginal } from "../actions.js";
 import { shrinkPhoto } from "../photo.js";
-import { HANDOFF_KEY } from "../ai-check/handoff.js";
+import { HANDOFF_KEY, DRAFT_KEY, take } from "../ai-check/handoff.js";
 
 export default function StoryEditor({ story, regions, topics, defaultAuthor, role = "admin", editorsPublish = false }) {
   const admin = role === "admin";
@@ -14,6 +14,21 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor, rol
   const [busy, setBusy] = useState(false);
   const sending = useRef(false); // a quick second tap must not send the story twice
   const isPublished = story?.status === "approved";
+  const formRef = useRef(null);
+  const [fromChecker, setFromChecker] = useState(false);
+
+  // A new story opened from the AI checker ("Open as a new story") arrives with its headline, intro and text.
+  // An existing story is never overwritten.
+  useEffect(() => {
+    if (story) return;
+    const draft = take(DRAFT_KEY);
+    const form = formRef.current;
+    if (!draft || !form) return;
+    if (draft.headline) form.elements.headline.value = String(draft.headline).slice(0, 200);
+    if (draft.summary) form.elements.summary.value = String(draft.summary).slice(0, 600);
+    if (draft.body) form.elements.body.value = String(draft.body);
+    setFromChecker(true);
+  }, [story]);
 
   async function submit(formData) {
     if (sending.current) return;
@@ -33,7 +48,10 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor, rol
   }
 
   return (
-    <form action={submit} className="editor">
+    <form action={submit} className="editor" ref={formRef}>
+      {fromChecker && (
+        <div className="notice">Filled in from the AI checker&apos;s senior editor. Check every fact against your source before sending.</div>
+      )}
       {story && <input type="hidden" name="id" value={story.id} />}
 
       <label>

@@ -4,7 +4,8 @@
 import { useEffect, useState } from "react";
 import { scoreText, styleEdit, applyAlternative, tokenize } from "../../../public/ai-tools/engine.js";
 import { HANDOFF_KEY, DRAFT_KEY, leave, take } from "./handoff.js";
-import { editAsSeniorEditor } from "./actions.js";
+import { editAsSeniorEditor, teachTheAi } from "./actions.js";
+import { lessonSuggestions, TOOLS } from "../../../lib/ai-lessons.js";
 import { wordDiff, diffCounts } from "./diff.js";
 import { LENGTHS } from "./lengths.js";
 
@@ -65,7 +66,52 @@ function Marked({ text, suggestions }) {
   return <div className="aic-marked">{parts}</div>;
 }
 
-export default function AiCheck() {
+// "Teach the AI": a phrase the AI should stop using. Staff lessons wait for the admin; the admin's are used at once.
+function TeachTheAi() {
+  const [phrase, setPhrase] = useState("");
+  const [better, setBetter] = useState("");
+  const [why, setWhy] = useState("");
+  const [tools, setTools] = useState(Object.keys(TOOLS));
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+
+  async function send() {
+    setBusy(true);
+    let r;
+    try {
+      r = await teachTheAi({ phrase, better, why, tools });
+    } catch {
+      r = { ok: false, error: "The website could not be reached. Try again." };
+    }
+    setBusy(false);
+    setMessage(r.ok ? `✓ ${r.message}` : r.error);
+    if (r.ok) { setPhrase(""); setBetter(""); setWhy(""); }
+  }
+
+  const toggle = (key) => setTools((t) => (t.includes(key) ? t.filter((x) => x !== key) : [...t, key]));
+  return (
+    <section className="story aic-result aic-teach">
+      <h2>🧠 Teach the AI</h2>
+      <p className="note">
+        Did the AI write a phrase that sounds machine-written or breaks house style? Add it here with a better wording, and
+        the AI tools will avoid it from now on. <a href="/admin/ai-lessons">See all lessons</a>.
+      </p>
+      <label>Phrase to stop using<input type="text" value={phrase} maxLength={120} onChange={(e) => setPhrase(e.target.value)} /></label>
+      <label>Better wording <span className="hint">— optional</span><input type="text" value={better} maxLength={200} onChange={(e) => setBetter(e.target.value)} /></label>
+      <label>Why <span className="hint">— optional</span><input type="text" value={why} maxLength={300} onChange={(e) => setWhy(e.target.value)} /></label>
+      <fieldset className="aic-tools">
+        <legend>Which AI tools should learn it</legend>
+        {Object.entries(TOOLS).map(([key, label]) => (
+          <label key={key} className="check"><input type="checkbox" checked={tools.includes(key)} onChange={() => toggle(key)} /> {label}</label>
+        ))}
+      </fieldset>
+      <button className="btn btn-edit" type="button" disabled={busy || !phrase.trim()} onClick={send}>{busy ? "SAVING…" : "TEACH THE AI"}</button>
+      {message && <p className="note" aria-live="polite">{message}</p>}
+    </section>
+  );
+}
+
+export default function AiCheck({ lessons = [] }) {
   const [model, setModel] = useState(null);
   const [loadError, setLoadError] = useState("");
   const [input, setInput] = useState("");
@@ -93,6 +139,10 @@ export default function AiCheck() {
 
   const words = tokenize(input).length;
 
+  // The checker's suggestions plus the phrases the desk has taught the AI to avoid, in text order.
+  const withLessons = (suggestions, text) =>
+    [...suggestions, ...lessonSuggestions(text, lessons)].sort((a, b) => (a.index ?? 1e9) - (b.index ?? 1e9));
+
   function check(text = input, source = "original") {
     setError("");
     try {
@@ -107,7 +157,7 @@ export default function AiCheck() {
     setError("");
     if (!words) return setError("Paste some text first.");
     const r = styleEdit(input, { model });
-    setEdit({ text: r.text, changes: r.changes, suggestions: r.suggestions, disclaimer: r.disclaimer });
+    setEdit({ text: r.text, changes: r.changes, suggestions: withLessons(r.suggestions, r.text), disclaimer: r.disclaimer });
     setCopied("");
   }
 
@@ -133,7 +183,7 @@ export default function AiCheck() {
     setEdit({
       text,
       changes: [],
-      suggestions: s.suggestions,
+      suggestions: withLessons(s.suggestions, text),
       disclaimer: s.disclaimer,
       pro: { notes: r.notes, changes: r.changes, before, after, shortHeadline: r.shortHeadline, headlineOptions: r.headlineOptions, intro: r.intro },
     });
@@ -152,7 +202,7 @@ export default function AiCheck() {
     const options = edit.pro.headlineOptions.map((h) => (h === option ? headline : h));
     const text = `${option}\n\n${body}`;
     const s = styleEdit(text, { apply: false, model });
-    setEdit((e) => ({ ...e, text, suggestions: s.suggestions, pro: { ...e.pro, headlineOptions: options } }));
+    setEdit((e) => ({ ...e, text, suggestions: withLessons(s.suggestions, text), pro: { ...e.pro, headlineOptions: options } }));
   }
 
   async function copyText(text, label) {
@@ -176,7 +226,7 @@ export default function AiCheck() {
   // Suggestions for the edited text as it stands now (no further automatic changes).
   function refresh(text) {
     const r = styleEdit(text, { apply: false, model });
-    setEdit((e) => ({ ...e, text, suggestions: r.suggestions }));
+    setEdit((e) => ({ ...e, text, suggestions: withLessons(r.suggestions, text) }));
   }
 
   async function copy() {
@@ -396,6 +446,8 @@ export default function AiCheck() {
           </ul>
         </section>
       )}
+
+      {edit && <TeachTheAi />}
     </div>
   );
 }

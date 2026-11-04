@@ -24,6 +24,7 @@ import { currentRole, currentUser, userForPassword, hashPassword, startSession, 
 import { SUB_EDITOR, staffTitle, canEditKokborok } from "../../lib/staff.js";
 import { translationsAfterEdit } from "../../lib/languages.js";
 import { researchAndDraft } from "../../lib/research.js";
+import { loadLessons } from "../../lib/ai-lessons-store.js";
 import { clientIp, rateLimit } from "../../lib/rate-limit.js";
 import { totpEnabled, verifyTotp } from "../../lib/totp.js";
 import { cleanText } from "../../lib/clean-text.js";
@@ -532,7 +533,7 @@ export async function researchTopic(formData) {
   if (!topic) redirect(`/admin/research?error=${encodeURIComponent("Please write a topic.")}`);
   let failed = null;
   try {
-    await researchAndDraft({ topic, notes, store: hunterStore });
+    await researchAndDraft({ topic, notes, store: hunterStore, lessons: await loadLessons() });
   } catch (err) {
     failed = err.message;
   }

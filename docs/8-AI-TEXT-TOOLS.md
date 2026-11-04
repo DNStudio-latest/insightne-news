@@ -49,6 +49,25 @@ This button is the only part of the checker that leaves the device: the text is 
 
 The public `/ai-tools/` page does not have this button, so visitors cannot spend the site's AI budget.
 
+## Teach the AI (admin panel)
+
+**🧠 Teach the AI** (`/admin/ai-lessons`, also linked from the AI checker) lets the desk correct the AI tools without a code change. A lesson is a phrase the AI should stop using, an optional better wording, and an optional one-sentence reason. Tick the tools that should learn it:
+
+| Tool | What the lesson does |
+|---|---|
+| Senior news editor | Added to the editor's instructions. If the edit still uses the phrase, the editor's notes say so. |
+| Daily news summaries | Added to the summary instructions (Claude or Gemini). A summary that still uses the phrase is written once more; if the phrase is still there, the story is marked for an extra check on the approval page. |
+| Research desk drafts | Added to the writer's instructions. A draft that still uses the phrase lists it under problems in News Hunter. |
+| AI checker flags | The admin AI checker flags the phrase under "For you to review", with the better wording as a one-click replacement. |
+
+**Approval.** A lesson from an editor or sub-editor waits under "Waiting for approval" until the admin approves it. The admin's own lessons are used at once. The admin can switch a lesson off, switch it on again or delete it. At most 80 lessons can be in use, and only the newest that fit (about 6,000 characters) are sent to the AI, so the main rules always come first.
+
+**Safety.** Lessons change wording only. The AI is told that a lesson never overrides the house rules, never allows a new fact, and that any part of a lesson asking for something else is to be ignored. Backticks, triple quotes and control characters are removed from lesson text.
+
+**Where lessons are kept.** In the site setting `ai_lessons` (the `site_settings` table), so no database change is needed. The code is in `lib/ai-lessons.js` (rules) and `lib/ai-lessons-store.js` (saving). If the database cannot be read, the tools carry on without lessons.
+
+**What lessons cannot do.** They do not retrain the detector's model (that needs the training scripts below), and the public `/ai-tools/` page does not use them, because it runs without the website. The News Hunter's automatic drafts (`scripts/hunt.js`) do not use them yet.
+
 ## Read this first
 
 - **A score is not proof.** The built-in model is right on about 9 in 10 test texts, but it wrongly flags about 1 in 13 human texts. Formal academic prose and writing by non-native English speakers are flagged in error more often (Liang et al., 2023, "GPT detectors are biased against non-native English writers", *Patterns*). Never use a score alone as evidence against a person.
@@ -241,6 +260,7 @@ AUC is the usual figure to report: 0.5 means chance and 1.0 means perfect separa
 | `scripts/ai-text-experiments.js` | Baselines and unseen-model / unseen-domain tests |
 | `scripts/ai-text-gemini.js` | Adds Gemini texts to the corpus (API or by hand) |
 | `lib/news-editor.js` | The "senior news editor" instructions and rewrite (admin panel) |
+| `lib/ai-lessons.js`, `lib/ai-lessons-store.js` | Teach the AI: lessons from the desk for the editor, summaries, research drafts and checker |
 | `scripts/ai-text-new-model-eval.js` | How well the detector catches a new AI model (zero-shot and 5-fold) |
 | `scripts/ai-text-standalone.js` | Builds the single-file version for use on a PC |
 | `tests/ai-text.test.js` | Tests (`npm test`) |

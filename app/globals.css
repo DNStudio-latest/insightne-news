@@ -606,3 +606,9 @@ main { padding: 20px 0 40px; }
 .aic-mini { font: inherit; font-size: 0.8rem; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--brand-soft); color: var(--brand); cursor: pointer; }
 .aic-warn { color: var(--warn); }
 .aic-open-story { margin-top: 10px; }
+
+/* Teach the AI (/admin/ai-lessons and the form in the AI checker) */
+.aic-tools { border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; display: grid; gap: 6px; }
+.aic-tools legend { font-weight: 700; padding: 0 4px; }
+.aic-teach { display: grid; gap: 8px; }
+.aic-teach input[type="text"] { width: 100%; }

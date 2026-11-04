@@ -7,19 +7,27 @@ import { createRulesAi } from "../lib/rules.js";
 import { runPipeline, fillMissingSummaries, fillMissingTranslations } from "../lib/pipeline.js";
 import { addMissingIllustrations } from "../lib/images.js";
 import { settings, states, enabledSources, trustedSourceNames, newsTopics } from "../lib/config.js";
+import { lessonsPrompt, summariesFollowLessons, activeFor } from "../lib/ai-lessons.js";
+import { loadLessons } from "../lib/ai-lessons-store.js";
 
 // With a Claude key, Claude scores and summarizes. With a free Gemini key, simple rules score the news
 // and Gemini writes the summaries. With neither, you write the summaries yourself ("no-AI mode", free).
+// The lessons approved in Admin → Teach the AI are added to the summary instructions, and each summary is checked.
 const hasClaudeKey = Boolean(process.env.ANTHROPIC_API_KEY || process.env.OPENROUTER_API_KEY);
+const lessons = await loadLessons(db, console.log);
+const lessonText = lessonsPrompt(lessons, "summaries");
 const rules = createRulesAi({ topics: newsTopics });
-const ai = hasClaudeKey
-  ? createClaudeAi({ topics: newsTopics, states })
-  : process.env.GEMINI_API_KEY
-    ? createGeminiAi({ rules, topics: newsTopics, states })
-    : rules;
+const ai = summariesFollowLessons(
+  hasClaudeKey
+    ? createClaudeAi({ topics: newsTopics, states, lessons: lessonText })
+    : process.env.GEMINI_API_KEY
+      ? createGeminiAi({ rules, topics: newsTopics, states, lessons: lessonText })
+      : rules,
+  lessons,
+);
 
 console.log(`InsightNE News collector — ${new Date().toISOString()}`);
-console.log(`Saving to: ${usingSupabase ? "Supabase (online)" : "data/local-db.json (on this computer)"}. Mode: ${ai.model}`);
+console.log(`Saving to: ${usingSupabase ? "Supabase (online)" : "data/local-db.json (on this computer)"}. Mode: ${ai.model}. Desk lessons for summaries: ${activeFor(lessons, "summaries").length}`);
 
 const run = await runPipeline({
   db,

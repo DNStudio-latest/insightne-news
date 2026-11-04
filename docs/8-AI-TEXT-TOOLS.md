@@ -127,11 +127,29 @@ The built-in model has never seen Google Gemini text, and AI models it has not s
 
    The experiment report now includes "Unseen generator: gemini": how much Gemini text the detector catches without having seen Gemini. That figure is worth reporting on its own.
 
+**First results (November 2026, 77 texts written in the Gemini app).** Each Gemini text was matched to a human text of the same genre and topic. 79 of the 80 prompts were answered, and 2 answers were dropped as too short (under 50 words). Full figures are in `docs/ai-text-gemini-eval.json`; reproduce them with `node scripts/ai-text-new-model-eval.js corpus.csv gemini.csv`.
+
+| Gemini texts caught | Zero-shot (built-in model, never saw Gemini) | After adding Gemini texts to training (5-fold) |
+|---|---|---|
+| **All genres** | **34 / 77 (44%)**, AUC 0.81 | **45 / 77 (58%)** |
+| Student essays | 9 / 10 | 10 / 10 |
+| News | 8 / 10 | 8 / 10 |
+| Short stories | 8 / 10 | 8 / 10 |
+| WikiHow | 7 / 10 | 7 / 10 |
+| Peer reviews | 1 / 10 | 5 / 10 |
+| arXiv abstracts | 0 / 10 | 5 / 10 |
+| Wikipedia | 1 / 8 | 2 / 8 |
+| Reddit ELI5 | 0 / 9 | 0 / 9 |
+
+Human texts wrongly flagged stayed at 7.6–8.0% in all five folds. With only about 10 texts per genre, each genre figure is a rough estimate: one text is 10 percentage points. Training a full model on the corpus plus the 77 texts gave 90.5% test accuracy and an 8.2% false-positive rate, compared with 90.9% and 7.6% for the built-in model. So the built-in model was kept unchanged until more Gemini texts are available, through route A.
+
+What this shows: Gemini's academic and explanatory writing (abstracts, peer reviews, ELI5 answers) usually passes as human to a detector trained on older AI models. A few dozen examples help in some genres but are not enough.
+
 **B) By hand, in the Gemini app (about 50–100 texts).**
 
 1. Export a prompt sheet: `node scripts/ai-text-gemini.js corpus.csv --prompts-out gemini-prompts.csv --per-domain 10` (80 prompts).
 2. Open it in Google Sheets or Excel. Paste each prompt into a new Gemini chat and paste the reply into the **answer** column of the same row. Rows you leave empty are skipped.
-3. Save it as CSV and import it: `node scripts/ai-text-gemini.js corpus.csv --import gemini-prompts.csv --out gemini.csv`. Use the same `corpus.csv` and `--per-domain` as in step 1, so the answers match their prompts.
+3. Save it as CSV (Excel's plain "CSV" and "CSV UTF-8" both work) and import it: `node scripts/ai-text-gemini.js corpus.csv --import gemini-prompts.csv --out gemini.csv`. Use the same `corpus.csv` and `--per-domain` as in step 1, so the answers match their prompts.
 
 A hand-made set is too small to train on well, but it makes a good **test** of how much Gemini text the current model catches. Use a new chat for each prompt, so earlier answers do not shape later ones.
 
@@ -186,6 +204,7 @@ AUC is the usual figure to report: 0.5 means chance and 1.0 means perfect separa
 | `scripts/ai-text-train.js` | Training and evaluation |
 | `scripts/ai-text-experiments.js` | Baselines and unseen-model / unseen-domain tests |
 | `scripts/ai-text-gemini.js` | Adds Gemini texts to the corpus (API or by hand) |
+| `scripts/ai-text-new-model-eval.js` | How well the detector catches a new AI model (zero-shot and 5-fold) |
 | `scripts/ai-text-standalone.js` | Builds the single-file version for use on a PC |
 | `tests/ai-text.test.js` | Tests (`npm test`) |
 

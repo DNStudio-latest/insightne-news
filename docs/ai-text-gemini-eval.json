@@ -1,0 +1,43 @@
+{
+  "gemini_texts": 77,
+  "human_test_texts": 2564,
+  "zero_shot": {
+    "caught": 34,
+    "n": 2641,
+    "accuracy": 0.9103,
+    "auc": 0.8134,
+    "precision": 0.1491,
+    "recall": 0.4416,
+    "f1": 0.223,
+    "falsePositiveRate": 0.0757,
+    "by_genre": {
+      "arxiv": "0/10",
+      "gb-essay": "9/10",
+      "gb-reuter": "8/10",
+      "gb-wp": "8/10",
+      "peerread": "1/10",
+      "reddit": "0/9",
+      "wikihow": "7/10",
+      "wikipedia": "1/8"
+    }
+  },
+  "fold0_human_fpr": 0.0796,
+  "fold1_human_fpr": 0.0792,
+  "fold2_human_fpr": 0.0768,
+  "fold3_human_fpr": 0.0764,
+  "fold4_human_fpr": 0.0776,
+  "with_gemini_training": {
+    "caught": 45,
+    "recall": 0.5844,
+    "by_genre": {
+      "arxiv": "5/10",
+      "gb-essay": "10/10",
+      "gb-reuter": "8/10",
+      "gb-wp": "8/10",
+      "peerread": "5/10",
+      "reddit": "0/9",
+      "wikihow": "7/10",
+      "wikipedia": "2/8"
+    }
+  }
+}

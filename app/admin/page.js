@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { db, cleanSearch } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
 import { currentUser } from "../../lib/auth.js";
-import { SUB_EDITOR, storyCounts } from "../../lib/staff.js";
+import { SUB_EDITOR, storyCounts, canEditKokborok } from "../../lib/staff.js";
 import { formatDate } from "../../lib/format.js";
 import { logout } from "./actions.js";
 import StoryActions from "./StoryActions.js";
@@ -35,7 +35,9 @@ export default async function AdminPage({ searchParams }) {
   const admin = user.role === "admin";
   // A sub-editor sees only the stories they wrote.
   const sub = user.role === SUB_EDITOR;
-  const mine = sub ? { authorId: user.id } : {};
+  // A sub-editor named in settings.json "kokborokEditors" sees every story (to edit its Kokborok version).
+  const kokborokEditor = sub && canEditKokborok(user, settings.kokborokEditors?.names);
+  const mine = sub && !kokborokEditor ? { authorId: user.id } : {};
   const params = await searchParams;
   const view = VIEWS[params.view] && (admin || params.view !== "rejected") ? params.view : "pending";
   const q = cleanSearch(params.q);
@@ -63,8 +65,8 @@ export default async function AdminPage({ searchParams }) {
       </div>
 
       <nav className="tabs">
-        <a href="/admin?view=pending" aria-current={view === "pending" ? "page" : undefined}>{sub ? "My drafts" : "Pending"} ({pendingCount})</a>
-        <a href="/admin?view=published" aria-current={view === "published" ? "page" : undefined}>{sub ? "My published stories" : "Published"}</a>
+        <a href="/admin?view=pending" aria-current={view === "pending" ? "page" : undefined}>{sub && !kokborokEditor ? "My drafts" : "Pending"} ({pendingCount})</a>
+        <a href="/admin?view=published" aria-current={view === "published" ? "page" : undefined}>{sub && !kokborokEditor ? "My published stories" : "Published"}</a>
         {admin && <a href="/admin?view=rejected" aria-current={view === "rejected" ? "page" : undefined}>Rejected</a>}
         <a href="/admin/write">✍ Write story</a>
         {admin && (
@@ -88,6 +90,7 @@ export default async function AdminPage({ searchParams }) {
           Signed in as <b>{user.name}</b> (sub-editor).{" "}
           {myCount !== null && <>Stories you have published so far: <b style={{ fontSize: "1.25em" }}>{myCount}</b>. </>}
           You see and edit only your own stories, in any state or topic. Your name appears as the byline (“By {user.name}, Sub-Editor”).
+          {kokborokEditor && " You also see every other story, and you can edit its Kokborok version (the English text of other people's stories stays as it is)."}
           Making a story the lead or breaking news is for the admin.{" "}
           {settings.subEditors?.canPublish === false ? "New stories you send go to Pending, and the admin publishes them." : "Stories you publish go live straight away."}
         </div>
@@ -136,7 +139,7 @@ export default async function AdminPage({ searchParams }) {
           </div>
         )}
         {stories.map((story) => (
-          <AdminStory key={story.id} story={story} view={view} admin={admin} />
+          <AdminStory key={story.id} story={story} view={view} admin={admin} scope={sub && story.author_id !== user.id ? "kokborok" : "full"} />
         ))}
       </div>
     </div>
@@ -161,7 +164,7 @@ function RunBox({ run }) {
   );
 }
 
-function AdminStory({ story, view, admin }) {
+function AdminStory({ story, view, admin, scope }) {
   return (
     <article className="story">
       <div className="meta">
@@ -209,7 +212,7 @@ function AdminStory({ story, view, admin }) {
         ))}
       </ul>
 
-      <StoryActions story={story} view={view} regions={regions} topics={settings.topics} facebook={facebookReady()} instagram={instagramReady()} admin={admin} />
+      <StoryActions story={story} view={view} regions={regions} topics={settings.topics} facebook={facebookReady()} instagram={instagramReady()} admin={admin} scope={scope} />
     </article>
   );
 }

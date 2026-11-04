@@ -82,6 +82,10 @@
     "_help": "People marked Sub-editor on /admin/editors. They see and edit only their own stories and can't make a story the lead or breaking news. If canPublish is true, their stories go live straight away; if false, they wait in Pending for the admin.",
     "canPublish": true
   },
+  "kokborokEditors": {
+    "_help": "Sub-editors named here (exactly as their name appears on /admin/editors, letter case does not matter) may also edit the Kokborok version of every story. On other people's stories they can change only the Kokborok headline and summary, not the English text.",
+    "names": ["Elisa", "Anita", "Mary John"]
+  },
   "facebook": {
     "_help": "Posting to your Facebook page. Needs FACEBOOK_PAGE_ID and FACEBOOK_PAGE_TOKEN in Vercel (see docs/5-FACEBOOK.md). autoPost: \"originals\" = your own reports are posted automatically when published; true = every story you approve; false = only with the POST TO FACEBOOK button.",
     "autoPost": "originals"

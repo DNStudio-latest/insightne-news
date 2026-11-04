@@ -4,7 +4,9 @@ import { useState } from "react";
 import { approve, reject, saveEdit, unpublish, restore, makeLead, togglePin, toggleBreaking, notifyReaders, postFacebook, postInstagram } from "./actions.js";
 import { shrinkPhoto } from "./photo.js";
 
-export default function StoryActions({ story, view, regions, topics, facebook = false, instagram = false, admin = true }) {
+// scope "kokborok": someone else's story, open only to change its Kokborok version.
+export default function StoryActions({ story, view, regions, topics, facebook = false, instagram = false, admin = true, scope = "full" }) {
+  const kokOnly = scope === "kokborok";
   // In no-AI mode a story arrives without a summary; WRITE SUMMARY opens the writing box.
   const needsSummary = !story.summary?.trim();
   const [editing, setEditing] = useState(false);
@@ -28,7 +30,7 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
   const id = <input type="hidden" name="id" value={story.id} />;
   // Your own reports open in the full editor; news briefs are edited right here.
   const editButton =
-    story.kind === "original" ? (
+    story.kind === "original" && !kokOnly ? (
       <a className="btn btn-edit" href={`/admin/write?id=${story.id}`} style={{ textDecoration: "none" }}>OPEN EDITOR</a>
     ) : (
       <button className="btn btn-edit" type="button" onClick={() => setEditing(!editing)} aria-expanded={editing}>
@@ -47,7 +49,8 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
       )}
       <div className="actions">
         {/* Editors can only write and edit; publishing and everything else is for the admin. */}
-        {!admin &&
+        {!admin && kokOnly && editButton}
+        {!admin && !kokOnly &&
           (needsSummary && story.kind === "original" ? (
             <a className="btn btn-approve" href={`/admin/write?id=${story.id}`} style={{ gridColumn: "span 2", textDecoration: "none" }}>
               CONTINUE WRITING
@@ -169,6 +172,19 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
         <form action={submitEdit} className="edit-form">
           {id}
           <input type="hidden" name="view" value={view} />
+          <details className="bn-fields" open={kokOnly || Boolean(story.translations?.trp?.summary)}>
+            <summary>Kokborok version (Latin script)</summary>
+            <label>
+              Kokborok headline
+              <input name="headline_trp" lang="trp" defaultValue={story.translations?.trp?.headline || ""} maxLength={300} />
+            </label>
+            <label>
+              Kokborok summary
+              <textarea name="summary_trp" lang="trp" defaultValue={story.translations?.trp?.summary || ""} maxLength={2000} placeholder="Leave both boxes empty and Gemini will write the Kokborok version again at the next run." />
+            </label>
+          </details>
+          {!kokOnly && (
+            <>
           <label>
             Headline
             <input name="headline" defaultValue={story.headline} required maxLength={200} />
@@ -242,6 +258,8 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
             <label className="confirm">
               <input type="checkbox" required /> I have checked this story before approving
             </label>
+          )}
+            </>
           )}
           <div className="edit-buttons">
             <button className="btn btn-edit" type="submit" formNoValidate disabled={busy}>{busy ? "SAVING…" : "SAVE"}</button>

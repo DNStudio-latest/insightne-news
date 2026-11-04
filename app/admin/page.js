@@ -45,11 +45,12 @@ export default async function AdminPage({ searchParams }) {
   const sort = SORTS[params.sort] ? params.sort : "newest";
   const filtering = Boolean(q || state);
 
-  const [found, pendingAll, lastRun, myCount] = await Promise.all([
+  const [found, pendingAll, lastRun, myCount, views] = await Promise.all([
     q ? db.searchStories(q, { status: VIEWS[view], limit: 300, ...mine }) : db.listStories({ status: VIEWS[view], limit: 500, ...mine }),
     view === "pending" && !filtering ? null : db.listStories({ status: "pending", limit: 500, ...mine }),
     sub ? null : db.lastRun(),
     sub ? db.storyAuthors().then((rows) => storyCounts(rows, [{ id: user.id, name: user.name }])[user.id]).catch(() => null) : null,
+    admin ? db.viewTotals().catch(() => null) : null,
   ]);
   const matching = found.filter((s) => !state || s.region === state).sort(SORTS[sort]);
   const stories = matching.slice(0, MAX_SHOWN);
@@ -104,6 +105,7 @@ export default async function AdminPage({ searchParams }) {
         </p>
       )}
       {!sub && <RunBox run={lastRun} />}
+      {admin && <ViewsBox views={views} />}
 
       <form className="admin-filter" action="/admin" role="search">
         <input type="hidden" name="view" value={view} />
@@ -144,6 +146,18 @@ export default async function AdminPage({ searchParams }) {
           <AdminStory key={story.id} story={story} view={view} admin={admin} scope={sub && story.author_id !== user.id ? "kokborok" : "full"} />
         ))}
       </div>
+    </div>
+  );
+}
+
+// Story views on the website (one count per story per reader page-open, per day). Shown to the admin only.
+// Unique visitors are not counted; this is the total number of times stories were opened.
+function ViewsBox({ views }) {
+  if (!views) return null;
+  return (
+    <div className="run-box">
+      📈 <b>Story views</b> on the website: <b>{views.today.toLocaleString("en-IN")}</b> today ·{" "}
+      <b>{views.all.toLocaleString("en-IN")}</b> in total. This counts story page openings, not separate people.
     </div>
   );
 }

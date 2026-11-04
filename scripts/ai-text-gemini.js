@@ -138,7 +138,8 @@ export async function generateWithApi(rows, { out, perDomain, model, gapMs, gene
 export function writePrompts(rows, { file, perDomain }) {
   const picked = pickHumanTexts(rows, perDomain);
   const body = picked.map((h) => [idFor(h), h.domain, promptFor(h), ""].map(csvField).join(","));
-  writeFileSync(file, ["id,genre,prompt,answer", ...body].join("\n") + "\n");
+  // The byte-order mark tells Excel the file is UTF-8 (otherwise "…" shows as "â€¦").
+  writeFileSync(file, "\uFEFF" + ["id,genre,prompt,answer", ...body].join("\r\n") + "\r\n");
   return picked.length;
 }
 

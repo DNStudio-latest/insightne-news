@@ -35,7 +35,23 @@ A Next.js news website for Tripura and Northeast India, deployed on Vercel from 
 
 The owner reviews live edits and reports phrases that sound machine-written. Simple phrase corrections can now be made by the desk itself in **Admin → 🧠 Teach the AI** (`/admin/ai-lessons`, `lib/ai-lessons.js`): an approved lesson is added to the instructions of the senior editor, the daily summaries and the drafts writer (Research desk and News Hunter), and flagged in the admin checker, with no code change. A News Hunter draft that still uses a banned phrase gets the `lesson` flag and is never auto-published. Lessons are stored in the `ai_lessons` site setting; staff lessons wait for the admin's approval. Reports that need more than a phrase swap (a structural rule, like the ", prompting…" rule) still become a rule in `EDITOR_SYSTEM` (with the real example as a before/after), a `PATTERNS` entry in `engine.js` where a rule-based flag helps, and a test.
 
+## PhD thesis checker (built November 2026, admin only)
+
+The owner's own tool for their PhD thesis in journalism and mass communication: writing suggestions, an academic editor and a ChatGPT-style signal. **It is a writing aid, not a verdict** (owner's decision, November 2026): tests showed it cannot detect text from current AI assistants, so labels say "ChatGPT-style signal" / "No ChatGPT-style signal found", never "human-written", and `DETECTION_LIMIT` is shown with every score. Keep it that way unless a new method is shown to work on the owner's test set. Guide and results: `docs/10-THESIS-AI-TOOLS.md`.
+
+| What | Where |
+|---|---|
+| Admin page (admin role only, not editors) | `app/admin/thesis-check/` |
+| Thesis reading (.docx, paragraphs, quotations, citations, references), suggestions, voice profile | `public/ai-tools/academic.js` |
+| Academic model (generated) and its data files | `public/ai-tools/model-academic.js`, `academic-words.js` (Kobak et al. 2025 excess words), `academic-norms.js` |
+| Academic editor (AI rewrite, server side) | `lib/academic-editor.js` |
+| Corpus, training, word list, norms, offline file | `scripts/thesis-*.js`, `scripts/thesis-checker.template.html` |
+
+Rules for the academic editor (keep them when changing `ACADEMIC_SYSTEM`): never add a fact, figure, source or citation, and never complete a reference; keep every citation, quotation, number and technical term exactly; never make a claim stronger or weaker; keep the writer's person ("I", "we", "the researcher") and spelling. `integrityNotes()` checks citations, quotations, figures and paragraph count after every edit. The news house style (`WRITING_RULES`) is deliberately **not** used here: it is for news copy ("said", datelines). Only the checker's `SAFE_REPLACEMENTS` are applied, outside quotations and citations. The thesis text is never stored on the website.
+
 ## Open items
+
+- **Thesis checker, next steps:** (1) add huggingface.co, arxiv.org, export.arxiv.org, api.openalex.org and shodhganga.inflibnet.ac.in to the environment's allowed domains, then add pre-2022 journalism and mass communication abstracts and Indian PhD theses as human text; (2) AI texts from current models (GPT-5, Claude, Gemini) in the owner's field, through an API key; (3) calibrate on the owner's own pre-2022 writing. See `docs/10-THESIS-AI-TOOLS.md`.
 
 - **Second newsroom study:** read Reuters, AP, PTI, BBC, Guardian, The Hindu, Wikipedia and trust.org directly once they are added to the environment's allowed network domains. Fill in the "unconfirmed" points in `docs/9-NEWS-WRITING-STANDARDS.md`.
 - **Gemini training:** 77 Gemini-app texts were collected; detection went from 44% to 58% (`docs/ai-text-gemini-eval.json`). The next step is about 1,200 texts through the API: `scripts/ai-text-gemini.js` with `GEMINI_API_KEY` set as an environment variable.

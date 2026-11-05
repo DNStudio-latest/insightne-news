@@ -1,0 +1,285 @@
+{
+  "corpus": {
+    "texts": 44514,
+    "train": 33431,
+    "dev": 4440,
+    "test": 6643
+  },
+  "createdAt": "2026-11-05T03:55:49.379Z",
+  "settings": {
+    "l2": 0.00001,
+    "keep": 15000
+  },
+  "test": {
+    "n": 6643,
+    "accuracy": 0.9377,
+    "auc": 0.9845,
+    "precision": 0.9504,
+    "recall": 0.9235,
+    "f1": 0.9368,
+    "falsePositiveRate": 0.0482
+  },
+  "test_at_ai_threshold": {
+    "n": 6643,
+    "threshold": 0.6822,
+    "accuracy": 0.9332,
+    "falsePositiveRate": 0.0214,
+    "caught": 0.8877
+  },
+  "by_domain": {
+    "arxiv": {
+      "n": 1365,
+      "accuracy": 0.8864,
+      "auc": 0.957,
+      "precision": 0.9388,
+      "recall": 0.828,
+      "f1": 0.8799,
+      "falsePositiveRate": 0.0545
+    },
+    "gpab-cs": {
+      "n": 768,
+      "accuracy": 0.957,
+      "auc": 0.992,
+      "precision": 0.9488,
+      "recall": 0.9661,
+      "f1": 0.9574,
+      "falsePositiveRate": 0.0521
+    },
+    "gpab-hss": {
+      "n": 2660,
+      "accuracy": 0.9575,
+      "auc": 0.9927,
+      "precision": 0.9599,
+      "recall": 0.9549,
+      "f1": 0.9574,
+      "falsePositiveRate": 0.0398
+    },
+    "gpab-phx": {
+      "n": 734,
+      "accuracy": 0.9659,
+      "auc": 0.9953,
+      "precision": 0.9597,
+      "recall": 0.9728,
+      "f1": 0.9662,
+      "falsePositiveRate": 0.0409
+    },
+    "ieee": {
+      "n": 940,
+      "accuracy": 0.9181,
+      "auc": 0.9763,
+      "precision": 0.9281,
+      "recall": 0.9064,
+      "f1": 0.9171,
+      "falsePositiveRate": 0.0702
+    },
+    "peerread": {
+      "n": 176,
+      "accuracy": 0.9375,
+      "auc": 0.9939,
+      "precision": 0.974,
+      "recall": 0.8929,
+      "f1": 0.9317,
+      "falsePositiveRate": 0.0217
+    }
+  },
+  "by_generator": {
+    "chatgpt": {
+      "n": 2729,
+      "accuracy": 0.9524
+    },
+    "claude-instant": {
+      "n": 92,
+      "accuracy": 0.837
+    },
+    "cohere": {
+      "n": 87,
+      "accuracy": 0.7931
+    },
+    "davinci": {
+      "n": 88,
+      "accuracy": 0.8068
+    },
+    "dolly": {
+      "n": 82,
+      "accuracy": 0.5488
+    },
+    "flant5": {
+      "n": 43,
+      "accuracy": 0.9302
+    },
+    "google-palm": {
+      "n": 95,
+      "accuracy": 0.6737
+    },
+    "human": {
+      "n": 3322,
+      "accuracy": 0.9518
+    },
+    "llama-2-70b": {
+      "n": 105,
+      "accuracy": 0.9714
+    }
+  },
+  "by_task": {
+    "complete": {
+      "n": 233,
+      "accuracy": 0.9442
+    },
+    "fusion": {
+      "n": 23,
+      "accuracy": 0.4348
+    },
+    "generate": {
+      "n": 2200,
+      "accuracy": 0.9568
+    },
+    "human": {
+      "n": 3322,
+      "accuracy": 0.9518
+    },
+    "polish": {
+      "n": 865,
+      "accuracy": 0.8462
+    }
+  },
+  "news_model_on_academic": {
+    "n": 6643,
+    "accuracy": 0.7905,
+    "auc": 0.9278,
+    "precision": 0.7252,
+    "recall": 0.9353,
+    "f1": 0.8169,
+    "falsePositiveRate": 0.3543
+  },
+  "news_model_on_hss": {
+    "n": 2660,
+    "accuracy": 0.7357,
+    "auc": 0.9424,
+    "precision": 0.6584,
+    "recall": 0.9797,
+    "f1": 0.7875,
+    "falsePositiveRate": 0.5083
+  },
+  "unseen_domain": {
+    "gpab-hss": {
+      "n": 2660,
+      "accuracy": 0.9041,
+      "auc": 0.9726,
+      "precision": 0.8674,
+      "recall": 0.9541,
+      "f1": 0.9087,
+      "falsePositiveRate": 0.1459
+    },
+    "ieee": {
+      "n": 940,
+      "accuracy": 0.8894,
+      "auc": 0.9632,
+      "precision": 0.8927,
+      "recall": 0.8851,
+      "f1": 0.8889,
+      "falsePositiveRate": 0.1064
+    },
+    "arxiv": {
+      "n": 1365,
+      "accuracy": 0.7443,
+      "auc": 0.9138,
+      "precision": 0.9856,
+      "recall": 0.4985,
+      "f1": 0.6621,
+      "falsePositiveRate": 0.0074
+    }
+  },
+  "unseen_generator": {
+    "claude-instant": {
+      "n": 3414,
+      "accuracy": 0.9549,
+      "auc": 0.9483,
+      "precision": 0.3333,
+      "recall": 0.6739,
+      "f1": 0.446,
+      "falsePositiveRate": 0.0373
+    },
+    "google-palm": {
+      "n": 3417,
+      "accuracy": 0.9462,
+      "auc": 0.882,
+      "precision": 0.2764,
+      "recall": 0.5789,
+      "f1": 0.3741,
+      "falsePositiveRate": 0.0433
+    },
+    "llama-2-70b": {
+      "n": 3427,
+      "accuracy": 0.9527,
+      "auc": 0.9955,
+      "precision": 0.3908,
+      "recall": 0.9714,
+      "f1": 0.5574,
+      "falsePositiveRate": 0.0479
+    },
+    "cohere": {
+      "n": 3409,
+      "accuracy": 0.9475,
+      "auc": 0.87,
+      "precision": 0.2444,
+      "recall": 0.5057,
+      "f1": 0.3296,
+      "falsePositiveRate": 0.0409
+    },
+    "dolly": {
+      "n": 3404,
+      "accuracy": 0.941,
+      "auc": 0.7138,
+      "precision": 0.1161,
+      "recall": 0.2195,
+      "f1": 0.1519,
+      "falsePositiveRate": 0.0412
+    }
+  },
+  "unseen_task": {
+    "polish": {
+      "n": 4187,
+      "accuracy": 0.8691,
+      "auc": 0.9079,
+      "precision": 0.8514,
+      "recall": 0.4439,
+      "f1": 0.5836,
+      "falsePositiveRate": 0.0202
+    }
+  },
+  "robust": {
+    "by_task": {
+      "complete": {
+        "n": 593,
+        "accuracy": 0.3069
+      },
+      "humanize": {
+        "n": 598,
+        "accuracy": 0.9783
+      },
+      "paraphrase-dipper": {
+        "n": 392,
+        "accuracy": 0.9184
+      },
+      "polish_sentence": {
+        "n": 818,
+        "accuracy": 0.2372
+      },
+      "polish_token": {
+        "n": 859,
+        "accuracy": 0.2049
+      },
+      "rewrite": {
+        "n": 595,
+        "accuracy": 0.2622
+      }
+    },
+    "dipper_at_ai_threshold": {
+      "n": 392,
+      "threshold": 0.6822,
+      "accuracy": 0.8571,
+      "falsePositiveRate": 0,
+      "caught": 0.8571
+    }
+  }
+}

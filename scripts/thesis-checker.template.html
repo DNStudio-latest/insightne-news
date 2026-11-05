@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Thesis Writing Checker</title>
+<style>
+  :root { --bg: #f6f5f1; --card: #fff; --text: #1b1b1b; --muted: #5f6368; --line: #e3e1da; --brand: #0f4c5c; --soft: #e3eef0; --ok: #1e7b45; --warn: #a8441a; --warn-bg: #fff1e6; --danger: #b3261e; --mid: #c99a2e; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #111315; --card: #1a1d20; --text: #ecebe7; --muted: #a0a4a8; --line: #2c3034; --brand: #7cc4d4; --soft: #1d3338; --ok: #5cc28a; --warn: #ffb38a; --warn-bg: #3a2416; --danger: #ff8a80; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 1.5rem; margin: 8px 0; } h2 { font-size: 1.15rem; margin: 0 0 8px; } h3 { font-size: 1rem; margin: 8px 0 4px; }
+  section, article { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 14px 0; }
+  .note { color: var(--muted); font-size: 0.88rem; }
+  .flag { border-left: 4px solid var(--warn); background: var(--warn-bg); padding: 10px 12px; border-radius: 6px; font-size: 0.92rem; }
+  textarea { width: 100%; min-height: 160px; font: inherit; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
+  button, select, input[type=file] { font: inherit; }
+  button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--brand); background: var(--brand); color: var(--card); cursor: pointer; font-weight: 600; }
+  button.plain { background: transparent; color: var(--brand); }
+  .row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 8px 0; }
+  label { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; margin: 8px 0; min-width: 0; }
+  input[type=file] { width: 100%; max-width: 100%; }
+  .note { overflow-wrap: anywhere; }
+  .ai { color: var(--danger); } .human { color: var(--muted); } .mixed { color: var(--warn); }
+  .shares { display: flex; height: 14px; border-radius: 7px; overflow: hidden; } .shares span { display: block; }
+  article { border-left: 6px solid var(--line); } article.b-ai { border-left-color: var(--danger); } article.b-mixed { border-left-color: var(--mid); } article.b-human { border-left-color: var(--line); }
+  .head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 0.9rem; }
+  .text { white-space: pre-wrap; line-height: 1.6; margin: 6px 0; }
+  mark { background: var(--warn-bg); color: inherit; border-bottom: 2px solid var(--warn); }
+  mark.k-wordy { background: var(--soft); border-bottom-color: var(--brand); }
+  .u { text-decoration: underline wavy var(--danger); text-underline-offset: 3px; } .u.k-source { text-decoration: underline dashed var(--brand); } .u.k-long { text-decoration: underline dotted var(--muted); }
+  ul { padding-left: 18px; margin: 4px 0; } li { margin-bottom: 6px; font-size: 0.93rem; }
+  .tag { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); }
+  .alts { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: 4px; color: var(--muted); font-size: 0.85rem; }
+  .alts button { padding: 1px 10px; border-radius: 999px; background: var(--soft); color: var(--brand); border-color: var(--line); font-weight: 400; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; } td, th { border-bottom: 1px solid var(--line); padding: 4px 8px; text-align: left; } td + td, th + th { text-align: right; }
+  .scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<main>
+  <h1>🎓 Thesis writing checker (offline)</h1>
+  <p class="note">This file works without the internet. Your thesis is read on this computer only; nothing is sent anywhere. The AI rewrite (academic editor) is available only in the website's admin panel.</p>
+  <div class="flag" id="caveat"><strong>A writing aid, not a verdict.</strong> The score shows only ChatGPT-style writing of the 2023 kind. It does not detect text from current AI assistants, so a low score does not mean a text is human-written. On genuine human theses in this field it gives a false signal on about 1 paragraph in 100. <span id="model-line"></span></div>
+
+  <section>
+    <h2>1. Open a chapter</h2>
+    <label>Word or text file <span class="note">(.docx or .txt; save a PDF as .docx first)</span><input type="file" id="file" accept=".docx,.txt,.md"></label>
+    <label>Or paste text <span class="note">(blank line between paragraphs)</span><textarea id="paste" placeholder="Paste a chapter or a few paragraphs here…"></textarea></label>
+    <div class="row"><button id="check">Check pasted text</button></div>
+    <p class="flag" id="error" hidden></p>
+  </section>
+
+  <div id="out"></div>
+</main>
+<script type="module">
+import { readDocx, paragraphsFromText, analyseThesis, applyAlternative, VOICE_LABELS, VOICE_NORMS, THESIS_DISCLAIMER, MIN_PARAGRAPH_WORDS, DETECTION_LIMIT, BAND_LABELS, WRITING_POINTS } from "./academic.js";
+import { ACADEMIC_MODEL } from "./model-academic.js";
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const BAND = BAND_LABELS;
+const KIND = { excess: "Word that rose with ChatGPT", wordy: "Wordy", pattern: "Stock formula", source: "Needs a citation", overclaim: "Overclaim", sentence: "ChatGPT-style sentence", long: "Long sentence", uniform: "Even rhythm" };
+let paras = null;
+let name = "";
+let filter = "attention";
+
+const tm = ACADEMIC_MODEL.training;
+$("model-line").textContent = `Never use it as evidence about anyone.`;
+
+function marked(text, suggestions) {
+  const outerK = new Set(["sentence", "source", "long"]);
+  const pick = (test) => { const out = []; let end = -1; for (const s of suggestions.filter((x) => test(x.kind) && x.index !== undefined).sort((a, b) => a.index - b.index)) { if (s.index < end) continue; out.push(s); end = s.index + s.length; } return out; };
+  const outer = pick((k) => outerK.has(k));
+  const inner = pick((k) => !outerK.has(k) && k !== "uniform");
+  const cuts = [...new Set([0, text.length, ...[...outer, ...inner].flatMap((s) => [s.index, s.index + s.length])])].sort((a, b) => a - b);
+  const cover = (spans, at) => spans.find((s) => at >= s.index && at < s.index + s.length);
+  let html = "";
+  for (let i = 0; i < cuts.length - 1; i++) {
+    let piece = esc(text.slice(cuts[i], cuts[i + 1]));
+    const n = cover(inner, cuts[i]);
+    const o = cover(outer, cuts[i]);
+    if (n) piece = `<mark class="k-${n.kind}" title="${esc(n.message)}">${piece}</mark>`;
+    if (o) piece = `<span class="u k-${o.kind}" title="${esc(o.message)}">${piece}</span>`;
+    html += piece;
+  }
+  return html;
+}
+
+function render() {
+  const a = analyseThesis(paras, ACADEMIC_MODEL);
+  const s = a.summary;
+  const cls = (b) => (b === "ai" ? "ai" : b === "human" ? "human" : "mixed");
+  let html = `<section><h2>2. Overview: ${esc(name)}</h2>
+    <p>${s.words.toLocaleString("en")} words of your own prose were analysed (${s.counts.heading || 0} headings, ${s.counts.quote || 0} quotations and interview extracts, ${s.counts.table || 0} table cells, ${s.counts.caption || 0} captions and ${s.counts.reference || 0} references were left out).</p>`;
+  const points = WRITING_POINTS.filter(([k]) => s.writing[k]);
+  html += `<h3>Writing points</h3>${points.length ? `<ul>${points.map(([k, label]) => `<li><b>${s.writing[k]}</b> ${esc(label)}</li>`).join("")}</ul>` : "<p>No writing points found.</p>"}
+    <h3>ChatGPT-style signal</h3><p class="flag"><strong>What this can show.</strong> ${esc(DETECTION_LIMIT)}</p>`;
+  if (s.scoredWords) {
+    html += `<div class="shares"><span style="flex-grow:${s.shares.ai || 0.0001};background:var(--danger)"></span><span style="flex-grow:${s.shares.mixed || 0.0001};background:var(--mid)"></span><span style="flex-grow:${s.shares.human || 0.0001};background:var(--line)"></span></div>
+      <p><b class="ai">${s.shares.ai}%</b> of the scored words are in paragraphs with a ChatGPT-style signal, <b class="mixed">${s.shares.mixed}%</b> with a weak signal and <b class="human">${s.shares.human}%</b> with no ChatGPT-style signal found.${s.shortWords ? ` ${s.shortWords.toLocaleString("en")} words are in paragraphs under ${MIN_PARAGRAPH_WORDS} words, scored only with their section.` : ""}</p>`;
+  } else html += `<p class="note">No paragraph is long enough to score on its own (${MIN_PARAGRAPH_WORDS}+ words).</p>`;
+  html += `<p class="note">${esc(THESIS_DISCLAIMER)}</p><div class="row"><button id="download">Download revised text (.txt)</button></div>
+    <p class="note">Changes you make here are kept only while this page is open. Download the revised text before closing it.</p></section>`;
+
+  if (a.sections.length > 1) {
+    html += `<section><h2>Sections</h2><ul>${a.sections.map((x) => `<li><a href="#p${x.paragraphs[0]}">${esc(x.title)}</a> <span class="note">· ${x.words.toLocaleString("en")} words</span>${x.score !== undefined ? ` <b class="${cls(x.band)}">· ${x.score}/100</b>` : ""}</li>`).join("")}</ul></section>`;
+  }
+
+  if (VOICE_NORMS && a.voice.words) {
+    const keys = ["selfMention", "hedges", "boosters", "attitude", "frameMarkers", "transitions", "excessWords", "citations"];
+    html += `<section><h2>Your voice in numbers</h2><p class="note">Per 1,000 of your own words, next to the averages for human and ChatGPT humanities and social-science abstracts (GPABench2). Red: nearer the AI average. Abstracts are denser than chapters: read these as directions, not targets.</p>
+      <div class="scroll"><table><thead><tr><th>Measure</th><th>Your text</th><th>Human abstracts</th><th>AI abstracts</th></tr></thead><tbody>
+      ${keys.map((k) => { const you = a.voice.rates[k]; const h = VOICE_NORMS.human[k].mean; const ai = VOICE_NORMS.ai[k].mean; const near = Math.abs(you - ai) < Math.abs(you - h) && Math.abs(h - ai) > 1; return `<tr><td>${esc(VOICE_LABELS[k])}</td><td class="${near ? "ai" : ""}">${you}</td><td>${h}</td><td>${ai}</td></tr>`; }).join("")}
+      <tr><td>Average sentence length (words)</td><td>${a.voice.meanSentence}</td><td>${VOICE_NORMS.human.meanSentence.mean}</td><td>${VOICE_NORMS.ai.meanSentence.mean}</td></tr>
+      <tr><td>Variation in sentence length</td><td>${a.voice.sentenceVariation}</td><td>${VOICE_NORMS.human.sentenceVariation.mean}</td><td>${VOICE_NORMS.ai.sentenceVariation.mean}</td></tr>
+      </tbody></table></div></section>`;
+  }
+
+  const visible = a.paragraphs.filter((p) => (p.kind === "prose" || p.kind === "list") && (filter === "all" || (filter === "ai" && p.band === "ai") || (filter === "attention" && (p.band === "ai" || p.band === "mixed" || (p.suggestions || []).some((x) => ["source", "overclaim", "pattern", "sentence"].includes(x.kind))))));
+  html += `<section><h2>3. Paragraphs</h2><label>Show <select id="filter">
+      <option value="attention"${filter === "attention" ? " selected" : ""}>Paragraphs that need attention</option>
+      <option value="ai"${filter === "ai" ? " selected" : ""}>Only paragraphs with a ChatGPT-style signal</option>
+      <option value="all"${filter === "all" ? " selected" : ""}>All paragraphs</option></select></label>
+      <p class="note"><mark>Highlighted</mark> words have a suggestion; <span class="u">underlined</span> sentences have a ChatGPT-style signal or need a citation. Hover over a mark to see why.</p>
+      ${visible.length ? "" : "<p>Nothing to show with this filter.</p>"}</section>`;
+  for (const p of visible) {
+    const tips = (p.suggestions || []).filter((x) => x.kind !== "sentence");
+    html += `<article id="p${p.index}" class="b-${p.band || "none"}"><div class="head"><span class="note">${esc(p.section)}</span>${p.score !== undefined ? `<b class="${cls(p.band)}">${p.score}/100 · ${BAND[p.band]}</b>` : `<span class="note">${p.words} words: scored with its section</span>`}</div>
+      <p class="text">${marked(p.text, p.suggestions || [])}</p>
+      ${p.cues?.length ? `<p class="note">Words that raised the score most: ${p.cues.map((c) => `“${esc(c)}”`).join(", ")}</p>` : ""}
+      ${tips.length ? `<ul>${tips.map((t, i) => `<li><span class="tag">${KIND[t.kind] || t.kind}</span> ${esc(t.message)}${t.alternatives?.length ? `<span class="alts">Replace “${esc(t.phrase)}” with: ${t.alternatives.map((alt, j) => `<button data-p="${p.index}" data-s="${i}" data-a="${j}">${esc(alt || "(delete)")}</button>`).join("")}</span>` : ""}</li>`).join("")}</ul>` : ""}
+    </article>`;
+    p._tips = tips;
+  }
+  $("out").innerHTML = html;
+  $("download").onclick = () => {
+    const url = URL.createObjectURL(new Blob([paras.map((x) => x.text).join("\n\n")], { type: "text/plain;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url; link.download = `${(name || "thesis").replace(/\.[^.]+$/, "")}-revised.txt`; link.click();
+    URL.revokeObjectURL(url);
+  };
+  $("filter").onchange = (e) => { filter = e.target.value; render(); };
+  $("out").querySelectorAll(".alts button").forEach((b) => {
+    b.onclick = () => {
+      const p = a.paragraphs[Number(b.dataset.p)];
+      const tip = p._tips[Number(b.dataset.s)];
+      const y = window.scrollY;
+      paras[p.index] = { ...paras[p.index], text: applyAlternative(p.text, tip, tip.alternatives[Number(b.dataset.a)]) };
+      render();
+      window.scrollTo(0, y);
+    };
+  });
+}
+
+function showError(msg) { $("error").hidden = !msg; $("error").textContent = msg || ""; }
+$("check").onclick = () => {
+  const list = paragraphsFromText($("paste").value);
+  if (!list.length) return showError("Paste some text first.");
+  showError(""); paras = list; name = "Pasted text"; render();
+};
+$("file").onchange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const list = /\.docx$/i.test(file.name) ? await readDocx(await file.arrayBuffer()) : paragraphsFromText(await file.text());
+    if (!list.some((p) => p.text)) throw new Error("No text was found in this file.");
+    showError(""); paras = list; name = file.name; render();
+  } catch (err) {
+    showError(/\.(pdf|doc)$/i.test(file.name) ? "Only .docx and .txt files can be opened. In Word, use File → Save As → Word Document (.docx), or paste the text." : err.message);
+  }
+  e.target.value = "";
+};
+</script>
+</body>
+</html>

@@ -78,7 +78,7 @@ export function loadRows(csvText) {
   const li = col("label");
   const ti = col("text");
   if (li < 0 || ti < 0) throw new Error('The CSV needs a header row with "label" and "text" columns.');
-  const extras = ["split", "domain", "generator"].filter((c) => col(c) >= 0);
+  const extras = ["split", "domain", "generator", "task"].filter((c) => col(c) >= 0);
   return body.map((r, n) => {
     const raw = (r[li] || "").trim().toLowerCase();
     const label = AI_LABELS.has(raw) ? 1 : HUMAN_LABELS.has(raw) ? 0 : null;

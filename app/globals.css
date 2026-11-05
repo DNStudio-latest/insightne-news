@@ -647,3 +647,29 @@ main { padding: 20px 0 40px; }
 .tc-table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
 .tc-table th, .tc-table td { border-bottom: 1px solid var(--line); padding: 4px 8px; text-align: left; }
 .tc-table td:not(:first-child), .tc-table th:not(:first-child) { text-align: right; white-space: nowrap; }
+
+/* ================= Livelier site: card hover, scroll fade-in, lead photo, accent colour ================= */
+/* 1. Story cards lift a little when a mouse points at them. Only on devices with a mouse, and not for people who prefer less motion. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(15, 76, 92, 0.12); }
+}
+
+/* 2. Sections and boxes fade up as you scroll to them. Browsers that cannot do this simply show them as before. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes rise-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+    .section, .latest { animation: rise-in linear both; animation-timeline: view(); animation-range: entry 0% entry 30%; }
+  }
+}
+
+/* 3. The lead photo eases in with a slight zoom when the page opens. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes lead-zoom { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: scale(1); } }
+  .lead .img-link { overflow: hidden; border-radius: 10px; }
+  .lead .img-link img { animation: lead-zoom 1.2s ease-out both; }
+}
+
+/* 4. More accent colour: a red-orange bar before every section title and a red-orange line under the masthead. */
+.masthead { border-bottom: 3px solid var(--accent); }
+.section-title::before { content: ""; flex: none; width: 5px; height: 1.1em; border-radius: 3px; background: var(--accent); }

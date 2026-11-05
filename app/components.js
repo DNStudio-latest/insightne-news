@@ -532,7 +532,7 @@ export function SiteFooter() {
         </div>
       )}
       <div className="container">
-        <div className="brand-block">
+        <div className="brand-block footer-box box-brand">
           <a href="/" className="logo">
             {first}
             {rest.length > 0 && <span> {rest.join(" ")}</span>}
@@ -540,7 +540,7 @@ export function SiteFooter() {
           <p>{settings.tagline}. Our own reports, and short news briefs in our own words that always link to the original publisher.</p>
           <SocialLinks />
         </div>
-        <div>
+        <div className="footer-box box-sections">
           <h4>Sections</h4>
           <ul className="footer-links">
             {[...regions, ...topics].map((c) => (
@@ -551,7 +551,7 @@ export function SiteFooter() {
             <li><a href="/live">Live TV</a></li>
           </ul>
         </div>
-        <div>
+        <div className="footer-box box-about">
           <h4>About us</h4>
           <ul className="footer-links">
             <li><a href="/about">About</a></li>

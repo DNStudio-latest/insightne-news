@@ -612,3 +612,38 @@ main { padding: 20px 0 40px; }
 .aic-tools legend { font-weight: 700; padding: 0 4px; }
 .aic-teach { display: grid; gap: 8px; }
 .aic-teach input[type="text"] { width: 100%; }
+
+/* Thesis checker (/admin/thesis-check, admin only) */
+.tc .tc-paste { min-height: 160px; }
+.tc-text { white-space: pre-wrap; margin: 6px 0; line-height: 1.6; }
+.tc-text mark { background: var(--warn-bg); color: inherit; border-bottom: 2px solid var(--warn); border-radius: 2px; }
+.tc-text mark.tc-wordy { background: var(--brand-soft); border-bottom-color: var(--brand); }
+.tc-under { text-decoration: underline wavy color-mix(in srgb, var(--danger) 70%, transparent); text-underline-offset: 3px; }
+.tc-under.tc-source { text-decoration-color: var(--brand); text-decoration-style: dashed; }
+.tc-under.tc-long { text-decoration-color: var(--muted); text-decoration-style: dotted; }
+.tc-para { border: 1px solid var(--line); border-left: 6px solid var(--line); border-radius: 8px; padding: 10px 14px; margin: 12px 0; background: var(--card); }
+.tc-band-ai { border-left-color: var(--danger); background-color: var(--danger); }
+.tc-band-mixed { border-left-color: #c99a2e; background-color: #c99a2e; }
+.tc-band-human { border-left-color: var(--ok); background-color: var(--ok); }
+.tc-para.tc-band-ai, .tc-para.tc-band-mixed, .tc-para.tc-band-human, .tc-para.tc-band-none { background-color: var(--card); }
+.tc-para-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 0.9rem; }
+.tc-section { color: var(--muted); }
+.tc-tips { margin-top: 6px; }
+.tc-tag { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); }
+.tc-tag.tc-source, .tc-tag.tc-overclaim { color: var(--brand); }
+.tc-tag.tc-sentence, .tc-tag.tc-pattern, .tc-tag.tc-excess { color: var(--warn); }
+.tc-para-actions { margin-top: 8px; }
+.tc-para-actions .btn { width: auto; }
+.tc-edit { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; display: grid; gap: 6px; }
+.tc-edit h3 { margin: 6px 0 2px; font-size: 1rem; }
+.tc-edited { min-height: 220px; }
+.tc-shares { display: flex; height: 14px; border-radius: 7px; overflow: hidden; margin: 6px 0; }
+.tc-share { display: block; min-width: 0; }
+.tc-sections { margin: 0; padding-left: 18px; }
+.tc-sections li { margin-bottom: 4px; }
+.tc-controls { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.tc-controls label { display: grid; gap: 4px; }
+.tc-table-wrap { overflow-x: auto; }
+.tc-table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+.tc-table th, .tc-table td { border-bottom: 1px solid var(--line); padding: 4px 8px; text-align: left; }
+.tc-table td:not(:first-child), .tc-table th:not(:first-child) { text-align: right; white-space: nowrap; }

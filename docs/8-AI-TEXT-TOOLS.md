@@ -7,6 +7,8 @@ A research tool with two parts:
 
 All the work happens in the reader's browser. No text is sent to the website, to Claude or to any other service. The page is at **`/ai-tools/`** on the website (`https://www.insightnenews.in/ai-tools/`). It is hidden from search engines (`noindex`) and does not appear in the site menu.
 
+**For academic writing** (the owner's PhD thesis), use the separate thesis checker, which has its own model trained on research abstracts: see [10-THESIS-AI-TOOLS.md](10-THESIS-AI-TOOLS.md). On humanities and social-science abstracts, this news model wrongly flags about half the human texts.
+
 ## In the admin panel
 
 Signed-in staff (admin, editors and sub-editors) also have the tool at **`/admin/ai-check`**: the **🤖 AI checker** tab on the approval page. It works the same way as the public page and also runs in the browser. Use it to check a press release, a contributor's submission or your own draft before publishing.

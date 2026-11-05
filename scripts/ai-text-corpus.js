@@ -81,7 +81,7 @@ export function clean(text, { prompt = "" } = {}) {
   return t;
 }
 
-const wordCount = (t) => (t ? t.split(" ").length : 0);
+export const wordCount = (t) => (t ? t.split(" ").length : 0);
 
 async function readJsonl(path) {
   const rows = [];
@@ -92,7 +92,7 @@ async function readJsonl(path) {
   return rows;
 }
 
-async function m4Rows(dir, perFile) {
+export async function m4Rows(dir, perFile) {
   const out = [];
   const files = readdirSync(dir).filter((f) => f.endsWith(".jsonl") && M4_DOMAINS.includes(f.split("_")[0]));
   for (const file of files) {

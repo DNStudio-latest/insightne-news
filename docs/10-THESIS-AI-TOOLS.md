@@ -205,6 +205,31 @@ What this shows:
 
 The next step is to train on current-AI text in the owner's genre, matched to these human paragraphs, and to test on the two AI drafts, which the model has not seen.
 
+## Can current AI writing be detected here? Two experiments (November 2026)
+
+**1. Retraining with current-AI paragraphs.** About 100 paragraphs in current-AI style were written on the owner's topics: a typical assistant draft, a "write like a PhD scholar" style, and polished versions of real human paragraphs. They were added to the training data with 3,428 human paragraphs from the owner's literature folder. Whole documents were held out for testing.
+
+| Test texts | Current model | Retrained, "scholar" style held out | Retrained on all |
+|---|---|---|---|
+| Held-out human theses and papers (857 paragraphs) | 2.3% flagged | 0.8% | 0.9% |
+| Two AI-written drafts from the owner's folder (16 paragraphs) | 0% | 0% | 0% |
+| Held-out "scholar"-style AI paragraphs | — | 0% | — |
+
+False alarms fell, but current AI text was still not caught. A model that counts words and short phrases cannot separate careful scholarly AI prose from human scholarly prose, because both use the same words.
+
+**2. A predictability method (Binoculars, Hans et al. 2024).** It scores how predictable a text is to a language model (`scripts/thesis-binoculars.py`), with open Qwen2.5 models run on this computer. AUC 0.5 is chance; "caught" is at a level that flags 2% of human paragraphs.
+
+| Known AI text | Qwen2.5-0.5B, AUC | Qwen2.5-1.5B, AUC | Caught (1.5B) |
+|---|---|---|---|
+| The owner's two AI drafts | 0.45 | 0.52 | 0 of 16 |
+| "Scholar"-style AI paragraphs | 0.31 | 0.46 | 0 of 24 |
+| Typical AI draft style | 0.78 | 0.84 | 11 of 30 |
+| AI-polished human paragraphs | 0.75 | 0.73 | 3 of 22 |
+
+Small open models catch the plainer AI drafts but not careful scholarly AI writing. The published method uses 7-billion-parameter models, which this computer cannot run.
+
+**Conclusion.** With free tools in this environment, text from current AI assistants written in a scholarly style cannot be detected reliably. The checker's score remains useful for 2023-style ChatGPT text, and its false-alarm rate on genuine human writing in the owner's field is low (about 1 in 100 paragraphs). For a dependable verdict on current AI text, a commercial detector trained on very large data is needed. Pangram did best in an independent 2026 study of academic papers (Van Vlasselaer et al., 2026, *International Journal for Educational Integrity*).
+
 ## Next steps (the owner chose to proceed with what was available; these need settings or money)
 
 1. **Unblock the research sites** in this environment's network settings: huggingface.co, arxiv.org, export.arxiv.org, api.openalex.org, shodhganga.inflibnet.ac.in. Then (a) add pre-2022 journalism and mass communication abstracts from OpenAlex as human text, (b) add chapters of Indian PhD theses in mass communication from Shodhganga, from before 2022, as human text in the genre that matters, and (c) add larger detector benchmarks (RAID, MAGE, HC3). A changed network setting usually applies only to a new session.

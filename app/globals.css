@@ -204,7 +204,11 @@ main { padding: 20px 0 40px; }
 /* ================= Footer ================= */
 .site-footer { background: var(--brand-dark); color: #cfe2e6; font-size: 0.88rem; margin-top: 20px; }
 .site-footer .container { padding-top: 28px; padding-bottom: 28px; display: grid; gap: 22px; grid-template-columns: 1fr; }
-@media (min-width: 760px) { .site-footer .container { grid-template-columns: 2fr 1fr 1fr; } }
+/* Desktop: logo block on the left, Sections and About Us side by side, all three columns ending at about the same height. */
+@media (min-width: 760px) { .site-footer .container { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1.4fr); column-gap: 40px; align-items: start; } }
+@media (min-width: 1000px) { .site-footer .footer-links { grid-template-columns: 1fr 1fr; gap: 8px 24px; } }
+.site-footer .brand-block { display: grid; gap: 14px; align-content: start; }
+.site-footer .brand-block p { margin: 0; max-width: 360px; line-height: 1.55; }
 /* On phones the footer links sit in two neat columns instead of one long list. */
 @media (max-width: 759px) {
   .site-footer .footer-links { grid-template-columns: 1fr 1fr; gap: 10px 16px; }
@@ -446,7 +450,6 @@ main { padding: 20px 0 40px; }
 @media (prefers-color-scheme: dark) { .cricket-status { color: #90caf9; } }
 
 /* Social media row in the footer */
-.site-footer .footer-social { display: block; padding-top: 0; padding-bottom: 18px; }
 .social { display: flex; flex-wrap: wrap; gap: 8px; }
 .social a { border: 1px solid rgba(255,255,255,0.35); border-radius: 999px; padding: 6px 14px; font-size: 0.85rem; font-weight: 700; }
 .social a:hover { background: rgba(255,255,255,0.12); text-decoration: none; }

@@ -532,12 +532,13 @@ export function SiteFooter() {
         </div>
       )}
       <div className="container">
-        <div>
+        <div className="brand-block">
           <a href="/" className="logo">
             {first}
             {rest.length > 0 && <span> {rest.join(" ")}</span>}
           </a>
           <p>{settings.tagline}. Our own reports, and short news briefs in our own words that always link to the original publisher.</p>
+          <SocialLinks />
         </div>
         <div>
           <h4>Sections</h4>
@@ -572,9 +573,6 @@ export function SiteFooter() {
             {newsletterReady() && <li><a href="/newsletter">Daily email</a></li>}
           </ul>
         </div>
-      </div>
-      <div className="container footer-social">
-        <SocialLinks />
       </div>
       <div className="footnote">
         <div className="container">

@@ -37,17 +37,16 @@ The owner reviews live edits and reports phrases that sound machine-written. Sim
 
 ## PhD thesis checker (built November 2026, admin only)
 
-The owner's own tool for their PhD thesis in journalism and mass communication: writing suggestions, an academic editor and a ChatGPT-style signal. **It is a writing aid, not a verdict** (owner's decision, November 2026): tests showed it cannot detect text from current AI assistants, so labels say "ChatGPT-style signal" / "No ChatGPT-style signal found", never "human-written", and `DETECTION_LIMIT` is shown with every score. Keep it that way unless a new method is shown to work on the owner's test set. Guide and results: `docs/10-THESIS-AI-TOOLS.md`.
+The owner's own tool for their PhD thesis in journalism and mass communication: writing suggestions and a ChatGPT-style signal. **No AI may be used to edit the owner's thesis text** (owner's instruction, November 2026): the AI "academic editor" was removed (see PR #15 in git history if it is ever wanted again, and only if the owner asks); everything runs in the browser and no thesis text is sent anywhere. **It is a writing aid, not a verdict** (owner's decision, November 2026): tests showed it cannot detect text from current AI assistants, so labels say "ChatGPT-style signal" / "No ChatGPT-style signal found", never "human-written", and `DETECTION_LIMIT` is shown with every score. Keep it that way unless a new method is shown to work on the owner's test set. Guide and results: `docs/10-THESIS-AI-TOOLS.md`.
 
 | What | Where |
 |---|---|
 | Admin page (admin role only, not editors) | `app/admin/thesis-check/` |
 | Thesis reading (.docx, paragraphs, quotations, citations, references), suggestions, voice profile | `public/ai-tools/academic.js` |
 | Academic model (generated) and its data files | `public/ai-tools/model-academic.js`, `academic-words.js` (Kobak et al. 2025 excess words), `academic-norms.js` |
-| Academic editor (AI rewrite, server side) | `lib/academic-editor.js` |
 | Corpus, training, word list, norms, offline file | `scripts/thesis-*.js`, `scripts/thesis-checker.template.html` |
 
-Rules for the academic editor (keep them when changing `ACADEMIC_SYSTEM`): never add a fact, figure, source or citation, and never complete a reference; keep every citation, quotation, number and technical term exactly; never make a claim stronger or weaker; keep the writer's person ("I", "we", "the researcher") and spelling. `integrityNotes()` checks citations, quotations, figures and paragraph count after every edit. The news house style (`WRITING_RULES`) is deliberately **not** used here: it is for news copy ("said", datelines). Only the checker's `SAFE_REPLACEMENTS` are applied, outside quotations and citations. The thesis text is never stored on the website.
+Replacements offered by the checker are fixed rules the owner chooses; none is made by an AI. Only the checker's `SAFE_REPLACEMENTS` are used. The thesis text is never stored on the website.
 
 ## Open items
 

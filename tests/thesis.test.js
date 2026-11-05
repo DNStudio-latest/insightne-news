@@ -6,7 +6,6 @@ import {
   academicSuggestions, voiceProfile, analyseThesis, applyAlternative, EXCESS_WORDS, VOICE_NORMS, THESIS_DISCLAIMER,
 } from "../public/ai-tools/academic.js";
 import { ACADEMIC_MODEL } from "../public/ai-tools/model-academic.js";
-import { editLikeAcademicEditor, integrityNotes, safeOutsideProtected, systemFor, ACADEMIC_SYSTEM, MAX_INPUT_CHARS } from "../lib/academic-editor.js";
 import { excessRatios } from "../scripts/thesis-words.js";
 import { cutToLength, cleanAcademic, makeRepairer, abstractKey, splitFor, balance } from "../scripts/thesis-corpus.js";
 import { thresholdForFpr, atThreshold } from "../scripts/thesis-train.js";
@@ -168,53 +167,6 @@ test("the academic model scores machine-written prose higher than a researcher's
   assert.match(THESIS_DISCLAIMER, /not a verdict/);
 });
 
-// ---------- the academic editor ----------
-
-const PASSAGE = 'Local newspapers play a pivotal role in Tripura (Sen, 2019). One reporter said, “We print the party line.”\n\nThe survey of 120 readers suggests that trust is falling.';
-
-test("the editor's instructions forbid new facts and citations and protect quotations", () => {
-  assert.match(ACADEMIC_SYSTEM, /never add anything/i);
-  assert.match(ACADEMIC_SYSTEM, /Never invent a\s+citation/);
-  assert.match(ACADEMIC_SYSTEM, /word for word/);
-  assert.match(systemFor("thorough"), /THOROUGH/);
-  assert.match(systemFor("anything"), /LIGHT/);
-});
-
-test("an edit comes back with notes from the safety nets when citations, quotes or figures change", async () => {
-  const r = await editLikeAcademicEditor(PASSAGE, {
-    generate: async (system, text) => {
-      assert.ok(text.includes(PASSAGE));
-      return JSON.stringify({
-        edited: 'Local newspapers shape politics in Tripura (Sen, 2020). One reporter said, “We print the line.” In order to check, 150 readers were asked.\n\nThe survey suggests that trust is falling.',
-        notes: ["Which districts?"],
-        changes: ["'play a pivotal role' -> 'shape'"],
-      });
-    },
-  });
-  const notes = r.notes.join("\n");
-  assert.match(notes, /not in the edit: \(Sen, 2019\)/);
-  assert.match(notes, /in the edit but not in your text: \(Sen, 2020\)/);
-  assert.match(notes, /quotations were changed/);
-  assert.match(notes, /150/);
-  assert.ok(r.notes.includes("Which districts?"));
-  assert.ok(r.edited.includes("To check"), "safe replacement applied outside quotes");
-});
-
-test("a faithful edit raises no safety-net notes", () => {
-  assert.deepEqual(integrityNotes(PASSAGE, 'Local newspapers shape politics in Tripura (Sen, 2019). One reporter said, "We print the party line."\n\nThe survey of 120 readers suggests that trust is falling.'), []);
-});
-
-test("automatic corrections never touch quotations or citations", () => {
-  assert.equal(safeOutsideProtected('In order to win, he said “in order to win we lie” (In order to, 2019).'), 'To win, he said “in order to win we lie” (In order to, 2019).');
-});
-
-test("the editor refuses empty and over-long passages and needs an AI key", async () => {
-  await assert.rejects(editLikeAcademicEditor("  ", { generate: async () => "{}" }), /Paste a passage/);
-  await assert.rejects(editLikeAcademicEditor("x".repeat(MAX_INPUT_CHARS + 1), { generate: async () => "{}" }), /too long/);
-  await assert.rejects(editLikeAcademicEditor("text", { provider: null }), /No AI key/);
-  await assert.rejects(editLikeAcademicEditor("text", { generate: async () => "not json" }), /expected format/);
-});
-
 // ---------- corpus and training helpers ----------
 
 test("corpus helpers: length matching, cleaning, word repair, grouping, balance", () => {
@@ -271,4 +223,14 @@ test("the checker never labels a paragraph as human-written and states what it c
   const r = analyseThesis(paragraphsFromText("Many scholars argue that local papers ignore the environment. The data proves this beyond doubt, as the survey of readers in Agartala in 2019 showed clearly to everyone involved in the work."), ACADEMIC_MODEL);
   assert.ok(r.summary.writing.source >= 1 && r.summary.writing.overclaim >= 1);
   assert.equal(WRITING_POINTS[0][0], "source");
+});
+
+test("the thesis checker has no AI editor: no server action and no AI call", async () => {
+  const { existsSync, readFileSync } = await import("node:fs");
+  assert.equal(existsSync(new URL("../lib/academic-editor.js", import.meta.url)), false);
+  assert.equal(existsSync(new URL("../app/admin/thesis-check/actions.js", import.meta.url)), false);
+  for (const f of ["../app/admin/thesis-check/ThesisCheck.js", "../app/admin/thesis-check/page.js"]) {
+    const src = readFileSync(new URL(f, import.meta.url), "utf8");
+    assert.doesNotMatch(src, /use server|anthropic|gemini|openrouter|fetch\(/i, f);
+  }
 });

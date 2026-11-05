@@ -21,7 +21,7 @@ import { hunterStore } from "../../lib/hunter/store.js";
 import { hasCheckMarks } from "../../lib/hunter/checks.js";
 import { settings, regions } from "../../lib/config.js";
 import { currentRole, currentUser, userForPassword, hashPassword, startSession, endSession } from "../../lib/auth.js";
-import { SUB_EDITOR, staffTitle, canEditKokborok } from "../../lib/staff.js";
+import { SUB_EDITOR, staffTitle, canEditKokborok, editedByName } from "../../lib/staff.js";
 import { translationsAfterEdit } from "../../lib/languages.js";
 import { researchAndDraft } from "../../lib/research.js";
 import { loadLessons } from "../../lib/ai-lessons-store.js";
@@ -106,12 +106,24 @@ export async function reject(formData) {
   refresh("pending", "Rejected");
 }
 
+// Saves the "edited by" name too. If supabase/editor-controls.sql has not been run yet, saves everything else.
+async function updateWithMark(id, fields) {
+  try {
+    await db.updateStory(id, fields);
+  } catch (err) {
+    if (!("edited_by" in fields)) throw err;
+    const { edited_by, ...rest } = fields;
+    await db.updateStory(id, rest);
+  }
+}
+
 // Photo, caption and credit from a form. Keeps the old photo unless a new one is chosen or "Remove photo" is tapped.
-async function photoFields(formData, existing, onError) {
+// People with canDelete off cannot remove the photo.
+async function photoFields(formData, existing, onError, canDelete = true) {
   const fields = {
     image_caption: text(formData, "image_caption", 300) || null,
     image_credit: text(formData, "image_credit", 120) || null,
-    image_url: formData.get("removeImage") ? null : existing?.image_url || null,
+    image_url: formData.get("removeImage") && canDelete ? null : existing?.image_url || null,
   };
   const file = formData.get("image");
   if (file && typeof file === "object" && file.size > 0) {
@@ -150,16 +162,18 @@ export async function saveEdit(formData) {
     await db.updateStory(id, { translations: translationsAfterEdit(existing, false, kok) });
     refresh(view, "Kokborok version saved");
   }
-  const fields = { ...editedFields(formData), ...(await photoFields(formData, existing, fail)) };
+  const fields = { ...editedFields(formData), ...(await photoFields(formData, existing, fail, user?.canDelete !== false)) };
   // If the English text changed, the Hindi/Assamese/Nepali versions are made again at the next collector run.
   const englishChanged = fields.headline !== existing?.headline || fields.summary !== existing?.summary;
   if (englishChanged || kok !== undefined) fields.translations = translationsAfterEdit(existing, englishChanged, kok);
+  const mark = editedByName(user, existing);
+  if (mark) fields.edited_by = mark; // an editor changed a sub-editor's story: their name is shown with the sub-editor's
   if (formData.get("andApprove") && role === "admin") {
     await db.updateStory(id, { ...fields, status: "approved", published_at: new Date().toISOString() });
     illustrateLater(id);
     refresh("pending", "Saved and published");
   }
-  await db.updateStory(id, fields);
+  await updateWithMark(id, fields);
   refresh(String(formData.get("view") || "pending"), "Changes saved");
 }
 
@@ -243,11 +257,14 @@ export async function saveOriginal(formData) {
   const englishChanged = Boolean(existing) && (fields.headline !== existing.headline || fields.summary !== existing.summary);
   if (englishChanged || kok !== undefined) fields.translations = translationsAfterEdit(existing, englishChanged, kok);
   if (publish && (!fields.summary || !fields.body)) backToEditor("Please write the intro and the story text before publishing.");
-  Object.assign(fields, await photoFields(formData, existing, backToEditor));
+  const canDelete = user?.canDelete !== false;
+  Object.assign(fields, await photoFields(formData, existing, backToEditor, canDelete));
+  const mark = editedByName(user, existing);
+  if (mark) fields.edited_by = mark; // an editor changed a sub-editor's story: their name is shown with the sub-editor's
 
-  // Gallery: keep the ticked photos, add the new ones (at most 20 in total).
+  // Gallery: keep the ticked photos, add the new ones (at most 20 in total). People with canDelete off keep every photo.
   const keep = new Set(formData.getAll("keepGallery").map(String));
-  const gallery = (existing?.gallery || []).filter((g) => keep.has(g.url));
+  const gallery = (existing?.gallery || []).filter((g) => !canDelete || keep.has(g.url));
   for (const file of formData.getAll("galleryFiles")) {
     if (!file || typeof file !== "object" || !file.size || gallery.length >= 20) continue;
     if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 4 * 1024 * 1024) continue;
@@ -272,8 +289,8 @@ export async function saveOriginal(formData) {
         (s) => s.headline === cleanText(fields.headline) && s.author === cleanText(fields.author) && Date.now() - new Date(s.created_at).getTime() < 5 * 60000,
       );
   let storyId = id || twin?.id;
-  if (existing) await db.updateStory(id, fields);
-  else if (twin) await db.updateStory(twin.id, fields);
+  if (existing) await updateWithMark(id, fields);
+  else if (twin) await updateWithMark(twin.id, fields);
   else storyId = await db.createStory({ ...fields, score: null, needs_check: false, check_reasons: [] });
 
   const wantsLead = role === "admin" ? Boolean(formData.get("is_lead")) : Boolean(existing?.is_lead);
@@ -407,6 +424,13 @@ export async function changeEditor(formData) {
   if (what === "remove") {
     await db.deleteEditor(id);
     backToEditors(`${editor.name} was removed and is signed out. Their stories stay on the website.`);
+  }
+  if (what === "photos") {
+    // Switches whether this person may remove photos (the "Remove photo" button and removing gallery photos).
+    const allowed = editor.can_delete === false;
+    const saved = await db.updateEditor(id, { can_delete: allowed }).then(() => true, () => false);
+    if (!saved) backToEditors("Could not change it. First run supabase/editor-controls.sql in Supabase → SQL Editor.");
+    backToEditors(allowed ? `${editor.name} can now remove photos.` : `${editor.name} can no longer remove photos or gallery pictures.`);
   }
   if (what === "toggle") {
     await db.updateEditor(id, { active: !editor.active });

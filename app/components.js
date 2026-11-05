@@ -331,6 +331,7 @@ export function ArticlesList({ stories }) {
               <span className="article-by">
                 {bylineName(s.author)}
                 {s.author_title && `, ${s.author_title}`}
+                {s.edited_by && ` · edited by ${s.edited_by}`}
               </span>
             </div>
             <a href={storyUrl(s)} tabIndex={-1} aria-hidden="true">

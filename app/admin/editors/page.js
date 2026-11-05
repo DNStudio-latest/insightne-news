@@ -64,6 +64,7 @@ export default async function EditorsPage({ searchParams }) {
             <div className="meta">
               <span className="badge" style={{ background: "var(--accent)" }}>{e.role === SUB_EDITOR ? "Sub-editor" : "Editor"}</span>
               {e.active ? <span className="badge">Can sign in</span> : <span className="tag">Paused</span>}
+              {e.can_delete === false && <span className="tag">Cannot remove photos</span>}
               <span>Added {formatDate(e.created_at)}</span>
             </div>
             <h2>
@@ -79,6 +80,11 @@ export default async function EditorsPage({ searchParams }) {
                 <input type="hidden" name="id" value={e.id} />
                 <input type="hidden" name="what" value="role" />
                 <button className="btn btn-plain" type="submit">{e.role === SUB_EDITOR ? "MAKE EDITOR" : "MAKE SUB-EDITOR"}</button>
+              </form>
+              <form action={changeEditor}>
+                <input type="hidden" name="id" value={e.id} />
+                <input type="hidden" name="what" value="photos" />
+                <button className="btn btn-plain" type="submit">{e.can_delete === false ? "ALLOW REMOVING PHOTOS" : "STOP REMOVING PHOTOS"}</button>
               </form>
               <form action={changeEditor}>
                 <input type="hidden" name="id" value={e.id} />

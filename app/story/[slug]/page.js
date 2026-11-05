@@ -76,6 +76,7 @@ export default async function StoryPage({ params }) {
           <div className="byline">
             <Byline story={story} link />
             {isOriginal && story.author_title && <>, {story.author_title}</>}
+            {isOriginal && story.edited_by && <> · edited by {story.edited_by}</>}
             <br />
             <time dateTime={story.published_at}>{formatDate(story.published_at)}</time>
             {isOriginal && blocks.length > 0 && ` · ${readingMinutes(story.body)} min read`}

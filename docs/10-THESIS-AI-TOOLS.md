@@ -210,7 +210,21 @@ False alarms fell, but current AI text was still not caught. A model that counts
 
 Small open models catch the plainer AI drafts but not careful scholarly AI writing. The published method uses 7-billion-parameter models, which this computer cannot run.
 
-**Conclusion.** With free tools in this environment, text from current AI assistants written in a scholarly style cannot be detected reliably. The checker's score remains useful for 2023-style ChatGPT text, and its false-alarm rate on genuine human writing in the owner's field is low (about 1 in 100 paragraphs). For a dependable verdict on current AI text, a commercial detector trained on very large data is needed. Pangram did best in an independent 2026 study of academic papers (Van Vlasselaer et al., 2026, *International Journal for Educational Integrity*).
+**3. Author-style test (Burrows' Delta).** The idea: compare a block of text with the writing style of its author, using the 200 most frequent words, and flag blocks that do not match. Tested on 8 multi-chapter theses from the owner's folder, holding one chapter out and using the author's other chapters as the reference (189 held-out blocks of 400 words):
+
+| Compared with the author's reference | AUC (0.5 = chance; below 0.5 = backwards) |
+|---|---|
+| Blocks by other authors | 0.67 |
+| AI draft style | 0.40 |
+| AI "scholar" style | 0.44 |
+| AI-polished human text | 0.35 |
+| Two AI-written drafts from the owner's folder | 0.70 |
+
+AI text came out *closer* to each author's style than the author's own held-out chapters did. A chapter on methodology reads differently from an introduction by the same person, and AI writes the "average" academic English that sits near the middle of every author's range. **Result: does not work.**
+
+**4. "Average-ness" of a block.** Distance of a block's word-frequency profile from the average human profile (400- and 1,000-word blocks). AUC for telling AI from human: 0.67 (draft style), 0.61 (scholar style), 0.73 (polished human text) and 0.37 (the owner's two independent drafts). **Result: does not work.**
+
+**Conclusion.** Four free methods were tried: retraining the word-and-phrase model, a predictability method with small open models, author-style comparison, and block average-ness. With free tools in this environment, text from current AI assistants written in a scholarly style cannot be detected reliably. The checker's score remains useful for 2023-style ChatGPT text, and its false-alarm rate on genuine human writing in the owner's field is low (about 1 in 100 paragraphs). For a dependable verdict on current AI text, a commercial detector trained on very large data is needed. Pangram did best in an independent 2026 study of academic papers (Van Vlasselaer et al., 2026, *International Journal for Educational Integrity*).
 
 ## Next steps (the owner chose to proceed with what was available; these need settings or money)
 

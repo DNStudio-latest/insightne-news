@@ -187,18 +187,19 @@ What this means:
 
 ## Test on real theses: before and after ChatGPT (November 2026)
 
-`scripts/thesis-era-test.js` runs both checkers and the style measures on a folder of real theses and papers listed in a manifest (`path,year,group`). It reads PDF, Word and text files. The owner supplied about 95 documents from their literature folder: Shodhganga thesis chapters and journal papers on environmental and climate news coverage. They are not stored in the repository. Results:
+`scripts/thesis-era-test.js` runs both checkers and the style measures on a folder of real theses and papers listed in a manifest (`path,year,group`). It reads PDF, Word and text files. The owner supplied about 110 documents from their literature folder: Shodhganga thesis chapters and journal papers on environmental and climate news coverage. They are not stored in the repository. Results:
 
 | Group | Paragraphs | Academic checker flags | News checker flags | ChatGPT-era words per 1,000 | Commas per 100 words | Sentence variation |
 |---|---|---|---|---|---|---|
 | Indian PhD theses before ChatGPT (23 chapters) | 802 | 1.4% | 16% | 1.4 | 5.4 | 0.40 |
 | Papers and reports before ChatGPT (45) | 2,352 | 1.1% | 19% | 2.0 | 6.8 | 0.48 |
+| *Global Environmental Change* vol. 70, 2021 (18 papers) | 471 | 0.4% | 19% | 2.3 | 7.9 | 0.54 |
 | Papers and theses 2023–2026 (25) | 1,159 | 9.4% | 32% | 5.7 | 6.9 | 0.46 |
 | Known AI: two drafts written by an AI assistant | 16 | 0% | 12% | 1.4 | 5.3 | 0.43 |
 | Known AI: 12 paragraphs by a current AI model | 12 | 0% | 33% | 3.4 | 4.6 | 0.28 |
 
 What this shows:
-- False alarms on genuine pre-ChatGPT writing in the owner's field are rare (about 1 in 80 paragraphs).
+- False alarms on genuine pre-ChatGPT writing in the owner's field are rare: 38 of 3,625 paragraphs (1.0%), some of them table fragments left by the PDF conversion.
 - After 2022, ChatGPT-style writing becomes common: flags and ChatGPT-era words both rise sharply.
 - The checker does **not** detect text from current AI assistants, which avoid the 2023 ChatGPT vocabulary. Commas, mistakes and sentence length do not separate these texts either.
 

@@ -1,17 +1,19 @@
-# 10. PhD thesis checker: AI-text check, suggestions and academic editor
+# 10. PhD thesis checker: writing suggestions and a ChatGPT-style signal
 
 A private tool for the owner's PhD thesis in journalism and mass communication. **It is a writing aid, not a verdict on who wrote a text** (the owner's decision, November 2026, after the tests below showed that text from current AI assistants cannot be detected reliably with free tools). It has three parts:
 
-1. **Checker:** finds your own prose in a chapter and estimates, paragraph by paragraph, how much it reads like AI-generated academic writing. It shows the words and patterns behind each score.
-2. **Suggestions:** marks the words that became common in research writing after ChatGPT, stock AI formulas, claims about the literature that have no citation, and overclaiming. Each comes with plain alternatives you can apply in one click.
-3. **Academic editor:** an AI rewrite of one paragraph at a time, in the manner of the website's senior news editor. It keeps your citations, quotations, figures and terms, never adds a fact or a source, and lists anything missing as a note for you. A "What changed" view shows every word removed and added.
+1. **Suggestions:** marks the words that became common in research writing after ChatGPT, stock AI formulas, claims about the literature that have no citation, overclaiming and wordy phrases. Each comes with plain alternatives you can apply in one click. The alternatives are fixed rules; you choose each one.
+2. **Your voice in numbers:** compares your writing with human and ChatGPT abstracts.
+3. **ChatGPT-style signal:** estimates, paragraph by paragraph, whether a paragraph has the style of 2023-era ChatGPT text, with the words and patterns behind the score.
+
+**No AI is used to change your thesis text.** An AI "academic editor" was built in the first version (pull request #15) and removed at the owner's request in November 2026. The checker itself is a small statistical model trained on public research text; it can score and flag, but it cannot write, and everything runs in the browser.
 
 **Where it is**
 
 - **Admin panel → 🎓 Thesis checker** (`/admin/thesis-check`). Only the admin account can open it; editors and sub-editors cannot. It is not linked from the public website.
-- **Offline file for your PC** (`thesis-checker.html`). It has the checker and the suggestions, but no academic editor, because the editor needs the website's AI key. Build it with `node scripts/thesis-standalone.js thesis-checker.html`, save it anywhere and double-click it. It works without the internet.
+- **Offline file for your PC** (`thesis-checker.html`). It has the same checker and suggestions. Build it with `node scripts/thesis-standalone.js thesis-checker.html`, save it anywhere and double-click it. It works without the internet.
 
-**Privacy.** The checking runs in your browser: the chapter is not sent to the website or to any AI service. Only **Edit with the academic editor** sends that one paragraph to the website's AI (Claude, or Gemini if no Claude key is set) to make the edit. The website does not store it. Your changes are kept only in the open tab until you download the revised text.
+**Privacy.** Everything runs in your browser: the chapter is not sent to the website, to any AI service or anywhere else, and the website stores nothing. Your changes are kept only in the open tab until you download the revised text.
 
 ## Read this first
 
@@ -27,9 +29,9 @@ A private tool for the owner's PhD thesis in journalism and mass communication. 
 
 1. Open the chapter as a Word **.docx** file, or paste it. For a PDF, save it as .docx in Word first. The old .doc format cannot be read.
 2. The checker sorts the paragraphs. Headings, quotations, interview extracts ("Respondent 4: …"), table cells, captions ("Table 2.1 …") and everything after the **References** or **Bibliography** heading are left out. In your own paragraphs, quotations and citations are also removed before scoring, so only your words are scored.
-3. Read the **Overview** (the share of your words in AI-like, mixed and human-like paragraphs), the **Sections** list and **Your voice in numbers**.
-4. Under **Paragraphs**, the default view shows only paragraphs that need attention. Hover over a mark to see why it was flagged. Apply an alternative with one click, or press **Edit with the academic editor**. Choose **Light** (words only) or **Thorough** (sentence structure too).
-5. Check the editor's version against your sources. Read its notes, then press **Use the edited version**, edit it further in the box, or discard it.
+3. Read the **Overview** (the writing points, then the share of your words in paragraphs with a ChatGPT-style signal), the **Sections** list and **Your voice in numbers**.
+4. Under **Paragraphs**, the default view shows only paragraphs that need attention. Hover over a mark to see why it was flagged. Apply an alternative with one click, or rewrite the sentence yourself.
+5. Check each change against your sources and data.
 6. **Download revised text (.txt)** and copy the paragraphs you want into your Word file.
 
 A paragraph needs at least 60 of your own words to get its own score. Shorter ones are scored with their section. A section needs 150 words.
@@ -67,28 +69,6 @@ The table compares your text, per 1,000 of your own words, with the averages for
 | Average sentence length (words) | 24.8 | 24.9 |
 
 The first three rows agree with published corpus studies. AI academic text uses fewer self-mentions and more frame markers and structuring devices than human writers (Jiang and Hyland, 2024; Mo et al., 2025; Pham, 2026). In this corpus, however, ChatGPT used slightly *more* hedges than human authors, while several studies report fewer. So the tool does not treat hedging as a sign of AI. Abstracts are denser than chapters, so read the table as a direction, not a target.
-
-## The academic editor
-
-The rules are in `ACADEMIC_SYSTEM` in `lib/academic-editor.js`:
-
-- **Never add anything.** No new fact, finding, figure, date, name, newspaper, quotation, source, theory or citation. A reference is never invented or completed. Anything missing becomes a note.
-- **Keep exactly:** every citation (character for character and in place), every quotation (interview answers, survey answers, newspaper text), every number, and every technical term (agenda-setting, framing, gatekeeping, public sphere, purposive sampling…).
-- **Keep your position.** A claim is never made stronger or weaker, so "suggests" stays "suggests". An overclaim is kept and mentioned in the notes. Your "I", "we" or "the researcher" stays as written, and so does your spelling (Indian/British "-ise" unless you use American spelling throughout). Established Indian usage (lakh, crore) is not "corrected".
-- **Edit:** plain words, the active voice where the actor matters, no stock AI vocabulary or formulas, no trailing ", highlighting…" clauses, no added signposting or summaries, varied sentence length, past and present tense used conventionally.
-- **Notes for you:** claims about the literature with no citation, claims needing evidence, overstatements, inconsistent terms, generic sentences that need your own data, and research-ethics points (identifiable respondents, minors, confidential sources, caste details).
-
-**Safety nets.** After every edit, the tool checks, without AI, that:
-- every citation in your paragraph is still in the edit, and no new one appeared;
-- every quotation is unchanged, word for word;
-- no figure appears that was not in your text;
-- the number of paragraphs is the same.
-
-Any difference goes to the top of the notes. The checker's fixed replacements ("in order to" → "to") are then made outside quotations and citations. Words that rose sharply with ChatGPT and are still in the edit are listed.
-
-**Not used here:** the website's news house style (`WRITING_RULES`: "said", datelines and so on), because it is for news copy, and the Teach the AI lessons, which are news-desk phrases.
-
-**Model and cost.** The editor uses `CLAUDE_ACADEMIC_MODEL` if set, then `CLAUDE_EDITOR_MODEL`, then the site's default Claude model. With Gemini, it uses `GEMINI_ACADEMIC_MODEL`, then `GEMINI_EDITOR_MODEL`. For thesis work a stronger model is worth it: set `CLAUDE_ACADEMIC_MODEL` (for example `claude-opus-5-5` or `claude-sonnet-5-5`) in Vercel's environment variables. Each edit of one paragraph is one AI request. The admin can make 60 an hour.
 
 ## The training data
 
@@ -230,7 +210,21 @@ False alarms fell, but current AI text was still not caught. A model that counts
 
 Small open models catch the plainer AI drafts but not careful scholarly AI writing. The published method uses 7-billion-parameter models, which this computer cannot run.
 
-**Conclusion.** With free tools in this environment, text from current AI assistants written in a scholarly style cannot be detected reliably. The checker's score remains useful for 2023-style ChatGPT text, and its false-alarm rate on genuine human writing in the owner's field is low (about 1 in 100 paragraphs). For a dependable verdict on current AI text, a commercial detector trained on very large data is needed. Pangram did best in an independent 2026 study of academic papers (Van Vlasselaer et al., 2026, *International Journal for Educational Integrity*).
+**3. Author-style test (Burrows' Delta).** The idea: compare a block of text with the writing style of its author, using the 200 most frequent words, and flag blocks that do not match. Tested on 8 multi-chapter theses from the owner's folder, holding one chapter out and using the author's other chapters as the reference (189 held-out blocks of 400 words):
+
+| Compared with the author's reference | AUC (0.5 = chance; below 0.5 = backwards) |
+|---|---|
+| Blocks by other authors | 0.67 |
+| AI draft style | 0.40 |
+| AI "scholar" style | 0.44 |
+| AI-polished human text | 0.35 |
+| Two AI-written drafts from the owner's folder | 0.70 |
+
+AI text came out *closer* to each author's style than the author's own held-out chapters did. A chapter on methodology reads differently from an introduction by the same person, and AI writes the "average" academic English that sits near the middle of every author's range. **Result: does not work.**
+
+**4. "Average-ness" of a block.** Distance of a block's word-frequency profile from the average human profile (400- and 1,000-word blocks). AUC for telling AI from human: 0.67 (draft style), 0.61 (scholar style), 0.73 (polished human text) and 0.37 (the owner's two independent drafts). **Result: does not work.**
+
+**Conclusion.** Four free methods were tried: retraining the word-and-phrase model, a predictability method with small open models, author-style comparison, and block average-ness. With free tools in this environment, text from current AI assistants written in a scholarly style cannot be detected reliably. The checker's score remains useful for 2023-style ChatGPT text, and its false-alarm rate on genuine human writing in the owner's field is low (about 1 in 100 paragraphs). For a dependable verdict on current AI text, a commercial detector trained on very large data is needed. Pangram did best in an independent 2026 study of academic papers (Van Vlasselaer et al., 2026, *International Journal for Educational Integrity*).
 
 ## Next steps (the owner chose to proceed with what was available; these need settings or money)
 
@@ -243,11 +237,10 @@ Small open models catch the plainer AI drafts but not careful scholarly AI writi
 
 | File | What it is |
 |---|---|
-| `app/admin/thesis-check/` | The admin page (`page.js`), the interface (`ThesisCheck.js`) and the editor call (`actions.js`) |
+| `app/admin/thesis-check/` | The admin page (`page.js`) and the interface (`ThesisCheck.js`) |
 | `public/ai-tools/academic.js` | .docx reading, paragraph sorting, quotations and citations, suggestions, voice profile, whole-document analysis |
 | `public/ai-tools/model-academic.js` | The academic model (generated; do not edit) |
 | `public/ai-tools/academic-words.js`, `academic-norms.js` | The rising words and the voice norms (generated) |
-| `lib/academic-editor.js` | The academic editor's instructions, the AI call and the safety nets |
 | `scripts/thesis-corpus.js` | Builds the corpus from the datasets above |
 | `scripts/thesis-train.js` | Trains the model and writes `docs/thesis-ai-eval.json` |
 | `scripts/thesis-words.js`, `scripts/thesis-norms.js` | Build the word list and the voice norms |

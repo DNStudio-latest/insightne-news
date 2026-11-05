@@ -1,33 +1,16 @@
 "use client";
 // The PhD thesis checker. Analysis runs in the browser with public/ai-tools/academic.js and the academic model
-// (about 550 KB, loaded only when this page opens). The thesis stays in this tab's memory: nothing is saved.
+// (about 550 KB, loaded only when this page opens). The thesis stays in this tab's memory: nothing is saved and
+// nothing is sent anywhere. There is deliberately no AI editor here (owner's decision, November 2026).
 import { useEffect, useMemo, useState } from "react";
 import {
   readDocx, paragraphsFromText, analyseThesis, applyAlternative, VOICE_LABELS, VOICE_NORMS, THESIS_DISCLAIMER, MIN_PARAGRAPH_WORDS,
   DETECTION_LIMIT, BAND_LABELS, WRITING_POINTS,
 } from "../../../public/ai-tools/academic.js";
-import { scoreText } from "../../../public/ai-tools/engine.js";
-import { wordDiff, diffCounts } from "../ai-check/diff.js";
-import { editThesisPassage } from "./actions.js";
 
 const BAND_TEXT = BAND_LABELS;
 const KIND_TEXT = { excess: "Word that rose with ChatGPT", wordy: "Wordy", pattern: "Stock formula", source: "Needs a citation", overclaim: "Overclaim", sentence: "ChatGPT-style sentence", long: "Long sentence", uniform: "Even rhythm" };
 const SHOW_STEP = 120;
-
-function Changes({ before, after }) {
-  const segments = wordDiff(before, after);
-  if (!segments) return <p className="note">The texts are too long to compare word by word.</p>;
-  const { removed, added } = diffCounts(segments);
-  return (
-    <>
-      <p className="note">{removed || added ? `${removed} words removed, ${added} words added.` : "No words changed."} <span className="aic-key"><del>removed</del> <ins>added</ins></span></p>
-      <div className="aic-marked aic-diff">
-        {segments.map((s, i) => (s.type === "del" ? <del key={i}>{s.text}</del> : s.type === "ins" ? <ins key={i}>{s.text}</ins> : <span key={i}>{s.text}</span>))
-          .flatMap((el, i) => (i ? [" ", el] : [el]))}
-      </div>
-    </>
-  );
-}
 
 // The paragraph with sentence-level flags underlined and word-level flags highlighted.
 function Marked({ text, suggestions }) {
@@ -91,36 +74,7 @@ function Voice({ voice }) {
   );
 }
 
-function Paragraph({ p, model, mode, onChange }) {
-  const [busy, setBusy] = useState(false);
-  const [seconds, setSeconds] = useState(0);
-  const [edit, setEdit] = useState(null);
-  const [error, setError] = useState("");
-  const [copied, setCopied] = useState("");
-  useEffect(() => {
-    if (!busy) return setSeconds(0);
-    const t = setInterval(() => setSeconds((x) => x + 1), 1000);
-    return () => clearInterval(t);
-  }, [busy]);
-
-  async function runEditor() {
-    setBusy(true);
-    setError("");
-    let r;
-    try {
-      r = await editThesisPassage(p.text, mode);
-    } catch {
-      r = { ok: false, error: "The editor could not be reached. Check your connection and try again." };
-    }
-    setBusy(false);
-    if (!r.ok) return setError(r.error);
-    let after = null;
-    try { after = scoreText(r.edited, model).score; } catch { /* too short */ }
-    setEdit({ ...r, after });
-  }
-  async function copy(text) {
-    try { await navigator.clipboard.writeText(text); setCopied("Copied."); } catch { setCopied("Select the text and press Ctrl+C to copy."); }
-  }
+function Paragraph({ p, onChange }) {
   const tips = (p.suggestions || []).filter((s) => s.kind !== "sentence");
   return (
     <article className={`tc-para tc-band-${p.band || "none"}`} id={`p${p.index}`}>
@@ -149,34 +103,6 @@ function Paragraph({ p, model, mode, onChange }) {
           ))}
         </ul>
       )}
-      <div className="tc-para-actions">
-        <button className="btn btn-edit" type="button" disabled={busy} onClick={runEditor}>
-          {busy ? `THE ACADEMIC EDITOR IS WORKING… ${seconds}s` : "🎓 EDIT WITH THE ACADEMIC EDITOR"}
-        </button>
-      </div>
-      {error && <div className="flag">{error}</div>}
-      {edit && (
-        <div className="tc-edit">
-          <div className="aic-compare">
-            <div className="aic-col"><h3>Your text {p.score !== undefined && <span className="note">· {p.score}/100</span>}</h3><p className="tc-text">{p.text}</p></div>
-            <div className="aic-col">
-              <h3>Academic editor ({edit.mode}) {edit.after !== null && <span className="note">· {edit.after}/100</span>}</h3>
-              <textarea className="body tc-edited" value={edit.edited} onChange={(e) => setEdit((x) => ({ ...x, edited: e.target.value }))} />
-            </div>
-          </div>
-          <h3>What changed</h3>
-          <Changes before={p.text} after={edit.edited} />
-          {edit.notes.length > 0 && (<><h3>Editor&apos;s notes for you</h3><ul className="aic-list aic-notes">{edit.notes.map((n, i) => <li key={i}>{n}</li>)}</ul></>)}
-          {edit.changes.length > 0 && (<><h3>Main edits</h3><ul className="aic-list">{edit.changes.map((c, i) => <li key={i}>{c}</li>)}</ul></>)}
-          <div className="aic-actions aic-actions-3">
-            <button className="btn btn-approve" type="button" onClick={() => { onChange(edit.edited); setEdit(null); }}>USE THE EDITED VERSION</button>
-            <button className="btn btn-edit" type="button" onClick={() => copy(edit.edited)}>COPY</button>
-            <button className="btn btn-plain" type="button" onClick={() => setEdit(null)}>DISCARD</button>
-          </div>
-          {copied && <p className="note">{copied}</p>}
-          <p className="note">Check every change against your sources and data. The editor must not add facts or citations; the notes list anything it found missing.</p>
-        </div>
-      )}
     </article>
   );
 }
@@ -190,7 +116,6 @@ export default function ThesisCheck() {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("attention");
   const [shown, setShown] = useState(SHOW_STEP);
-  const [mode, setMode] = useState("light");
 
   useEffect(() => {
     import("../../../public/ai-tools/model-academic.js")
@@ -326,21 +251,15 @@ export default function ThesisCheck() {
                   <option value="all">All paragraphs</option>
                 </select>
               </label>
-              <label>Academic editor
-                <select value={mode} onChange={(e) => setMode(e.target.value)}>
-                  <option value="light">Light: language only</option>
-                  <option value="thorough">Thorough: language and sentence structure</option>
-                </select>
-              </label>
             </div>
             <p className="note">
               <mark className="tc-excess">Highlighted</mark> words and phrases have a suggestion; <span className="tc-under tc-sentence">underlined</span> sentences
-              have a ChatGPT-style signal or need a citation. Hover over a mark to see why. The academic editor sends only that paragraph to the
-              website&apos;s AI; it keeps your citations, quotations, figures and terms, and lists anything missing as a note.
+              have a ChatGPT-style signal or need a citation. Hover over a mark to see why.
+              Nothing here uses AI to change your text: every replacement is a fixed suggestion that you choose.
             </p>
             {visible.length === 0 && <p>Nothing to show with this filter.</p>}
             {visible.slice(0, shown).map((p) => (
-              <Paragraph key={`${p.index}:${p.text.length}`} p={p} model={model} mode={mode} onChange={(text) => change(p.index, text)} />
+              <Paragraph key={`${p.index}:${p.text.length}`} p={p} onChange={(text) => change(p.index, text)} />
             ))}
             {visible.length > shown && <button className="btn btn-edit" type="button" onClick={() => setShown((n) => n + SHOW_STEP)}>SHOW MORE ({visible.length - shown} left)</button>}
           </section>

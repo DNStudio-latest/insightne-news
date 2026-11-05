@@ -1,6 +1,5 @@
 // Builds one self-contained HTML file of the thesis checker (page, engine, academic module and model inlined),
-// for use on a PC without the internet. Nothing in it sends text anywhere; it has no academic editor, because
-// that needs the website's AI key.
+// for use on a PC without the internet. Nothing in it sends text anywhere, and it uses no AI to change text.
 //
 //   node scripts/thesis-standalone.js [thesis-checker.html]
 //

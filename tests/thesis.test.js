@@ -242,3 +242,24 @@ test("excess-word ratios are computed from the yearly counts", () => {
   const counts = "word,2022,2023,2024\ndelves,10,100,500\ncovid,10,10,500\nthe,1000,1000,1000\n,1000,1000,1000\n";
   assert.deepEqual(excessRatios(words, counts), { delves: 50 });
 });
+
+// ---------- before/after-2022 test script ----------
+
+test("PDF text with hard line breaks is rebuilt into paragraphs, without page numbers", async () => {
+  const { pdfParagraphs, mistakeRate } = await import("../scripts/thesis-era-test.js");
+  const pdf = [
+    "Background",
+    "The newspapers of Tripura have reported on the environment for many years, but the",
+    "coverage has been uneven across seasons and across the different dailies of the state.",
+    "",
+    "12",
+    "",
+    "Most reports appeared during floods. Editors said that space was limited and that",
+    "advertising decided the length of the paper on most days of the week in the year.",
+  ].join("\n");
+  const paras = pdfParagraphs(pdf).map((p) => p.text);
+  assert.equal(paras[0], "Background");
+  assert.ok(paras[1].startsWith("The newspapers of Tripura") && paras[1].endsWith("state."));
+  assert.ok(!paras.includes("12"), "page numbers are dropped");
+  assert.ok(mistakeRate("The public listened the Carson. it was a informations problem,and more.") > mistakeRate("The public listened to Carson. It was an information problem, and more."));
+});

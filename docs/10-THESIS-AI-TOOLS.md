@@ -185,6 +185,25 @@ What this means:
 - Light AI editing of a human text mostly reads as human. That is reasonable, because the ideas and most of the words are still the writer's.
 - An AI rewrite aimed at sounding human defeats it, as it defeats commercial detectors (Weber-Wulff et al., 2023; Perkins et al., 2023).
 
+## Test on real theses: before and after ChatGPT (November 2026)
+
+`scripts/thesis-era-test.js` runs both checkers and the style measures on a folder of real theses and papers listed in a manifest (`path,year,group`). It reads PDF, Word and text files. The owner supplied about 95 documents from their literature folder: Shodhganga thesis chapters and journal papers on environmental and climate news coverage. They are not stored in the repository. Results:
+
+| Group | Paragraphs | Academic checker flags | News checker flags | ChatGPT-era words per 1,000 | Commas per 100 words | Sentence variation |
+|---|---|---|---|---|---|---|
+| Indian PhD theses before ChatGPT (23 chapters) | 802 | 1.4% | 16% | 1.4 | 5.4 | 0.40 |
+| Papers and reports before ChatGPT (45) | 2,352 | 1.1% | 19% | 2.0 | 6.8 | 0.48 |
+| Papers and theses 2023–2026 (25) | 1,159 | 9.4% | 32% | 5.7 | 6.9 | 0.46 |
+| Known AI: two drafts written by an AI assistant | 16 | 0% | 12% | 1.4 | 5.3 | 0.43 |
+| Known AI: 12 paragraphs by a current AI model | 12 | 0% | 33% | 3.4 | 4.6 | 0.28 |
+
+What this shows:
+- False alarms on genuine pre-ChatGPT writing in the owner's field are rare (about 1 in 80 paragraphs).
+- After 2022, ChatGPT-style writing becomes common: flags and ChatGPT-era words both rise sharply.
+- The checker does **not** detect text from current AI assistants, which avoid the 2023 ChatGPT vocabulary. Commas, mistakes and sentence length do not separate these texts either.
+
+The next step is to train on current-AI text in the owner's genre, matched to these human paragraphs, and to test on the two AI drafts, which the model has not seen.
+
 ## Next steps (the owner chose to proceed with what was available; these need settings or money)
 
 1. **Unblock the research sites** in this environment's network settings: huggingface.co, arxiv.org, export.arxiv.org, api.openalex.org, shodhganga.inflibnet.ac.in. Then (a) add pre-2022 journalism and mass communication abstracts from OpenAlex as human text, (b) add chapters of Indian PhD theses in mass communication from Shodhganga, from before 2022, as human text in the genre that matters, and (c) add larger detector benchmarks (RAID, MAGE, HC3). A changed network setting usually applies only to a new session.

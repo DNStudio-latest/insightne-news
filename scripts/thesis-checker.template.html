@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Thesis AI Checker</title>
+<title>Thesis Writing Checker</title>
 <style>
   :root { --bg: #f6f5f1; --card: #fff; --text: #1b1b1b; --muted: #5f6368; --line: #e3e1da; --brand: #0f4c5c; --soft: #e3eef0; --ok: #1e7b45; --warn: #a8441a; --warn-bg: #fff1e6; --danger: #b3261e; --mid: #c99a2e; }
   @media (prefers-color-scheme: dark) { :root { --bg: #111315; --card: #1a1d20; --text: #ecebe7; --muted: #a0a4a8; --line: #2c3034; --brand: #7cc4d4; --soft: #1d3338; --ok: #5cc28a; --warn: #ffb38a; --warn-bg: #3a2416; --danger: #ff8a80; } }
@@ -23,9 +23,9 @@
   label { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; margin: 8px 0; min-width: 0; }
   input[type=file] { width: 100%; max-width: 100%; }
   .note { overflow-wrap: anywhere; }
-  .ai { color: var(--danger); } .human { color: var(--ok); } .mixed { color: var(--warn); }
+  .ai { color: var(--danger); } .human { color: var(--muted); } .mixed { color: var(--warn); }
   .shares { display: flex; height: 14px; border-radius: 7px; overflow: hidden; } .shares span { display: block; }
-  article { border-left: 6px solid var(--line); } article.b-ai { border-left-color: var(--danger); } article.b-mixed { border-left-color: var(--mid); } article.b-human { border-left-color: var(--ok); }
+  article { border-left: 6px solid var(--line); } article.b-ai { border-left-color: var(--danger); } article.b-mixed { border-left-color: var(--mid); } article.b-human { border-left-color: var(--line); }
   .head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 0.9rem; }
   .text { white-space: pre-wrap; line-height: 1.6; margin: 6px 0; }
   mark { background: var(--warn-bg); color: inherit; border-bottom: 2px solid var(--warn); }
@@ -41,9 +41,9 @@
 </head>
 <body>
 <main>
-  <h1>🎓 Thesis AI checker (offline)</h1>
+  <h1>🎓 Thesis writing checker (offline)</h1>
   <p class="note">This file works without the internet. Your thesis is read on this computer only; nothing is sent anywhere. The AI rewrite (academic editor) is available only in the website's admin panel.</p>
-  <div class="flag" id="caveat"><strong>A score is not proof.</strong> <span id="model-line">Loading the model…</span> It was trained on research abstracts and older AI models, so it is less reliable on thesis chapters, newer AI models and lightly AI-polished text. Use it to improve your writing, not as evidence about anyone.</div>
+  <div class="flag" id="caveat"><strong>A writing aid, not a verdict.</strong> The score shows only ChatGPT-style writing of the 2023 kind. It does not detect text from current AI assistants, so a low score does not mean a text is human-written. On genuine human theses in this field it gives a false signal on about 1 paragraph in 100. <span id="model-line"></span></div>
 
   <section>
     <h2>1. Open a chapter</h2>
@@ -56,19 +56,19 @@
   <div id="out"></div>
 </main>
 <script type="module">
-import { readDocx, paragraphsFromText, analyseThesis, applyAlternative, VOICE_LABELS, VOICE_NORMS, THESIS_DISCLAIMER, MIN_PARAGRAPH_WORDS } from "./academic.js";
+import { readDocx, paragraphsFromText, analyseThesis, applyAlternative, VOICE_LABELS, VOICE_NORMS, THESIS_DISCLAIMER, MIN_PARAGRAPH_WORDS, DETECTION_LIMIT, BAND_LABELS, WRITING_POINTS } from "./academic.js";
 import { ACADEMIC_MODEL } from "./model-academic.js";
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-const BAND = { ai: "Reads as AI-like", mixed: "Mixed signals", human: "Reads as human-written" };
-const KIND = { excess: "Word that rose with ChatGPT", wordy: "Wordy", pattern: "Stock formula", source: "Needs a citation", overclaim: "Overclaim", sentence: "AI-like sentence", long: "Long sentence", uniform: "Even rhythm" };
+const BAND = BAND_LABELS;
+const KIND = { excess: "Word that rose with ChatGPT", wordy: "Wordy", pattern: "Stock formula", source: "Needs a citation", overclaim: "Overclaim", sentence: "ChatGPT-style sentence", long: "Long sentence", uniform: "Even rhythm" };
 let paras = null;
 let name = "";
 let filter = "attention";
 
 const tm = ACADEMIC_MODEL.training;
-$("model-line").textContent = `The model was right on ${(tm.test_metrics.accuracy * 100).toFixed(1)}% of ${tm.test_metrics.n.toLocaleString("en")} test abstracts; at the "AI-like" level it wrongly flags ${(tm.at_ai_threshold.falsePositiveRate * 100).toFixed(1)}% of human abstracts.`;
+$("model-line").textContent = `Never use it as evidence about anyone.`;
 
 function marked(text, suggestions) {
   const outerK = new Set(["sentence", "source", "long"]);
@@ -95,9 +95,12 @@ function render() {
   const cls = (b) => (b === "ai" ? "ai" : b === "human" ? "human" : "mixed");
   let html = `<section><h2>2. Overview: ${esc(name)}</h2>
     <p>${s.words.toLocaleString("en")} words of your own prose were analysed (${s.counts.heading || 0} headings, ${s.counts.quote || 0} quotations and interview extracts, ${s.counts.table || 0} table cells, ${s.counts.caption || 0} captions and ${s.counts.reference || 0} references were left out).</p>`;
+  const points = WRITING_POINTS.filter(([k]) => s.writing[k]);
+  html += `<h3>Writing points</h3>${points.length ? `<ul>${points.map(([k, label]) => `<li><b>${s.writing[k]}</b> ${esc(label)}</li>`).join("")}</ul>` : "<p>No writing points found.</p>"}
+    <h3>ChatGPT-style signal</h3><p class="flag"><strong>What this can show.</strong> ${esc(DETECTION_LIMIT)}</p>`;
   if (s.scoredWords) {
-    html += `<div class="shares"><span style="flex-grow:${s.shares.ai || 0.0001};background:var(--danger)"></span><span style="flex-grow:${s.shares.mixed || 0.0001};background:var(--mid)"></span><span style="flex-grow:${s.shares.human || 0.0001};background:var(--ok)"></span></div>
-      <p><b class="ai">${s.shares.ai}%</b> of the scored words are in paragraphs that read as AI-like, <b class="mixed">${s.shares.mixed}%</b> in paragraphs with mixed signals and <b class="human">${s.shares.human}%</b> in paragraphs that read as human-written.${s.shortWords ? ` ${s.shortWords.toLocaleString("en")} words are in paragraphs under ${MIN_PARAGRAPH_WORDS} words, scored only with their section.` : ""}</p>`;
+    html += `<div class="shares"><span style="flex-grow:${s.shares.ai || 0.0001};background:var(--danger)"></span><span style="flex-grow:${s.shares.mixed || 0.0001};background:var(--mid)"></span><span style="flex-grow:${s.shares.human || 0.0001};background:var(--line)"></span></div>
+      <p><b class="ai">${s.shares.ai}%</b> of the scored words are in paragraphs with a ChatGPT-style signal, <b class="mixed">${s.shares.mixed}%</b> with a weak signal and <b class="human">${s.shares.human}%</b> with no ChatGPT-style signal found.${s.shortWords ? ` ${s.shortWords.toLocaleString("en")} words are in paragraphs under ${MIN_PARAGRAPH_WORDS} words, scored only with their section.` : ""}</p>`;
   } else html += `<p class="note">No paragraph is long enough to score on its own (${MIN_PARAGRAPH_WORDS}+ words).</p>`;
   html += `<p class="note">${esc(THESIS_DISCLAIMER)}</p><div class="row"><button id="download">Download revised text (.txt)</button></div>
     <p class="note">Changes you make here are kept only while this page is open. Download the revised text before closing it.</p></section>`;
@@ -119,9 +122,9 @@ function render() {
   const visible = a.paragraphs.filter((p) => (p.kind === "prose" || p.kind === "list") && (filter === "all" || (filter === "ai" && p.band === "ai") || (filter === "attention" && (p.band === "ai" || p.band === "mixed" || (p.suggestions || []).some((x) => ["source", "overclaim", "pattern", "sentence"].includes(x.kind))))));
   html += `<section><h2>3. Paragraphs</h2><label>Show <select id="filter">
       <option value="attention"${filter === "attention" ? " selected" : ""}>Paragraphs that need attention</option>
-      <option value="ai"${filter === "ai" ? " selected" : ""}>Only paragraphs that read as AI-like</option>
+      <option value="ai"${filter === "ai" ? " selected" : ""}>Only paragraphs with a ChatGPT-style signal</option>
       <option value="all"${filter === "all" ? " selected" : ""}>All paragraphs</option></select></label>
-      <p class="note"><mark>Highlighted</mark> words have a suggestion; <span class="u">underlined</span> sentences read as AI-like or need a citation. Hover over a mark to see why.</p>
+      <p class="note"><mark>Highlighted</mark> words have a suggestion; <span class="u">underlined</span> sentences have a ChatGPT-style signal or need a citation. Hover over a mark to see why.</p>
       ${visible.length ? "" : "<p>Nothing to show with this filter.</p>"}</section>`;
   for (const p of visible) {
     const tips = (p.suggestions || []).filter((x) => x.kind !== "sentence");

@@ -4,13 +4,14 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   readDocx, paragraphsFromText, analyseThesis, applyAlternative, VOICE_LABELS, VOICE_NORMS, THESIS_DISCLAIMER, MIN_PARAGRAPH_WORDS,
+  DETECTION_LIMIT, BAND_LABELS, WRITING_POINTS,
 } from "../../../public/ai-tools/academic.js";
 import { scoreText } from "../../../public/ai-tools/engine.js";
 import { wordDiff, diffCounts } from "../ai-check/diff.js";
 import { editThesisPassage } from "./actions.js";
 
-const BAND_TEXT = { ai: "Reads as AI-like", mixed: "Mixed signals", human: "Reads as human-written" };
-const KIND_TEXT = { excess: "Word that rose with ChatGPT", wordy: "Wordy", pattern: "Stock formula", source: "Needs a citation", overclaim: "Overclaim", sentence: "AI-like sentence", long: "Long sentence", uniform: "Even rhythm" };
+const BAND_TEXT = BAND_LABELS;
+const KIND_TEXT = { excess: "Word that rose with ChatGPT", wordy: "Wordy", pattern: "Stock formula", source: "Needs a citation", overclaim: "Overclaim", sentence: "ChatGPT-style sentence", long: "Long sentence", uniform: "Even rhythm" };
 const SHOW_STEP = 120;
 
 function Changes({ before, after }) {
@@ -126,7 +127,7 @@ function Paragraph({ p, model, mode, onChange }) {
       <header className="tc-para-head">
         <span className="tc-section">{p.section}</span>
         {p.score !== undefined
-          ? <b className={p.band === "ai" ? "aic-ai" : p.band === "human" ? "aic-human" : "aic-warn"}>{p.score}/100 · {BAND_TEXT[p.band]}</b>
+          ? <b className={p.band === "ai" ? "aic-ai" : p.band === "human" ? "" : "aic-warn"}>{p.score}/100 · {BAND_TEXT[p.band]}</b>
           : <span className="note">{p.words} words: too short to score on its own (counted in its section)</span>}
       </header>
       <Marked text={p.text} suggestions={p.suggestions || []} />
@@ -267,6 +268,14 @@ export default function ThesisCheck() {
               ({s.counts.heading || 0} headings, {s.counts.quote || 0} quotations and interview extracts, {s.counts.table || 0} table cells,
               {" "}{s.counts.caption || 0} captions and {s.counts.reference || 0} references were left out).
             </p>
+            <h3>Writing points</h3>
+            {WRITING_POINTS.some(([k]) => s.writing[k]) ? (
+              <ul className="aic-list">
+                {WRITING_POINTS.filter(([k]) => s.writing[k]).map(([k, label]) => <li key={k}><b>{s.writing[k]}</b> {label}</li>)}
+              </ul>
+            ) : <p>No writing points found.</p>}
+            <h3>ChatGPT-style signal</h3>
+            <div className="flag"><strong>What this can show.</strong> {DETECTION_LIMIT}</div>
             {s.scoredWords > 0 ? (
               <>
                 <div className="tc-shares">
@@ -275,9 +284,9 @@ export default function ThesisCheck() {
                   <span className="tc-share tc-band-human" style={{ flexGrow: s.shares.human || 0.0001 }} />
                 </div>
                 <p>
-                  <b className="aic-ai">{s.shares.ai}%</b> of the scored words are in paragraphs that read as AI-like,{" "}
-                  <b className="aic-warn">{s.shares.mixed}%</b> in paragraphs with mixed signals and{" "}
-                  <b className="aic-human">{s.shares.human}%</b> in paragraphs that read as human-written.
+                  <b className="aic-ai">{s.shares.ai}%</b> of the scored words are in paragraphs with a ChatGPT-style signal,{" "}
+                  <b className="aic-warn">{s.shares.mixed}%</b> with a weak signal and{" "}
+                  <b>{s.shares.human}%</b> with no ChatGPT-style signal found.
                   {s.shortWords > 0 && ` ${s.shortWords.toLocaleString("en")} words are in paragraphs under ${MIN_PARAGRAPH_WORDS} words, which are scored only with their section.`}
                 </p>
               </>
@@ -298,7 +307,7 @@ export default function ThesisCheck() {
                   <li key={i}>
                     <a href={`#p${sec.paragraphs[0]}`}>{sec.title}</a>
                     <span className="note"> · {sec.words.toLocaleString("en")} words</span>
-                    {sec.score !== undefined && <b className={sec.band === "ai" ? "aic-ai" : sec.band === "human" ? "aic-human" : "aic-warn"}> · {sec.score}/100</b>}
+                    {sec.score !== undefined && <b className={sec.band === "ai" ? "aic-ai" : sec.band === "human" ? "" : "aic-warn"}> · {sec.score}/100</b>}
                   </li>
                 ))}
               </ul>
@@ -313,7 +322,7 @@ export default function ThesisCheck() {
               <label>Show
                 <select value={filter} onChange={(e) => { setFilter(e.target.value); setShown(SHOW_STEP); }}>
                   <option value="attention">Paragraphs that need attention</option>
-                  <option value="ai">Only paragraphs that read as AI-like</option>
+                  <option value="ai">Only paragraphs with a ChatGPT-style signal</option>
                   <option value="all">All paragraphs</option>
                 </select>
               </label>
@@ -326,7 +335,7 @@ export default function ThesisCheck() {
             </div>
             <p className="note">
               <mark className="tc-excess">Highlighted</mark> words and phrases have a suggestion; <span className="tc-under tc-sentence">underlined</span> sentences
-              read as AI-like to the model or need a citation. Hover over a mark to see why. The academic editor sends only that paragraph to the
+              have a ChatGPT-style signal or need a citation. Hover over a mark to see why. The academic editor sends only that paragraph to the
               website&apos;s AI; it keeps your citations, quotations, figures and terms, and lists anything missing as a note.
             </p>
             {visible.length === 0 && <p>Nothing to show with this filter.</p>}

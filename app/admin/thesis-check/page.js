@@ -24,16 +24,15 @@ export default async function ThesisCheckPage() {
       </div>
       <p className="note">
         Open a chapter (.docx or .txt) or paste it. The checker finds your own prose (it leaves out headings,
-        quotations, interview extracts, tables, captions and the reference list), estimates which paragraphs read as
-        AI-written, and suggests plainer wording. Checking happens on this device: your text is not sent anywhere.
-        Only <b>Edit with the academic editor</b> sends that one passage to the website&apos;s AI to make the edit.
+        quotations, interview extracts, tables, captions and the reference list) and suggests improvements: claims
+        that need a citation, overclaims, stock phrases and wordy wording. Checking happens on this device: your text
+        is not sent anywhere. Only <b>Edit with the academic editor</b> sends that one passage to the website&apos;s AI.
       </p>
       <div className="flag">
-        <strong>A score is not proof.</strong>
-        The academic model was right on about 94 in 100 test abstracts, but it wrongly flagged about 1 in 20 human
-        abstracts (about 1 in 50 at the &ldquo;AI-like&rdquo; level). It was trained on abstracts, not thesis chapters, and on
-        older AI models. It often misses text from AI models it has not seen, most text that AI has only polished, and
-        AI text rewritten to sound human. Use it to improve your writing, not as evidence about anyone.
+        <strong>A writing aid, not a verdict.</strong>
+        The score shows only ChatGPT-style writing of the 2023 kind. It does not detect text from current AI assistants,
+        so a low score does not mean a text is human-written. On genuine human theses in this field it gives a false
+        signal on about 1 paragraph in 100. Never use it as evidence about anyone.
       </div>
       <ThesisCheck />
     </div>

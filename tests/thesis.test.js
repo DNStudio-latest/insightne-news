@@ -165,7 +165,7 @@ test("the academic model scores machine-written prose higher than a researcher's
   assert.equal(r.paragraphs.find((p) => p.text.startsWith("Sen, A.")).kind, "reference");
   assert.ok(r.summary.scoredWords > 100 && r.sections.length === 1 && r.sections[0].title === "Chapter 1", "empty sections such as the reference list are not listed");
   assert.ok(ACADEMIC_MODEL.thresholds.high > 0.5 && ACADEMIC_MODEL.training.test_metrics.n > 1000);
-  assert.match(THESIS_DISCLAIMER, /not proof/);
+  assert.match(THESIS_DISCLAIMER, /not a verdict/);
 });
 
 // ---------- the academic editor ----------
@@ -262,4 +262,13 @@ test("PDF text with hard line breaks is rebuilt into paragraphs, without page nu
   assert.ok(paras[1].startsWith("The newspapers of Tripura") && paras[1].endsWith("state."));
   assert.ok(!paras.includes("12"), "page numbers are dropped");
   assert.ok(mistakeRate("The public listened the Carson. it was a informations problem,and more.") > mistakeRate("The public listened to Carson. It was an information problem, and more."));
+});
+
+test("the checker never labels a paragraph as human-written and states what it cannot detect", async () => {
+  const { BAND_LABELS, DETECTION_LIMIT, WRITING_POINTS } = await import("../public/ai-tools/academic.js");
+  for (const label of Object.values(BAND_LABELS)) assert.doesNotMatch(label, /human|AI-written|written by/i);
+  assert.match(DETECTION_LIMIT, /does not detect text from current AI assistants/);
+  const r = analyseThesis(paragraphsFromText("Many scholars argue that local papers ignore the environment. The data proves this beyond doubt, as the survey of readers in Agartala in 2019 showed clearly to everyone involved in the work."), ACADEMIC_MODEL);
+  assert.ok(r.summary.writing.source >= 1 && r.summary.writing.overclaim >= 1);
+  assert.equal(WRITING_POINTS[0][0], "source");
 });

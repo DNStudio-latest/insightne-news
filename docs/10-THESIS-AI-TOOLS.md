@@ -1,6 +1,6 @@
 # 10. PhD thesis checker: AI-text check, suggestions and academic editor
 
-A private tool for the owner's PhD thesis in journalism and mass communication. It has three parts:
+A private tool for the owner's PhD thesis in journalism and mass communication. **It is a writing aid, not a verdict on who wrote a text** (the owner's decision, November 2026, after the tests below showed that text from current AI assistants cannot be detected reliably with free tools). It has three parts:
 
 1. **Checker:** finds your own prose in a chapter and estimates, paragraph by paragraph, how much it reads like AI-generated academic writing. It shows the words and patterns behind each score.
 2. **Suggestions:** marks the words that became common in research writing after ChatGPT, stock AI formulas, claims about the literature that have no citation, and overclaiming. Each comes with plain alternatives you can apply in one click.
@@ -14,6 +14,8 @@ A private tool for the owner's PhD thesis in journalism and mass communication. 
 **Privacy.** The checking runs in your browser: the chapter is not sent to the website or to any AI service. Only **Edit with the academic editor** sends that one paragraph to the website's AI (Claude, or Gemini if no Claude key is set) to make the edit. The website does not store it. Your changes are kept only in the open tab until you download the revised text.
 
 ## Read this first
+
+- **What the score shows.** Only ChatGPT-style writing of the 2023 kind. The pages label paragraphs "ChatGPT-style signal", "Weak ChatGPT-style signal" or "No ChatGPT-style signal found", never "human-written", because the checker does not detect text from current AI assistants (see "Can current AI writing be detected here?" below). Each score comes with that warning, and the overview lists the writing points (uncited claims, overclaims, stock formulas, rising words, wordy phrases, long sentences) before the score.
 
 - **A score is not proof.** On 6,643 test abstracts it had never seen, the model was right 93.8% of the time. It wrongly flagged 4.8% of human abstracts at the 50/100 mark and 2.1% at its "AI-like" level (68/100). Formal academic prose and writing by people whose first language is not English are flagged in error more often (Liang et al., 2023). Published tests of commercial detectors, Turnitin included, reach the same conclusion: no detector is reliable enough to be the only evidence (Weber-Wulff et al., 2023).
 - **It was trained on abstracts, not thesis chapters.** No public collection of thesis chapters with AI versions was reachable from this environment. Literature reviews are flagged more often than abstracts by detectors in general (Dalalah and Dalalah, 2023), so treat paragraph scores in a literature review with extra caution.

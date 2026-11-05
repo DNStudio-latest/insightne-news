@@ -11,10 +11,27 @@ import { VOICE_NORMS } from "./academic-norms.js";
 export { applyAlternative, VOICE_NORMS, EXCESS_WORDS };
 
 export const THESIS_DISCLAIMER =
-  "A score is a statistical estimate, not proof of who wrote a text. Formal academic prose and writing by people " +
-  "whose first language is not English are flagged in error more often. The suggestions improve your own writing; " +
-  "they are not a way to hide AI use. Follow your university's rules and the UGC regulations, and disclose any AI " +
-  "assistance as they require.";
+  "This is a writing aid, not a verdict. The suggestions improve your own writing; they are not a way to hide AI use. " +
+  "Follow your university's rules and the UGC regulations, and disclose any AI assistance as they require.";
+
+// What the score can and cannot show (measured November 2026; docs/10-THESIS-AI-TOOLS.md). Shown with every score.
+export const DETECTION_LIMIT =
+  "The score only shows ChatGPT-style writing of the 2023 kind. It does not detect text from current AI assistants: " +
+  "in tests it caught none of the AI-written thesis drafts it was given. A low score therefore does not mean a text " +
+  "is human-written. On genuine human theses in this field it gives a false signal on about 1 paragraph in 100.";
+
+// Labels for the score bands: they describe a style signal, never authorship.
+export const BAND_LABELS = { ai: "ChatGPT-style signal", mixed: "Weak ChatGPT-style signal", human: "No ChatGPT-style signal found" };
+
+// Writing points counted for the overview, most important first.
+export const WRITING_POINTS = [
+  ["source", "claims about the literature without a citation"],
+  ["overclaim", "overclaims (proves, undoubtedly…)"],
+  ["pattern", "stock formulas (plays a crucial role…)"],
+  ["excess", "words that rose with ChatGPT"],
+  ["wordy", "wordy phrases with a shorter form"],
+  ["long", "sentences over 45 words"],
+];
 
 // Paragraphs shorter than this (in the author's own words) are scored only as part of their section.
 export const MIN_PARAGRAPH_WORDS = 60;
@@ -444,7 +461,7 @@ export function academicSuggestions(text, { model } = {}) {
   if (model) {
     for (const s of scoreSentences(raw, model)) {
       if (!s.aiLike || inside(guard, s.index, s.index + s.sentence.length)) continue;
-      add({ kind: "sentence", index: s.index, length: s.sentence.length, excerpt: s.sentence, cues: s.cues, message: `The model reads this sentence as AI-like${s.cues.length ? ` (it weighs ${s.cues.map((c) => `"${c}"`).join(", ")})` : ""}. Rewrite it in your own words: add your evidence, a specific case, a source or your own judgement.` });
+      add({ kind: "sentence", index: s.index, length: s.sentence.length, excerpt: s.sentence, cues: s.cues, message: `This sentence has a ChatGPT-style signal${s.cues.length ? ` (it weighs ${s.cues.map((c) => `"${c}"`).join(", ")})` : ""}. Rewrite it in your own words: add your evidence, a specific case, a source or your own judgement.` });
     }
   }
 
@@ -530,6 +547,7 @@ export function analyseThesis(paragraphs, model, { suggestions = true } = {}) {
       shortWords: totals.short,
       counts,
       overall: model && tokenize(ownAll).length >= MIN_SECTION_WORDS ? scoreText(ownAll, model).score : null,
+      writing: Object.fromEntries(WRITING_POINTS.map(([kind]) => [kind, parts.reduce((n, p) => n + (p.suggestions || []).filter((s) => s.kind === kind).length, 0)])),
       threshold: model?.thresholds?.high ?? 0.7,
     },
     voice: voiceProfile(fullAll, ownAll),

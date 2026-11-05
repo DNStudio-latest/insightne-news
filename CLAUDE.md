@@ -37,7 +37,7 @@ The owner reviews live edits and reports phrases that sound machine-written. Sim
 
 ## PhD thesis checker (built November 2026, admin only)
 
-The owner's own tool for their PhD thesis in journalism and mass communication: AI-text check, writing suggestions and an academic editor. Guide and results: `docs/10-THESIS-AI-TOOLS.md`.
+The owner's own tool for their PhD thesis in journalism and mass communication: writing suggestions, an academic editor and a ChatGPT-style signal. **It is a writing aid, not a verdict** (owner's decision, November 2026): tests showed it cannot detect text from current AI assistants, so labels say "ChatGPT-style signal" / "No ChatGPT-style signal found", never "human-written", and `DETECTION_LIMIT` is shown with every score. Keep it that way unless a new method is shown to work on the owner's test set. Guide and results: `docs/10-THESIS-AI-TOOLS.md`.
 
 | What | Where |
 |---|---|

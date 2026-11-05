@@ -624,7 +624,7 @@ main { padding: 20px 0 40px; }
 .tc-para { border: 1px solid var(--line); border-left: 6px solid var(--line); border-radius: 8px; padding: 10px 14px; margin: 12px 0; background: var(--card); }
 .tc-band-ai { border-left-color: var(--danger); background-color: var(--danger); }
 .tc-band-mixed { border-left-color: #c99a2e; background-color: #c99a2e; }
-.tc-band-human { border-left-color: var(--ok); background-color: var(--ok); }
+.tc-band-human { border-left-color: var(--line); background-color: var(--line); }
 .tc-para.tc-band-ai, .tc-para.tc-band-mixed, .tc-para.tc-band-human, .tc-para.tc-band-none { background-color: var(--card); }
 .tc-para-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 0.9rem; }
 .tc-section { color: var(--muted); }

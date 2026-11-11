@@ -82,8 +82,12 @@
     "_help": "People marked Sub-editor on /admin/editors. They see and edit only their own stories and can't make a story the lead or breaking news. If canPublish is true, their stories go live straight away; if false, they wait in Pending for the admin.",
     "canPublish": true
   },
+  "reporters": {
+    "_help": "People marked Reporter on /admin/editors. Like sub-editors, they see and edit only their own stories and can't make a story the lead or breaking news. If canPublish is true, their stories go live straight away; if false, they wait in Pending for the admin.",
+    "canPublish": false
+  },
   "kokborokEditors": {
-    "_help": "Sub-editors named here (exactly as their name appears on /admin/editors, letter case does not matter) may also edit the Kokborok version of every story. On other people's stories they can change only the Kokborok headline and summary, not the English text.",
+    "_help": "Sub-editors and reporters named here (exactly as their name appears on /admin/editors, letter case does not matter) may also edit the Kokborok version of every story. On other people's stories they can change only the Kokborok headline and summary, not the English text.",
     "names": ["Elisa", "Anita", "Mary John"]
   },
   "facebook": {

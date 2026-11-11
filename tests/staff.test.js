@@ -1,11 +1,25 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { storyCounts, staffTitle, SUB_EDITOR } from "../lib/staff.js";
+import { storyCounts, staffTitle, canEditKokborok, isOwnOnly, SUB_EDITOR, REPORTER } from "../lib/staff.js";
 
 test("sub-editors get their own title", () => {
   assert.equal(staffTitle({ role: SUB_EDITOR }), "Sub-Editor");
-  assert.equal(staffTitle({ role: "editor" }), "Reporter");
+  assert.equal(staffTitle({ role: REPORTER }), "Reporter");
+  assert.equal(staffTitle({ role: "editor" }), "Editor");
+  assert.equal(staffTitle({ name: "Older row without a role" }), "Editor");
   assert.equal(staffTitle(undefined), "Reporter");
+});
+
+test("sub-editors and reporters see only their own stories; editors and the admin do not", () => {
+  assert.equal(isOwnOnly(SUB_EDITOR), true);
+  assert.equal(isOwnOnly(REPORTER), true);
+  assert.equal(isOwnOnly("editor"), false);
+  assert.equal(isOwnOnly("admin"), false);
+});
+
+test("a reporter edits the Kokborok version only when named in settings", () => {
+  assert.equal(canEditKokborok({ role: REPORTER, name: "Elisa" }, ["Elisa"]), true);
+  assert.equal(canEditKokborok({ role: REPORTER, name: "Rina Das" }, ["Elisa"]), false);
 });
 
 test("stories count for a person by id, or by byline name for older stories", () => {

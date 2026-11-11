@@ -119,7 +119,7 @@ export function LangSwitch({ current, label = "Language" }) {
         }}
       >
         {LANGUAGES.map((l) => (
-          <option key={l.code} value={l.code} lang={l.code}>{l.name}</option>
+          <option key={l.code} value={l.code} lang={l.html || l.code}>{l.name}</option>
         ))}
       </select>
     </label>
@@ -336,7 +336,7 @@ export function LanguageWelcome({ current }) {
         {order.map((code) => {
           const l = LANGUAGES.find((x) => x.code === code);
           return (
-            <button key={code} type="button" lang={code} className={code === (suggested || current) ? "on" : undefined} onClick={() => choose(code)}>
+            <button key={code} type="button" lang={l.html || code} className={code === (suggested || current) ? "on" : undefined} onClick={() => choose(code)}>
               {l.name}
             </button>
           );
@@ -349,7 +349,7 @@ export function LanguageWelcome({ current }) {
 
 // "Listen to today's top news": the phone or computer reads the top stories aloud with its own voice (free, no audio files).
 // items: [{ headline, summary, headline_en, summary_en }]; texts: { intro, outro, intro_en, outro_en, listen, pause, resume, stop, noSound }.
-const VOICE_LANGS = { en: ["en-IN", "en"], bn: ["bn-IN", "bn"], hi: ["hi-IN", "hi"], as: ["as-IN", "as", "bn-IN", "bn"], ne: ["ne-NP", "ne", "hi-IN", "hi"] };
+const VOICE_LANGS = { en: ["en-IN", "en"], bn: ["bn-IN", "bn"], hi: ["hi-IN", "hi"], as: ["as-IN", "as", "bn-IN", "bn"], ne: ["ne-NP", "ne", "hi-IN", "hi"], trpb: ["bn-IN", "bn"] };
 
 function findVoice(code) {
   const voices = window.speechSynthesis.getVoices();
@@ -384,7 +384,7 @@ export function ListenBriefing({ items, lang = "en", texts }) {
   // Where the reader moved the tab, as a share of the free space ({ fx: 0 = left edge … 1 = right edge, fy }); null = default spot.
   const [spot, setSpot] = useState(null);
   const boxRef = useRef(null);
-  const run = useRef({ token: 0, pieces: [], index: 0, voice: null, langCode: "en-IN", utter: null, heard: false });
+  const run = useRef({ token: 0, pieces: [], index: 0, voice: null, english: null, langCode: "en-IN", utter: null, heard: false });
   const drag = useRef(null);
   const justDragged = useRef(false);
 
@@ -429,8 +429,10 @@ export function ListenBriefing({ items, lang = "en", texts }) {
     r.index = n;
     const piece = r.pieces[n];
     const u = new SpeechSynthesisUtterance(piece.text);
-    u.lang = r.langCode;
-    if (r.voice) u.voice = r.voice;
+    // English words (the intro and closing line, when there is no translation of them) get the English voice.
+    const voice = piece.en ? r.english : r.voice;
+    u.lang = piece.en ? r.english?.lang || "en-IN" : r.langCode;
+    if (voice) u.voice = voice;
     u.rate = 0.95;
     u.onstart = () => {
       r.heard = true;
@@ -453,14 +455,16 @@ export function ListenBriefing({ items, lang = "en", texts }) {
       // The reader's language if the device has a voice for it; otherwise English.
       const own = lang !== "en" ? findVoice(lang) : null;
       const local = lang === "en" || Boolean(own);
-      r.voice = own || findVoice("en");
+      r.english = findVoice("en");
+      r.voice = own || r.english;
       r.langCode = r.voice?.lang || (local ? VOICE_LANGS[lang]?.[0] : "en-IN") || "en-IN";
-      r.pieces = [{ text: local ? texts.intro : texts.intro_en, item: -1 }];
+      const spoken = (text, english) => ({ text: local ? text : english, item: -1, en: Boolean(own) && (!local || text === english) });
+      r.pieces = [{ ...spoken(texts.intro, texts.intro_en) }];
       items.forEach((s, i) => {
         r.pieces.push({ text: local ? s.headline : s.headline_en, item: i, pause: true });
         for (const line of sentences(local ? s.summary : s.summary_en)) r.pieces.push({ text: line, item: i });
       });
-      r.pieces.push({ text: local ? texts.outro : texts.outro_en, item: -1, pause: true });
+      r.pieces.push({ ...spoken(texts.outro, texts.outro_en), pause: true });
     }
     r.token += 1;
     r.heard = false;

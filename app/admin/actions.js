@@ -136,12 +136,13 @@ async function photoFields(formData, existing, onError, canDelete = true) {
   return fields;
 }
 
-// The Kokborok version typed in the editor. Both boxes empty = none (Gemini writes it again at the next run).
+// The Kokborok version typed in the editor: Roman script (code "trp") or Bengali script ("trpb").
+// Both boxes empty = none (Gemini writes it again at the next run).
 // Returns undefined when the form has no Kokborok boxes at all.
-function kokborokFrom(formData, fail) {
-  if (!formData.has("headline_trp")) return undefined;
-  const headline = String(formData.get("headline_trp") || "").trim().slice(0, 300);
-  const summary = String(formData.get("summary_trp") || "").trim().slice(0, 2000);
+function kokborokFrom(formData, fail, code = "trp") {
+  if (!formData.has(`headline_${code}`)) return undefined;
+  const headline = String(formData.get(`headline_${code}`) || "").trim().slice(0, 300);
+  const summary = String(formData.get(`summary_${code}`) || "").trim().slice(0, 2000);
   if (Boolean(headline) !== Boolean(summary)) fail("Fill in both Kokborok boxes, or leave both empty");
   return headline ? { headline, summary } : null;
 }
@@ -158,14 +159,15 @@ export async function saveEdit(formData) {
   const kokOnly = isOwnOnly(role) && existing?.author_id !== user?.id;
   if (kokOnly && !(existing && canEditKokborok(user, settings.kokborokEditors?.names))) fail("You can edit only your own stories");
   const kok = kokborokFrom(formData, fail);
+  const kokBn = kokborokFrom(formData, fail, "trpb");
   if (kokOnly) {
-    await db.updateStory(id, { translations: translationsAfterEdit(existing, false, kok) });
+    await db.updateStory(id, { translations: translationsAfterEdit(existing, false, kok, kokBn) });
     refresh(view, "Kokborok version saved");
   }
   const fields = { ...editedFields(formData), ...(await photoFields(formData, existing, fail, user?.canDelete !== false)) };
   // If the English text changed, the Hindi/Assamese/Nepali versions are made again at the next collector run.
   const englishChanged = fields.headline !== existing?.headline || fields.summary !== existing?.summary;
-  if (englishChanged || kok !== undefined) fields.translations = translationsAfterEdit(existing, englishChanged, kok);
+  if (englishChanged || kok !== undefined || kokBn !== undefined) fields.translations = translationsAfterEdit(existing, englishChanged, kok, kokBn);
   const mark = editedByName(user, existing);
   if (mark) fields.edited_by = mark; // an editor changed a sub-editor's story: their name is shown with the sub-editor's
   if (formData.get("andApprove") && role === "admin") {
@@ -236,6 +238,7 @@ export async function saveOriginal(formData) {
   const publish = canPublish ? formData.get("intent") === "publish" || (role !== "admin" && existing?.status === "approved") : existing?.status === "approved";
   const backToEditor = (message) => redirect(`/admin/write?${id ? `id=${id}&` : ""}error=${encodeURIComponent(message)}`);
   const kok = kokborokFrom(formData, backToEditor);
+  const kokBn = kokborokFrom(formData, backToEditor, "trpb");
 
   const fields = {
     kind: "original",
@@ -255,7 +258,7 @@ export async function saveOriginal(formData) {
   if (sub) Object.assign(fields, { author_id: user.id, author_title: staffTitle({ role }) });
   if (!fields.headline) backToEditor("Please write a headline.");
   const englishChanged = Boolean(existing) && (fields.headline !== existing.headline || fields.summary !== existing.summary);
-  if (englishChanged || kok !== undefined) fields.translations = translationsAfterEdit(existing, englishChanged, kok);
+  if (englishChanged || kok !== undefined || kokBn !== undefined) fields.translations = translationsAfterEdit(existing, englishChanged, kok, kokBn);
   if (publish && (!fields.summary || !fields.body)) backToEditor("Please write the intro and the story text before publishing.");
   const canDelete = user?.canDelete !== false;
   Object.assign(fields, await photoFields(formData, existing, backToEditor, canDelete));

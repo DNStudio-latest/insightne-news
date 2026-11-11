@@ -2,7 +2,7 @@ import "./globals.css";
 import { Roboto, Noto_Serif_Bengali, Noto_Sans_Bengali, Inter } from "next/font/google";
 import { settings } from "../lib/config.js";
 import { SiteAnalytics } from "./client.js";
-import { validLang } from "../lib/languages.js";
+import { validLang, htmlLang } from "../lib/languages.js";
 import { cookies } from "next/headers";
 
 const headline = Roboto({ subsets: ["latin"], weight: ["700", "800"], variable: "--font-headline", display: "swap" });
@@ -27,7 +27,7 @@ export const viewport = { width: "device-width", initialScale: 1, themeColor: "#
 export default async function RootLayout({ children }) {
   const lang = validLang((await cookies()).get("lang")?.value);
   return (
-    <html lang={lang} className={`${headline.variable} ${sans.variable} ${bnSerif.variable} ${bnSans.variable}`}>
+    <html lang={htmlLang(lang)} className={`${headline.variable} ${sans.variable} ${bnSerif.variable} ${bnSans.variable}`}>
       <body>
         {children}
         <SiteAnalytics />

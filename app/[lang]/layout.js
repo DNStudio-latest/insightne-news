@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { fontClasses } from "../fonts.js";
 import { siteMetadata, siteViewport } from "../site-metadata.js";
 import { SiteAnalytics } from "../client.js";
-import { LANGUAGE_CODES, INDEXED_LANGUAGES } from "../../lib/languages.js";
+import { LANGUAGE_CODES, INDEXED_LANGUAGES, htmlLang } from "../../lib/languages.js";
 import { initLang } from "../../lib/lang.js";
 
 export const viewport = siteViewport;
@@ -16,7 +16,7 @@ export function generateStaticParams() {
   return [];
 }
 
-const OG_LOCALE = { en: "en_IN", bn: "bn_IN", hi: "hi_IN", as: "as_IN", ne: "ne_NP", trp: "en_IN" };
+const OG_LOCALE = { en: "en_IN", bn: "bn_IN", hi: "hi_IN", as: "as_IN", ne: "ne_NP", trp: "en_IN", trpb: "bn_IN" };
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
@@ -34,7 +34,7 @@ export default async function SiteLayout({ children, params }) {
   if (!LANGUAGE_CODES.includes(lang)) notFound();
   await initLang(lang);
   return (
-    <html lang={lang} className={fontClasses}>
+    <html lang={htmlLang(lang)} className={fontClasses}>
       <body>
         {children}
         <SiteAnalytics />

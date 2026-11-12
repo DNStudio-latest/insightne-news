@@ -88,15 +88,23 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor, rol
         🤖 Check this text for AI
       </button>
 
-      <details className="bn-fields" open={Boolean(story?.translations?.trp?.summary)}>
-        <summary>Kokborok version (Latin script, optional)</summary>
+      <details className="bn-fields" open={Boolean(story?.translations?.trp?.summary || story?.translations?.trpb?.summary)}>
+        <summary>Kokborok version (Roman and Bengali script, optional)</summary>
         <label>
-          Kokborok headline
+          Kokborok headline (Roman script)
           <input type="text" name="headline_trp" lang="trp" defaultValue={story?.translations?.trp?.headline || ""} maxLength={300} />
         </label>
         <label>
-          Kokborok intro <span className="hint">— leave both boxes empty and Gemini will write it again at the next run</span>
+          Kokborok intro (Roman script) <span className="hint">— leave both boxes empty and Gemini will write it again at the next run</span>
           <textarea name="summary_trp" lang="trp" defaultValue={story?.translations?.trp?.summary || ""} maxLength={2000} rows={3} />
+        </label>
+        <label>
+          ককবরক শিরোনাম (Kokborok headline in Bengali script)
+          <input type="text" name="headline_trpb" lang="trp-Beng" defaultValue={story?.translations?.trpb?.headline || ""} maxLength={300} />
+        </label>
+        <label>
+          ককবরক ভূমিকা (Kokborok intro in Bengali script) <span className="hint">— leave both boxes empty and it is made again from the Roman version at the next run</span>
+          <textarea name="summary_trpb" lang="trp-Beng" defaultValue={story?.translations?.trpb?.summary || ""} maxLength={2000} rows={3} />
         </label>
       </details>
 

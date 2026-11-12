@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { db, cleanSearch } from "../../lib/db.js";
 import { settings, regions } from "../../lib/config.js";
 import { currentUser } from "../../lib/auth.js";
-import { SUB_EDITOR, storyCounts, canEditKokborok } from "../../lib/staff.js";
+import { isOwnOnly, publishesDirectly, staffTitle, storyCounts, canEditKokborok } from "../../lib/staff.js";
 import { formatDate } from "../../lib/format.js";
 import { logout } from "./actions.js";
 import StoryActions from "./StoryActions.js";
@@ -33,8 +33,8 @@ export default async function AdminPage({ searchParams }) {
   const user = await currentUser();
   if (!user) redirect("/admin/login");
   const admin = user.role === "admin";
-  // A sub-editor sees only the stories they wrote.
-  const sub = user.role === SUB_EDITOR;
+  // A sub-editor or reporter sees only the stories they wrote.
+  const sub = isOwnOnly(user.role);
   // A sub-editor named in settings.json "kokborokEditors" sees every story (to edit its Kokborok version).
   const kokborokEditor = sub && canEditKokborok(user, settings.kokborokEditors?.names);
   const mine = sub && !kokborokEditor ? { authorId: user.id } : {};
@@ -91,12 +91,12 @@ export default async function AdminPage({ searchParams }) {
       {params.done && <div className="notice">✓ {params.done}</div>}
       {sub && (
         <div className="run-box">
-          Signed in as <b>{user.name}</b> (sub-editor).{" "}
+          Signed in as <b>{user.name}</b> ({staffTitle(user).toLowerCase()}).{" "}
           {myCount !== null && <>Stories you have published so far: <b style={{ fontSize: "1.25em" }}>{myCount}</b>. </>}
-          You see and edit only your own stories, in any state or topic. Your name appears as the byline (“By {user.name}, Sub-Editor”).
+          You see and edit only your own stories, in any state or topic. Your name appears as the byline (“By {user.name}, {staffTitle(user)}”).
           {kokborokEditor && " You also see every other story, and you can edit its Kokborok version (the English text of other people's stories stays as it is)."}
           Making a story the lead or breaking news is for the admin.{" "}
-          {settings.subEditors?.canPublish === false ? "New stories you send go to Pending, and the admin publishes them." : "Stories you publish go live straight away."}
+          {publishesDirectly(user.role) ? "Stories you publish go live straight away." : "New stories you send go to Pending, and the admin publishes them."}
         </div>
       )}
       {!admin && !sub && (

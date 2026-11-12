@@ -341,8 +341,8 @@ test("Translations: missing languages are filled in one request, published stori
     translate: async ({ headline }, codes) => (asked.push([headline, codes.join(",")]), Object.fromEntries(codes.map((code) => [code, { headline: `${code} ${headline}`, summary: `${code} summary` }]))),
   };
   assert.equal(await fillMissingTranslations({ db, ai, log: quiet }), 3);
-  assert.deepEqual(asked[0], ["Published one", "bn,hi,as,ne,trp"], "published stories first");
-  assert.deepEqual(asked.slice(1).sort(), [["Has Bengali", "hi,as,ne,trp"], ["Pending one", "bn,hi,as,ne,trp"]], "only the missing languages are asked for");
+  assert.deepEqual(asked[0], ["Published one", "bn,hi,as,ne,trp,trpb"], "published stories first");
+  assert.deepEqual(asked.slice(1).sort(), [["Has Bengali", "hi,as,ne,trp,trpb"], ["Pending one", "bn,hi,as,ne,trp,trpb"]], "only the missing languages are asked for");
   const pub = await db.getStory(b);
   assert.equal(pub.headline_bn, "bn Published one");
   assert.equal(pub.translations.hi.headline, "hi Published one");

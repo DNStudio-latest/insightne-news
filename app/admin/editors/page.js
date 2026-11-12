@@ -3,7 +3,7 @@ import { db } from "../../../lib/db.js";
 import { currentRole } from "../../../lib/auth.js";
 import { formatDate } from "../../../lib/format.js";
 import { addEditor, changeEditor } from "../actions.js";
-import { SUB_EDITOR, storyCounts } from "../../../lib/staff.js";
+import { SUB_EDITOR, REPORTER, staffTitle, storyCounts } from "../../../lib/staff.js";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Editors", robots: { index: false, follow: false } };
@@ -39,7 +39,8 @@ export default async function EditorsPage({ searchParams }) {
         </p>
         <label>
           Role
-          <select name="role" defaultValue={SUB_EDITOR}>
+          <select name="role" defaultValue={REPORTER}>
+            <option value={REPORTER}>Reporter: writes and edits only their own stories (no lead or breaking news)</option>
             <option value={SUB_EDITOR}>Sub-editor: writes and edits only their own stories (no lead or breaking news)</option>
             <option value="editor">Editor: can edit every story</option>
           </select>
@@ -62,7 +63,7 @@ export default async function EditorsPage({ searchParams }) {
         {editors?.map((e) => (
           <article key={e.id} className="story">
             <div className="meta">
-              <span className="badge" style={{ background: "var(--accent)" }}>{e.role === SUB_EDITOR ? "Sub-editor" : "Editor"}</span>
+              <span className="badge" style={{ background: "var(--accent)" }}>{staffTitle(e)}</span>
               {e.active ? <span className="badge">Can sign in</span> : <span className="tag">Paused</span>}
               {e.can_delete === false && <span className="tag">Cannot remove photos</span>}
               <span>Added {formatDate(e.created_at)}</span>
@@ -78,11 +79,6 @@ export default async function EditorsPage({ searchParams }) {
               </form>
               <form action={changeEditor}>
                 <input type="hidden" name="id" value={e.id} />
-                <input type="hidden" name="what" value="role" />
-                <button className="btn btn-plain" type="submit">{e.role === SUB_EDITOR ? "MAKE EDITOR" : "MAKE SUB-EDITOR"}</button>
-              </form>
-              <form action={changeEditor}>
-                <input type="hidden" name="id" value={e.id} />
                 <input type="hidden" name="what" value="photos" />
                 <button className="btn btn-plain" type="submit">{e.can_delete === false ? "ALLOW REMOVING PHOTOS" : "STOP REMOVING PHOTOS"}</button>
               </form>
@@ -93,7 +89,20 @@ export default async function EditorsPage({ searchParams }) {
               </form>
             </div>
             <details className="bn-fields">
-              <summary>Change name or password</summary>
+              <summary>Change role, name or password</summary>
+              <form action={changeEditor} className="editor" style={{ marginBottom: 8 }}>
+                <input type="hidden" name="id" value={e.id} />
+                <input type="hidden" name="what" value="role" />
+                <label>
+                  Role
+                  <select name="role" defaultValue={e.role === SUB_EDITOR || e.role === REPORTER ? e.role : "editor"}>
+                    <option value={REPORTER}>Reporter: only their own stories</option>
+                    <option value={SUB_EDITOR}>Sub-editor: only their own stories</option>
+                    <option value="editor">Editor: can edit every story</option>
+                  </select>
+                </label>
+                <button className="btn btn-edit" type="submit">SAVE ROLE</button>
+              </form>
               <form action={changeEditor} className="editor" style={{ marginBottom: 8 }}>
                 <input type="hidden" name="id" value={e.id} />
                 <input type="hidden" name="what" value="rename" />

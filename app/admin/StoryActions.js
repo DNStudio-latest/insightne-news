@@ -172,15 +172,23 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
         <form action={submitEdit} className="edit-form">
           {id}
           <input type="hidden" name="view" value={view} />
-          <details className="bn-fields" open={kokOnly || Boolean(story.translations?.trp?.summary)}>
-            <summary>Kokborok version (Latin script)</summary>
+          <details className="bn-fields" open={kokOnly || Boolean(story.translations?.trp?.summary || story.translations?.trpb?.summary)}>
+            <summary>Kokborok version (Roman and Bengali script)</summary>
             <label>
-              Kokborok headline
+              Kokborok headline (Roman script)
               <input name="headline_trp" lang="trp" defaultValue={story.translations?.trp?.headline || ""} maxLength={300} />
             </label>
             <label>
-              Kokborok summary
+              Kokborok summary (Roman script)
               <textarea name="summary_trp" lang="trp" defaultValue={story.translations?.trp?.summary || ""} maxLength={2000} placeholder="Leave both boxes empty and Gemini will write the Kokborok version again at the next run." />
+            </label>
+            <label>
+              ককবরক শিরোনাম (Kokborok headline in Bengali script)
+              <input name="headline_trpb" lang="trp-Beng" defaultValue={story.translations?.trpb?.headline || ""} maxLength={300} />
+            </label>
+            <label>
+              ককবরক সারসংক্ষেপ (Kokborok summary in Bengali script)
+              <textarea name="summary_trpb" lang="trp-Beng" defaultValue={story.translations?.trpb?.summary || ""} maxLength={2000} placeholder="Leave both boxes empty and it is made again from the Roman version at the next run." />
             </label>
           </details>
           {!kokOnly && (

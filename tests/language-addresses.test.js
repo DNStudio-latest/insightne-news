@@ -18,6 +18,8 @@ test("splitLangPath reads the language off the address", () => {
   assert.deepEqual(splitLangPath("/bn"), { lang: "bn", path: "/" });
   assert.deepEqual(splitLangPath("/story/x"), { lang: "en", path: "/story/x" });
   assert.deepEqual(splitLangPath("/tips"), { lang: "en", path: "/tips" }); // a page name is not a language
+  assert.deepEqual(splitLangPath("/trpb/story/x"), { lang: "trpb", path: "/story/x" }); // Kokborok in Bengali letters
+  assert.equal(langPath("trpb", "/story/x"), "/trpb/story/x");
 });
 
 test("only English and Bengali are offered to search engines for now", () => {

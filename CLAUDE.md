@@ -19,6 +19,12 @@ A Next.js news website for Tripura and Northeast India, deployed on Vercel from 
 - **Photos:** `savePhoto()` in `lib/photo.js` stores `<id>.w1600.webp` and `<id>.w640.webp`; `responsiveImage()` in `lib/photo-url.js` adds `srcset` only for such photos. AI illustrations are now converted to WebP too.
 - **Layouts:** there is no `app/layout.js`: `app/[lang]/layout.js` and `app/admin/layout.js` are the two root layouts (fonts in `app/fonts.js`, metadata in `app/site-metadata.js`).
 
+## Brief fact check and brief length (built November 2026)
+
+- `lib/fact-check.js` (`checkSummaryFacts`) compares each AI-written brief with its sources (headlines, snippets and the news site's name): figures (digits, number words, "15 thousand", "3 lakh"), months, quotations and names in the summary (not the headline: Title Case) must appear in the sources. Names are skipped when the sources are mostly Bengali; abbreviations spelled out in the brief count as found when the abbreviation is in the sources. Reasons go into `check_reasons` and set `needs_check`, which blocks auto-publish. Wired into both paths in `lib/pipeline.js` (new briefs and `fillMissingSummaries`). Tests: `tests/fact-check.test.js`.
+- Measured on 300 real recent briefs (read-only): 10% flagged; most flags were real additions by the AI (a first name, a month, a figure the sources do not give). If it flags too much, add words to `COMMON` in the file rather than loosening the checks.
+- `SUMMARY_SYSTEM` (lib/ai.js) allows up to 90 words when two or more sources each add facts (70 for one source), never more than the sources say. The sources are only a headline and about 400 characters of snippet each: do not fetch publishers' full articles (copyright; the site's promise is short summaries in our own words).
+
 ## AI checker and senior news editor (built November 2026)
 
 | What | Where |

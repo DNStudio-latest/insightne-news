@@ -52,6 +52,15 @@ communities, elections, accidents, or crime involving named people. The system a
 when certain words appear (like "arrested", "killed", "election"), even if Claude did not, to be extra safe.
 It also warns you if the summary seems to repeat the original's wording.
 
+**Fact check (added November 2026).** After the AI writes a brief, a free automatic check compares every figure,
+month, name and quotation in it with the sources it was written from (their headlines and snippets). Anything the
+sources do not contain is listed as a reason, for example *"Fact check: the name "Kiren" is not in the sources"*, and
+the story gets NEEDS EXTRA CHECK, so it can never publish itself. It is a safety net, not proof: it catches things the
+sources do not say, and sometimes flags a correct brief (a name spelled differently, a number written as words).
+When you see this reason, open a source and look at the named item. On 300 recent real briefs it flagged about 10%.
+It does not run on News Hunter drafts, which have their own checks, or on translations. The code is in
+`lib/fact-check.js`.
+
 For these stories you must tick **"I have checked this story before approving"** before APPROVE works.
 
 **Good habit for flagged stories:** open at least one source, check the facts and names, and use EDIT to make

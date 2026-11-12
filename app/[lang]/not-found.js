@@ -1,4 +1,5 @@
 import { PageShell } from "../components.js";
+import { href } from "../../lib/lang.js";
 
 export default function NotFound() {
   return (
@@ -7,7 +8,7 @@ export default function NotFound() {
         <h1>Page not found</h1>
         <p>This page may have moved or been removed.</p>
         <p>
-          <a href="/">← Back to the latest news</a>
+          <a href={href("/")}>← Back to the latest news</a>
         </p>
       </div>
     </PageShell>

@@ -4,7 +4,7 @@ import { capitalsWeather } from "../../lib/weather.js";
 import { indiaMatch } from "../../lib/cricket.js";
 import { LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, ArticlesList, Card, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "../components.js";
 import { LiveUpdates, PollBox } from "../client.js";
-import { initLang, lang } from "../../lib/lang.js";
+import { initLang, lang, href } from "../../lib/lang.js";
 import { alternatesFor } from "../../lib/seo.js";
 import { pictureOf } from "../../lib/proof-shot.js";
 import { pinnedForFront, withoutStories } from "../../lib/pins.js";
@@ -134,7 +134,7 @@ export default async function HomePage({ params }) {
 
       {originals.length > 0 && (
         <section className="section">
-          <SectionHead title="InsightNE Originals" href="/originals" />
+          <SectionHead title="InsightNE Originals" href={href("/originals")} />
           <StoryGrid stories={originals} columns={3} />
         </section>
       )}

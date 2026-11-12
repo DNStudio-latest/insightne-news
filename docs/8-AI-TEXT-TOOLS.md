@@ -77,6 +77,8 @@ Every AI tool that writes for the website follows the senior editor's writing ru
 | Research desk and News Hunter drafts | Both are written by the same writer, so one tick covers both. The lesson is added to the writer's instructions. A draft that still uses the phrase lists it under problems in News Hunter and shows the badge "Uses a phrase from Teach the AI". Such a News Hunter draft is never auto-published: it waits for the editor. |
 | AI checker flags | The admin AI checker flags the phrase under "For you to review", with the better wording as a one-click replacement. |
 
+**Suggestions from your edits (admin).** When anyone edits an AI-written brief, the short phrases they replaced are noted (`lib/lesson-suggestions.js`, site setting `ai_lesson_suggestions`). A swap seen at least twice appears at the top of the page as *Suggested from your edits* with ADD AS A LESSON or DISMISS; nothing is added without the admin. Figures, names, one-word changes under five letters and long rewrites are ignored. Edits to your own reports and to News Hunter drafts are not noted.
+
 **Approval.** A lesson from an editor or sub-editor waits under "Waiting for approval" until the admin approves it. The admin's own lessons are used at once. The admin can switch a lesson off, switch it on again or delete it. At most 80 lessons can be in use, and only the newest that fit (about 6,000 characters) are sent to the AI, so the main rules always come first.
 
 **Safety.** Lessons change wording only. The AI is told that a lesson never overrides the house rules, never allows a new fact, and that any part of a lesson asking for something else is to be ignored. Backticks, triple quotes and control characters are removed from lesson text.

@@ -28,6 +28,7 @@ import { loadLessons } from "../../lib/ai-lessons-store.js";
 import { clientIp, rateLimit } from "../../lib/rate-limit.js";
 import { totpEnabled, verifyTotp } from "../../lib/totp.js";
 import { cleanText } from "../../lib/clean-text.js";
+import { recordEdit } from "../../lib/lesson-suggestions.js";
 
 // Any signed-in person. Returns "admin", "editor", "sub_editor" or "reporter".
 async function requireLogin() {
@@ -176,6 +177,10 @@ export async function saveEdit(formData) {
     refresh("pending", "Saved and published");
   }
   await updateWithMark(id, fields);
+  // Note which words the desk changed in an AI-written brief; repeated changes become lesson suggestions (Teach the AI).
+  if (existing && existing.kind !== "original") {
+    await recordEdit(`${existing.headline || ""}\n\n${existing.summary || ""}`, `${fields.headline}\n\n${fields.summary}`);
+  }
   refresh(String(formData.get("view") || "pending"), "Changes saved");
 }
 

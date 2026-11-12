@@ -25,6 +25,8 @@ A Next.js news website for Tripura and Northeast India, deployed on Vercel from 
 - Measured on 300 real recent briefs (read-only): 10% flagged; most flags were real additions by the AI (a first name, a month, a figure the sources do not give). If it flags too much, add words to `COMMON` in the file rather than loosening the checks.
 - `SUMMARY_SYSTEM` (lib/ai.js) allows up to 90 words when two or more sources each add facts (70 for one source), never more than the sources say. The sources are only a headline and about 400 characters of snippet each: do not fetch publishers' full articles (copyright; the site's promise is short summaries in our own words).
 
+- **Lesson suggestions:** `lib/lesson-suggestions.js` notes phrase swaps made when the desk edits AI briefs (`saveEdit` in `app/admin/actions.js`) and offers swaps seen twice on `/admin/ai-lessons`; the admin adds or dismisses. Never throws (a failure must not block a save).
+
 ## AI checker and senior news editor (built November 2026)
 
 | What | Where |

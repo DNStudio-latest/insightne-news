@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { currentUser } from "../../../lib/auth.js";
 import { rateLimit } from "../../../lib/rate-limit.js";
 import { addLesson, decideLesson } from "../../../lib/ai-lessons-store.js";
+import { dismissSuggestion } from "../../../lib/lesson-suggestions.js";
 
 const back = (key, message) => redirect(`/admin/ai-lessons?${key}=${encodeURIComponent(message)}`);
 
@@ -19,6 +20,14 @@ export async function suggestLesson(formData) {
   if (!r.ok) back("error", r.error);
   revalidatePath("/admin/ai-lessons");
   back("done", r.lesson.status === "active" ? `Lesson in use: "${r.lesson.phrase}"` : `Lesson sent to the admin for approval: "${r.lesson.phrase}"`);
+}
+
+export async function dismiss(formData) {
+  const user = await currentUser();
+  if (user?.role !== "admin") redirect("/admin/login");
+  await dismissSuggestion(String(formData.get("key") || "").slice(0, 200));
+  revalidatePath("/admin/ai-lessons");
+  back("done", "Suggestion dismissed");
 }
 
 export async function decide(formData) {

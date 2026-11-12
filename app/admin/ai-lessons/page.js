@@ -3,7 +3,8 @@ import { currentUser } from "../../../lib/auth.js";
 import { formatDate } from "../../../lib/format.js";
 import { loadLessons } from "../../../lib/ai-lessons-store.js";
 import { TOOLS, STATUS, LIMITS } from "../../../lib/ai-lessons.js";
-import { suggestLesson, decide } from "./actions.js";
+import { suggestLesson, decide, dismiss } from "./actions.js";
+import { suggestions } from "../../../lib/lesson-suggestions.js";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Teach the AI", robots: { index: false, follow: false } };
@@ -25,6 +26,7 @@ export default async function AiLessonsPage({ searchParams }) {
   const admin = user.role === "admin";
   const { done, error } = await searchParams;
   const lessons = await loadLessons();
+  const suggested = admin ? await suggestions().catch(() => []) : [];
   const groups = ["waiting", "active", "off"].map((status) => [status, lessons.filter((l) => l.status === status)]);
   const inUse = lessons.filter((l) => l.status === "active").length;
 
@@ -45,6 +47,35 @@ export default async function AiLessonsPage({ searchParams }) {
         draft lists it under problems. Lessons only change wording; they can never tell the AI to add a fact.
         {" "}{inUse} of at most {LIMITS.active} lessons are in use.
       </p>
+
+      {admin && suggested.length > 0 && (
+        <section>
+          <h2>Suggested from your edits ({suggested.length})</h2>
+          <p className="note">Your desk changed these words in AI-written briefs more than once. Add one as a lesson, or dismiss it.</p>
+          {suggested.map((s) => (
+            <div key={s.key} className="editor" style={{ marginBottom: 8 }}>
+              <p style={{ margin: 0 }}>
+                <strong>“{s.from}”</strong> → {s.to ? <strong>“{s.to}”</strong> : <em>cut</em>} <span className="hint">· changed {s.count} times</span>
+              </p>
+              <div className="editor-actions">
+                <form action={suggestLesson}>
+                  <input type="hidden" name="phrase" value={s.from} />
+                  <input type="hidden" name="better" value={s.to || "leave it out"} />
+                  <input type="hidden" name="why" value={`The desk changed this ${s.count} times when editing briefs.`} />
+                  {Object.keys(TOOLS).map((key) => (
+                    <input key={key} type="hidden" name="tools" value={key} />
+                  ))}
+                  <button className="btn btn-approve" type="submit">ADD AS A LESSON</button>
+                </form>
+                <form action={dismiss}>
+                  <input type="hidden" name="key" value={s.key} />
+                  <button className="btn btn-plain" type="submit">DISMISS</button>
+                </form>
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
 
       <form action={suggestLesson} className="editor">
         <h2 style={{ margin: 0 }}>New lesson</h2>

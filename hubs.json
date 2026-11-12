@@ -1,0 +1,21 @@
+{
+  "_help": "Topic pages (/topic/<slug>) for running stories. A story belongs to a topic when its headline or summary contains one of the keywords (any capitals). Only put facts here that have been checked against official or news-agency reports; 'facts' is a short timeline shown at the top of the page.",
+  "hubs": [
+    {
+      "slug": "tripura-civic-polls",
+      "title": "Tripura civic polls 2026",
+      "intro": "Every InsightNE story on the 2026 elections to the urban local bodies of Tripura, newest first.",
+      "keywords": ["civic poll", "civic election", "municipal election", "municipal corporation", "urban local bod", "nagar panchayat", "state election commission", "agartala municipal", "amc election", "ward candidate", "civic body"],
+      "factsTitle": "Key dates",
+      "facts": [
+        { "date": "30 Oct 2026", "text": "The State Election Commission announces the schedule." },
+        { "date": "31 Oct – 6 Nov", "text": "Nominations are filed." },
+        { "date": "7 Nov", "text": "Scrutiny of nominations." },
+        { "date": "10 Nov", "text": "Last day to withdraw." },
+        { "date": "27 Nov", "text": "Polling." },
+        { "date": "2 Dec", "text": "Counting of votes." }
+      ],
+      "factsNote": "21 urban local bodies and 345 seats, including 51 wards of the Agartala Municipal Corporation, as reported by news agencies after the announcement. Dates can change: the State Election Commission's notices are final."
+    }
+  ]
+}

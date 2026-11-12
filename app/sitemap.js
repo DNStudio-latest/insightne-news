@@ -3,6 +3,7 @@
 import { db } from "../lib/db.js";
 import { settings, categories, slugify } from "../lib/config.js";
 import { langPath } from "../lib/languages.js";
+import { allHubs } from "../lib/hubs.js";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,8 @@ export default async function sitemap() {
     changeFrequency: "monthly",
   }));
   const home = both("/", { changeFrequency: "hourly" });
+  const topics = allHubs().map((h) => ({ url: `${base}/topic/${h.slug}`, changeFrequency: "hourly" }));
   const sections = categories.flatMap((c) => both(`/category/${slugify(c)}`, { changeFrequency: "hourly" }));
   const stories = (await db.allPublishedSlugs(1000)).flatMap((s) => both(`/story/${s.slug}`, { lastModified: s.updated_at }, Boolean(s.summary_bn?.trim())));
-  return [...home, ...fixed, ...sections, ...stories];
+  return [...home, ...topics, ...fixed, ...sections, ...stories];
 }

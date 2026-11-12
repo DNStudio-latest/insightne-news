@@ -7,7 +7,8 @@ import { AI_CREDIT } from "../../../../lib/images.js";
 import { responsiveImage } from "../../../../lib/photo-url.js";
 import { pictureOf, proofShotOf, photoGallery } from "../../../../lib/proof-shot.js";
 import { ViewCounter } from "../../../client.js";
-import { initLang, lang, pick, tr, isTranslated } from "../../../../lib/lang.js";
+import { relatedStories, hubsForStory } from "../../../../lib/hubs.js";
+import { initLang, lang, pick, tr, isTranslated, href } from "../../../../lib/lang.js";
 import { alternatesFor, noindexUnlessTranslated } from "../../../../lib/seo.js";
 import { storyText } from "../../../../lib/languages.js";
 import { WhatsAppFollow, EmailSignup, PageShell, Kicker, Byline, ShareButtons, StoryGrid, SectionHead, storyUrl, absoluteUrl } from "../../../components.js";
@@ -57,7 +58,8 @@ export default async function StoryPage({ params }) {
   const story = await load(params);
   if (!story) notFound();
 
-  const related = (await site.listStories({ status: "approved", region: story.region, limit: 7 })).filter((s) => s.id !== story.id).slice(0, 3);
+  const related = relatedStories(story, await site.listStories({ status: "approved", limit: 80 }), 3);
+  const hubs = hubsForStory(story); // running-story topic pages this story belongs to (hubs.json)
   const sources = uniqueSources(story.sources);
   const isOriginal = story.kind === "original";
   const blocks = articleBlocks(pick(story, "body"));
@@ -196,6 +198,11 @@ export default async function StoryPage({ params }) {
         <ViewCounter id={story.id} />
       </article>
 
+      {hubs.map((h) => (
+        <p key={h.slug} className="note" style={{ marginTop: 28 }}>
+          <a href={href(`/topic/${h.slug}`)}>{h.title}: all stories and key dates →</a>
+        </p>
+      ))}
       {related.length > 0 && (
         <section className="section" style={{ marginTop: 34 }}>
           <SectionHead title="More news" />

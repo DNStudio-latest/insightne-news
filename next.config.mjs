@@ -18,6 +18,11 @@ const nextConfig = {
       },
     ];
   },
+  // The public AI-text checker is a plain HTML page in public/ai-tools/. Serve it at /ai-tools before the
+  // language pages (app/[lang]/) can mistake "ai-tools" for a language.
+  async rewrites() {
+    return { beforeFiles: [{ source: "/ai-tools", destination: "/ai-tools/index.html" }] };
+  },
   // The fonts used to draw the WhatsApp news-card pictures.
   outputFileTracingIncludes: { "/card/[slug]": ["./assets/fonts/**"] },
   experimental: {

@@ -20,6 +20,7 @@ export const maxDuration = 60;
 const indiaDay = (date) => new Date(date).toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
 const refreshPages = () => {
   revalidatePath("/", "layout");
+  revalidatePath("/[lang]", "layout"); // every language's copy of every public page
   refreshSite();
 };
 

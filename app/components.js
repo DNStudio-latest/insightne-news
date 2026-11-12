@@ -5,7 +5,8 @@ import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js"
 import { CopyLinkButton, NavBar } from "./client.js";
 import { AI_CREDIT } from "../lib/images.js";
 import { pictureOf } from "../lib/proof-shot.js";
-import { initLang, lang, pick, tr } from "../lib/lang.js";
+import { responsiveImage } from "../lib/photo-url.js";
+import { lang, pick, tr, href as langHref } from "../lib/lang.js";
 import { LangSwitch, AlertsButton, NewsletterSignup, LanguageWelcome, ListenBriefing, CookieNotice } from "./client.js";
 import { topStories } from "../lib/top.js";
 import { newsletterReady } from "../lib/newsletter.js";
@@ -45,8 +46,9 @@ const ALERT_LABELS = {
   },
 };
 
-export const storyUrl = (story) => `/story/${story.slug}`;
-export const categoryUrl = (name) => `/category/${slugify(name)}`;
+// Addresses inside the site, in the reader's language (Bengali readers stay under /bn/).
+export const storyUrl = (story) => langHref(`/story/${story.slug}`);
+export const categoryUrl = (name) => langHref(`/category/${slugify(name)}`);
 export const absoluteUrl = (path) => new URL(path, settings.siteUrl).toString();
 
 export function storyCategory(story) {
@@ -57,7 +59,17 @@ export function storyCategory(story) {
 export function StoryImage({ story, eager = false }) {
   const picture = pictureOf(story); // never the screenshot of an official page
   if (picture) {
-    const img = <img className="thumb" src={picture} alt={story.image_caption || story.headline} loading={eager ? "eager" : "lazy"} />;
+    const img = (
+      <img
+        className="thumb"
+        src={picture}
+        alt={story.image_caption || story.headline}
+        loading={eager ? "eager" : "lazy"}
+        decoding="async"
+        {...(eager ? { fetchPriority: "high" } : {})}
+        {...responsiveImage(picture, eager ? "(min-width: 1100px) 50vw, (min-width: 900px) 66vw, 100vw" : "(min-width: 900px) 33vw, 100vw")}
+      />
+    );
     if (story.image_credit !== AI_CREDIT) return img;
     // AI pictures are always labelled, so no reader mistakes them for a real photo.
     return (
@@ -93,7 +105,7 @@ const liveTitle = (live) => (lang() === "bn" && live.title_bn) || live.title;
 export function LiveBar({ live }) {
   if (!live) return null;
   return (
-    <a className="live-bar" href="/live">
+    <a className="live-bar" href={langHref("/live")}>
       <span className="live-label">● {tr("LIVE")}</span>
       <span className="live-text">{liveTitle(live)}</span>
       <span className="live-watch">{tr("Watch")} →</span>
@@ -137,7 +149,7 @@ const teamScore = (match, team) =>
 export function CricketBar({ match }) {
   if (!match?.live) return null;
   return (
-    <a className="cricket-bar" href="/#cricket">
+    <a className="cricket-bar" href={`${langHref("/")}#cricket`}>
       <span className="cricket-label">🏏 LIVE</span>
       <span className="cricket-text">
         {match.teams.map((t) => `${t.short} ${teamScore(match, t) || "–"}`).join("  ·  ")}
@@ -198,7 +210,7 @@ export function SiteHeader({ current, ticker = [], updatedAt, breaking, cricket,
           <span className="topbar-links">
             <LangSwitch current={lang()} label={tr("Language")} />
             <AlertsButton publicKey={pushPublicKey()} lang={lang()} labels={ALERT_LABELS[lang()] || ALERT_LABELS.en} />
-            <a href="/today">📰 {tr("Top 5 today")}</a>
+            <a href={langHref("/today")}>📰 {tr("Top 5 today")}</a>
             {settings.whatsappChannelUrl && (
               <a href={settings.whatsappChannelUrl} target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>
             )}
@@ -209,13 +221,13 @@ export function SiteHeader({ current, ticker = [], updatedAt, breaking, cricket,
       <div className="masthead">
         <div className="container">
           <div>
-            <a href="/" className="logo">
+            <a href={langHref("/")} className="logo">
               {first}
               {rest.length > 0 && <span> {rest.join(" ")}</span>}
             </a>
             <p className="tagline">{tr(settings.tagline)}</p>
           </div>
-          <form className="search-form" action="/search" role="search">
+          <form className="search-form" action={langHref("/search")} role="search">
             <label className="sr-only" htmlFor="q">Search news</label>
             <input id="q" name="q" type="search" placeholder={tr("Search news")} />
             <button type="submit">Search</button>
@@ -226,9 +238,10 @@ export function SiteHeader({ current, ticker = [], updatedAt, breaking, cricket,
         current={current}
         generalRegion={generalRegion}
         states={states}
+        homeHref={langHref("/")}
         labels={{ home: tr("Home"), region: tr(generalRegion), all: tr(`All ${generalRegion}`) }}
         stateLinks={northeastRegions.map((r) => [r, categoryUrl(r), tr(r)])}
-        items={[...[...widerRegions, ...topics].map((t) => [t, categoryUrl(t), tr(t)]), ["Originals", "/originals", tr("Originals")], ["Live", "/live", tr("Live TV")], ["Videos", "/videos", tr("Videos")], ["Search", "/search", tr("Search")]]}
+        items={[...[...widerRegions, ...topics].map((t) => [t, categoryUrl(t), tr(t)]), ["Originals", langHref("/originals"), tr("Originals")], ["Live", langHref("/live"), tr("Live TV")], ["Videos", langHref("/videos"), tr("Videos")], ["Search", langHref("/search"), tr("Search")]]}
       />
       {ticker.length > 0 && (
         <div className="ticker" aria-label="Latest headlines">
@@ -445,7 +458,7 @@ export function Videos({ videos, title = lang() === "en" ? `Watch ${settings.you
 export function Byline({ story, link = false }) {
   if (story.kind === "original") {
     const name = bylineName(story.author);
-    return <>{tr("By")} {link ? <a href={`/author/${slugify(name)}`}>{name}</a> : name}</>;
+    return <>{tr("By")} {link ? <a href={langHref(`/author/${slugify(name)}`)}>{name}</a> : name}</>;
   }
   const names = uniqueSources(story.sources).map((s) => s.source_name);
   return <>{names.length ? `${tr("Brief · Source:")} ${names.join(", ")}` : settings.defaultAuthor}</>;
@@ -533,7 +546,7 @@ export function SiteFooter() {
       )}
       <div className="container">
         <div className="brand-block footer-box box-brand">
-          <a href="/" className="logo">
+          <a href={langHref("/")} className="logo">
             {first}
             {rest.length > 0 && <span> {rest.join(" ")}</span>}
           </a>
@@ -546,31 +559,31 @@ export function SiteFooter() {
             {[...regions, ...topics].map((c) => (
               <li key={c}><a href={categoryUrl(c)}>{tr(c === generalRegion ? `All ${generalRegion}` : c)}</a></li>
             ))}
-            <li><a href="/originals">Originals</a></li>
-            <li><a href="/videos">Videos</a></li>
-            <li><a href="/live">Live TV</a></li>
+            <li><a href={langHref("/originals")}>Originals</a></li>
+            <li><a href={langHref("/videos")}>Videos</a></li>
+            <li><a href={langHref("/live")}>Live TV</a></li>
           </ul>
         </div>
         <div className="footer-box box-about">
           <h4>About us</h4>
           <ul className="footer-links">
-            <li><a href="/about">About</a></li>
-            <li><a href="/team">Ownership &amp; team</a></li>
-            <li><a href="/contact">Contact</a></li>
-            <li><a href="/advertise">Advertise with us</a></li>
-            <li><a href="/tips">Send a news tip</a></li>
-            <li><a href="/privacy">Privacy Policy</a></li>
-            <li><a href="/editorial-policy">Editorial policy</a></li>
-            <li><a href="/ethics">Ethics &amp; fact-checking</a></li>
-            <li><a href="/corrections">Corrections</a></li>
-            <li><a href="/terms">Terms &amp; Disclaimer</a></li>
-            <li><a href="/grievance">Grievance Redressal</a></li>
+            <li><a href={langHref("/about")}>About</a></li>
+            <li><a href={langHref("/team")}>Ownership &amp; team</a></li>
+            <li><a href={langHref("/contact")}>Contact</a></li>
+            <li><a href={langHref("/advertise")}>Advertise with us</a></li>
+            <li><a href={langHref("/tips")}>Send a news tip</a></li>
+            <li><a href={langHref("/privacy")}>Privacy Policy</a></li>
+            <li><a href={langHref("/editorial-policy")}>Editorial policy</a></li>
+            <li><a href={langHref("/ethics")}>Ethics &amp; fact-checking</a></li>
+            <li><a href={langHref("/corrections")}>Corrections</a></li>
+            <li><a href={langHref("/terms")}>Terms &amp; Disclaimer</a></li>
+            <li><a href={langHref("/grievance")}>Grievance Redressal</a></li>
             <li><a href={settings.youtubeUrl} target="_blank" rel="noopener noreferrer">YouTube</a></li>
             {settings.whatsappChannelUrl && (
               <li><a href={settings.whatsappChannelUrl} target="_blank" rel="noopener noreferrer">WhatsApp channel</a></li>
             )}
-            <li><a href="/today">Top 5 today</a></li>
-            {newsletterReady() && <li><a href="/newsletter">Daily email</a></li>}
+            <li><a href={langHref("/today")}>Top 5 today</a></li>
+            {newsletterReady() && <li><a href={langHref("/newsletter")}>Daily email</a></li>}
           </ul>
         </div>
       </div>
@@ -585,7 +598,7 @@ export function SiteFooter() {
 }
 
 export async function PageShell({ current, children, ticker, updatedAt }) {
-  await initLang();
+  // The reader's language was set by the page's layout (see app/[lang]/layout.js).
   const [[breaking], cricket, live] = await Promise.all([site.listStories({ status: "approved", breaking: true, limit: 1 }).catch(() => []), indiaMatch(), site.live()]);
   return (
     <>

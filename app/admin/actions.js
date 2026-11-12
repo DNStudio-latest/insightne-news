@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { refreshSite } from "../../lib/site-cache.js";
 import { MAX_PINNED } from "../../lib/pins.js";
 import { after } from "next/server";
-import { compressPhoto, PhotoError } from "../../lib/photo.js";
+import { savePhoto, PhotoError } from "../../lib/photo.js";
 import { sendAlert } from "../../lib/push.js";
 import { shareOnFacebook } from "../../lib/facebook.js";
 import { shareOnInstagram } from "../../lib/instagram.js";
@@ -45,6 +45,7 @@ async function requireAdmin() {
 // Shows the change on the website straight away.
 function refreshPages() {
   revalidatePath("/", "layout");
+  revalidatePath("/[lang]", "layout"); // every language's copy of every public page
   refreshSite();
 }
 
@@ -130,8 +131,7 @@ async function photoFields(formData, existing, onError, canDelete = true) {
     if (!/^image\/(jpeg|png|webp)$/.test(file.type)) onError("The photo must be a JPG, PNG or WEBP image.");
     if (file.size > 4 * 1024 * 1024) onError("The photo is too big (over 4 MB).");
     // The real type is read from the file itself; a file that is not a photo is refused.
-    const photo = await compressPhoto(new Uint8Array(await file.arrayBuffer())).catch((err) => (err instanceof PhotoError ? onError(err.message) : Promise.reject(err)));
-    fields.image_url = await db.uploadImage(photo.bytes, photo.contentType);
+    fields.image_url = await savePhoto(db, new Uint8Array(await file.arrayBuffer())).catch((err) => (err instanceof PhotoError ? onError(err.message) : Promise.reject(err)));
   }
   return fields;
 }
@@ -268,9 +268,9 @@ export async function saveOriginal(formData) {
   for (const file of formData.getAll("galleryFiles")) {
     if (!file || typeof file !== "object" || !file.size || gallery.length >= 20) continue;
     if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 4 * 1024 * 1024) continue;
-    const photo = await compressPhoto(new Uint8Array(await file.arrayBuffer())).catch((err) => (err instanceof PhotoError ? null : Promise.reject(err)));
-    if (!photo) continue; // not a real photo: skipped
-    gallery.push({ url: await db.uploadImage(photo.bytes, photo.contentType), caption: null });
+    const url = await savePhoto(db, new Uint8Array(await file.arrayBuffer())).catch((err) => (err instanceof PhotoError ? null : Promise.reject(err)));
+    if (!url) continue; // not a real photo: skipped
+    gallery.push({ url, caption: null });
   }
   fields.gallery = gallery;
 

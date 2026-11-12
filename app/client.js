@@ -47,13 +47,13 @@ export function CopyLinkButton({ url }) {
 }
 
 // The main menu. "Northeast ▾" opens a row with all eight states (a row, not a pop-up, so it works well on phones).
-export function NavBar({ current, generalRegion, states, items, stateLinks, labels = {} }) {
+export function NavBar({ current, generalRegion, states, items, stateLinks, labels = {}, homeHref = "/" }) {
   const inRegion = current === generalRegion || states.includes(current);
   const [open, setOpen] = useState(inRegion);
   return (
     <nav className="navbar" aria-label="Sections">
       <div className="container nav">
-        <a href="/" aria-current={!current ? "page" : undefined}>{labels.home || "Home"}</a>
+        <a href={homeHref} aria-current={!current ? "page" : undefined}>{labels.home || "Home"}</a>
         <button type="button" className={`nav-drop${inRegion ? " active" : ""}`} aria-expanded={open} aria-controls="states-menu" onClick={() => setOpen(!open)}>
           {labels.region || generalRegion} <span aria-hidden="true">{open ? "▴" : "▾"}</span>
         </button>

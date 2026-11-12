@@ -1,4 +1,6 @@
-# Plan: language-specific web addresses (for reading only, nothing changed yet)
+# Plan: language-specific web addresses
+
+**Status (12 Nov 2026):** built on branch `claude/language-addresses`, not yet published. All six languages have addresses; English and Bengali are offered to search engines, the others are `noindex` until reviewed. Details in `CLAUDE.md`.
 
 ## Why
 Today a reader's language is chosen by a saved setting in the browser, on the same web address.

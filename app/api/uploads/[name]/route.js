@@ -7,7 +7,7 @@ const TYPES = { jpg: "image/jpeg", png: "image/png", webp: "image/webp" };
 
 export async function GET(_request, { params }) {
   const { name } = await params;
-  if (usingSupabase || !/^[a-f0-9-]+\.(jpg|png|webp)$/.test(name)) return new Response("Not found", { status: 404 });
+  if (usingSupabase || !/^[a-f0-9-]+(\.w\d+)?\.(jpg|png|webp)$/.test(name)) return new Response("Not found", { status: 404 });
   try {
     const bytes = fs.readFileSync(path.join(process.cwd(), "data", "uploads", name));
     return new Response(bytes, { headers: { "Content-Type": TYPES[name.split(".").pop()], "Cache-Control": "public, max-age=31536000" } });

@@ -9,6 +9,16 @@ A Next.js news website for Tripura and Northeast India, deployed on Vercel from 
 - Run locally without real services: `ADMIN_PASSWORD=… SESSION_SECRET=<32+ chars> LOCAL_DB_FILE=<file> npx next start`. The admin panel is at `/admin`.
 - Publishing: commit to a branch, open a pull request, and merge it only when the owner says to publish.
 
+## Language addresses, page caching and photo sizes (built November 2026)
+
+- **Addresses:** every public page lives in `app/[lang]/`. English stays at the plain address (`/story/x`); other languages have a prefix (`/bn/story/x`). `proxy.js` serves plain addresses from `/en/…` without changing the address bar, redirects `/en/…` to the plain address, and sends a reader whose `lang` cookie says another language to that language's address. The rules are in `lib/lang-routing.js` (tested); helpers in `lib/languages.js` (`langPath`, `splitLangPath`, `INDEXED_LANGUAGES`).
+- **Language in pages:** comes from the address (`params.lang`), never from cookies or headers, so pages can be cached. Use `href()` from `lib/lang.js` (or `storyUrl` / `categoryUrl`) for every internal link.
+- **Search engines:** only `INDEXED_LANGUAGES` (English, Bengali) are indexed; the others are `noindex` until their translations are reviewed. A Bengali story without Bengali text is `noindex` with an English canonical. hreflang comes from `lib/seo.js`; the sitemap lists both versions.
+- **Caching:** pages with `export const revalidate = 60` (and `generateStaticParams` returning `[]`) are kept ready for a minute; publishing calls `revalidatePath("/[lang]", "layout")`. Category, Originals, Search and Newsletter stay dynamic because they read `searchParams`. Never call `cookies()` or `headers()` in public pages: it switches caching off for them.
+- **Matcher backslash:** `proxy.js`'s matcher must contain `\\..*` exactly as written in the file (two backslashes: an escaped dot). Shell heredocs drop the backslash; a test reads the matcher and fails if that happens.
+- **Photos:** `savePhoto()` in `lib/photo.js` stores `<id>.w1600.webp` and `<id>.w640.webp`; `responsiveImage()` in `lib/photo-url.js` adds `srcset` only for such photos. AI illustrations are now converted to WebP too.
+- **Layouts:** there is no `app/layout.js`: `app/[lang]/layout.js` and `app/admin/layout.js` are the two root layouts (fonts in `app/fonts.js`, metadata in `app/site-metadata.js`).
+
 ## AI checker and senior news editor (built November 2026)
 
 | What | Where |

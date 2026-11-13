@@ -28,6 +28,7 @@ import { loadLessons } from "../../lib/ai-lessons-store.js";
 import { clientIp, rateLimit } from "../../lib/rate-limit.js";
 import { totpEnabled, verifyTotp } from "../../lib/totp.js";
 import { cleanText } from "../../lib/clean-text.js";
+import { notifyAdmin, shouldAlertAdmin } from "../../lib/admin-alert.js";
 import { recordEdit } from "../../lib/lesson-suggestions.js";
 
 // Any signed-in person. Returns "admin", "editor", "sub_editor" or "reporter".
@@ -306,6 +307,8 @@ export async function saveOriginal(formData) {
   if (publish && !existing?.published_at && !twin) illustrateLater(storyId); // the twin already had its photo and Facebook post
   else if (existing?.is_lead && (!wantsLead || !publish)) await db.setLead(null);
 
+  // A reporter's story sent for approval: a quiet phone alert for the admin (no name, no headline).
+  if (shouldAlertAdmin(role, editorSends)) after(() => notifyAdmin());
   if (editorSends) refresh("pending", "Sent for approval — the admin will publish it");
   refresh(publish ? "published" : "pending", publish ? "Your story is published" : "Draft saved — find it under Pending");
 }

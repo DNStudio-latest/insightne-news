@@ -8,6 +8,8 @@ import { logout } from "./actions.js";
 import StoryActions from "./StoryActions.js";
 import { facebookReady } from "../../lib/facebook.js";
 import { instagramReady } from "../../lib/instagram.js";
+import AdminAlerts from "./AdminAlerts.js";
+import { pushPublicKey } from "../../lib/push.js";
 
 export const dynamic = "force-dynamic";
 // Room for the photo, Facebook and Instagram posts that run after APPROVE.
@@ -60,6 +62,7 @@ export default async function AdminPage({ searchParams }) {
     <div className="wrap">
       <div className="admin-bar">
         <h1>{settings.siteName} · {admin ? "Approvals" : sub ? "Sub-editor" : "Editor"}</h1>
+        {admin && <AdminAlerts publicKey={pushPublicKey()} />}
         <form action={logout}>
           <button className="btn btn-plain" type="submit">Sign out</button>
         </form>

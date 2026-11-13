@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- The page is opened at /ai-tools (no slash at the end), so "./engine.js" would point to /engine.js. This makes the
+     files load from /ai-tools/ at either address. The offline builder (scripts/ai-text-standalone.js) removes this line. -->
+<base href="/ai-tools/">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>AI text checker</title>

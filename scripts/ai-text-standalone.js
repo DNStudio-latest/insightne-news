@@ -9,7 +9,8 @@ const dir = new URL("../public/ai-tools/", import.meta.url);
 const page = readFileSync(new URL("index.html", dir), "utf8");
 const inline = (file) => readFileSync(new URL(file, dir), "utf8").replace(/^export /gm, "");
 
-let html = page;
+// The website page has <base href="/ai-tools/"> so its files load at /ai-tools; the offline copy has no such folder.
+let html = page.replace(/<base [^>]*>\s*/i, "");
 for (const file of ["engine.js", "model.js"]) {
   const importLine = new RegExp(`^import \\{[^}]+\\} from "\\./${file.replace(".", "\\.")}";$`, "m");
   if (!importLine.test(html)) throw new Error(`index.html no longer imports ./${file} as expected`);

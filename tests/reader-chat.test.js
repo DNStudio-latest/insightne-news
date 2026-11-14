@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { answerReader, searchWords, findStories, cleanHistory, citedStories, buildContext, chatEnabled, CHAT_SYSTEM, LIMITS } from "../lib/reader-chat.js";
+import { answerReader, searchWords, findStories, cleanHistory, citedStories, buildContext, chatEnabled, chatProvider, flattenTurns, CHAT_SYSTEM, LIMITS } from "../lib/reader-chat.js";
+import { createGeminiCaller } from "../lib/gemini.js";
 
 const STORIES = [
   { id: "1", slug: "flood-relief-abc123", headline: "Tripura approves flood relief", summary: "The Tripura cabinet approved Rs 50 crore for flood relief, Chief Minister Manik Saha said.", published_at: "2026-11-12T08:00:00Z", region: "Tripura", headline_bn: "ত্রিপুরায় বন্যা ত্রাণ অনুমোদন" },
@@ -108,4 +109,44 @@ test("the chat box shows only with an AI key, and settings.json can switch it of
   assert.equal(chatEnabled({ ANTHROPIC_API_KEY: "k" }, { enabled: true }), true);
   assert.equal(chatEnabled({ OPENROUTER_API_KEY: "k" }, undefined), true);
   assert.equal(chatEnabled({ ANTHROPIC_API_KEY: "k" }, { enabled: false }), false);
+});
+
+test("the free Gemini key is used first; CHAT_PROVIDER can choose Claude; no key means no chat", () => {
+  assert.equal(chatProvider({}), null);
+  assert.equal(chatProvider({ GEMINI_API_KEY: "g" }), "gemini");
+  assert.equal(chatProvider({ ANTHROPIC_API_KEY: "k" }), "claude");
+  assert.equal(chatProvider({ GEMINI_API_KEY: "g", ANTHROPIC_API_KEY: "k" }), "gemini", "free Gemini first when both keys exist");
+  assert.equal(chatProvider({ GEMINI_API_KEY: "g", OPENROUTER_API_KEY: "k", CHAT_PROVIDER: "claude" }), "claude");
+  assert.equal(chatProvider({ GEMINI_API_KEY: "g", CHAT_PROVIDER: "claude" }), "gemini", "a choice without its key falls back to the key that exists");
+  assert.equal(chatEnabled({ GEMINI_API_KEY: "g" }, { enabled: true }), true);
+  assert.equal(chatEnabled({ GEMINI_API_KEY: "g" }, { enabled: false }), false);
+});
+
+test("earlier turns are written out for Gemini, which takes one text", () => {
+  assert.equal(flattenTurns([{ role: "user", content: "Hello" }]), "Hello");
+  const text = flattenTurns([{ role: "user", content: "Hi" }, { role: "assistant", content: "Ask me about the news." }, { role: "user", content: "Flood relief?" }]);
+  assert.match(text, /^Conversation so far:\nVisitor: Hi\nAssistant: Ask me about the news\.\n\nVisitor's new question: Flood relief\?$/);
+});
+
+test("a Gemini call can be set to fail fast, so a visitor is not kept waiting when the free limit is reached", async () => {
+  let calls = 0;
+  const fetchFn = async () => {
+    calls++;
+    return new Response('{"error":{"code":429,"message":"quota"}}', { status: 429 });
+  };
+  const call = createGeminiCaller({ apiKey: "g", fetchFn, gapMs: 0, json: false, retries: 0 });
+  await assert.rejects(call("system", "question"), /Gemini error 429/);
+  assert.equal(calls, 1, "no retry, no waiting");
+});
+
+test("a plain-text Gemini answer is returned as written", async () => {
+  let sent;
+  const fetchFn = async (url, opts) => {
+    sent = JSON.parse(opts.body);
+    return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: "Answer [1]." }] } }] }), { status: 200 });
+  };
+  const call = createGeminiCaller({ apiKey: "g", fetchFn, gapMs: 0, json: false, temperature: 0.2, maxOutputTokens: 700 });
+  assert.equal(await call("rules", "question"), "Answer [1].");
+  assert.equal(sent.generationConfig.responseMimeType, undefined, "plain text, not JSON");
+  assert.equal(sent.generationConfig.maxOutputTokens, 700);
 });

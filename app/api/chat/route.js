@@ -1,13 +1,14 @@
 // "Ask InsightNE": answers a visitor's question from the stories published on the website (see lib/reader-chat.js).
 // Questions and answers are not stored. Each visitor can ask a limited number of questions, and the whole website
-// has a daily limit (CHAT_DAILY_LIMIT, default 1500), so the AI bill cannot run away.
+// has a daily limit (CHAT_DAILY_LIMIT, default 400 with Gemini and 1500 with Claude), so the AI bill cannot run away.
 import { db } from "../../../lib/db.js";
-import { answerReader, chatEnabled, LIMITS } from "../../../lib/reader-chat.js";
+import { answerReader, chatEnabled, chatProvider, LIMITS } from "../../../lib/reader-chat.js";
 import { clientIp, rateLimit, tooMany } from "../../../lib/rate-limit.js";
 
 export const dynamic = "force-dynamic";
 
-const dailyLimit = () => Math.max(1, Number(process.env.CHAT_DAILY_LIMIT) || 1500);
+// Free Gemini has a small daily allowance, so its default is lower than Claude's.
+const dailyLimit = () => Math.max(1, Number(process.env.CHAT_DAILY_LIMIT) || (chatProvider() === "gemini" ? 400 : 1500));
 
 export async function POST(request) {
   if (!chatEnabled()) return Response.json({ error: "The chat is switched off." }, { status: 404 });
@@ -28,6 +29,7 @@ export async function POST(request) {
     return Response.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (err) {
     console.error("chat failed:", err?.message);
+    if (/\b429\b/.test(err?.message || "")) return Response.json({ error: "The chat is busy right now. Please try again in a minute, or use Search." }, { status: 429 });
     return Response.json({ error: "Sorry, the chat could not answer just now. Please try again." }, { status: 500 });
   }
 }

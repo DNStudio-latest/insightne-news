@@ -70,7 +70,8 @@ Replacements offered by the checker are fixed rules the owner chooses; none is m
 
 - A 💬 button at the bottom-right of every public page (`ReaderChat` in `app/client.js`, mounted in `PageShell`). Answers come from `app/api/chat/route.js` → `lib/reader-chat.js` (tests: `tests/reader-chat.test.js`).
 - The AI answers **only** from published stories found by `findStories()` (search words from the question plus the latest stories) and the site's own details (contact, tips, corrections, grievance, advertising). It must never answer from its own knowledge, gives no political opinions, cites stories as [n], and the stories are shown as links under the answer. `CHAT_SYSTEM` includes the house style; answers pass through `houseText()`.
-- Chats are not stored (the privacy page says so). Limits: 15 questions per visitor per 10 minutes and `CHAT_DAILY_LIMIT` (default 1500) for the whole site per day. `CLAUDE_CHAT_MODEL` can set a different model.
+- **Which AI (owner's choice, November 2026):** the free Gemini key (`GEMINI_API_KEY`) is used first when the site has one; `CHAT_PROVIDER=claude` switches to Claude (`ANTHROPIC_API_KEY` / `OPENROUTER_API_KEY`). `chatProvider()` in `lib/reader-chat.js` decides. Gemini is called with no waiting and one retry only, so a visitor never waits minutes when Google's free limit is reached; the route then shows a "busy" message. `GEMINI_CHAT_MODEL` and `CLAUDE_CHAT_MODEL` set other models. On Google's free tier, Google may use submitted text to improve its products: the privacy page names Google Gemini.
+- Chats are not stored (the privacy page says so). Limits: 15 questions per visitor per 10 minutes and `CHAT_DAILY_LIMIT` for the whole site per day (default 400 with Gemini, 1500 with Claude).
 - Switch off with `"readerChat": { "enabled": false }` in `settings.json`; it is also hidden when there is no AI key.
 
 ## Open items

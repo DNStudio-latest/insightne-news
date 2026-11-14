@@ -613,3 +613,104 @@ export function CookieNotice({ current = "en" }) {
     </div>
   );
 }
+
+// 💬 "Ask InsightNE": a chat button in the bottom-right corner. Opens a small panel where readers ask questions;
+// answers come from /api/chat and use only stories published on this website. Nothing is stored: the
+// conversation disappears when the page is closed.
+export function ReaderChat({ lang = "en", labels = {} }) {
+  const t = {
+    button: "Ask InsightNE",
+    title: "Ask InsightNE",
+    intro: "Ask about news we have published, or how to contact us, send a tip or report a mistake. Answers are written by AI from our stories and can be wrong: check the linked story.",
+    placeholder: "Type your question",
+    send: "Send",
+    close: "Close chat",
+    thinking: "Looking through our stories…",
+    sources: "Read the stories:",
+    ...labels,
+  };
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const endRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (open) inputRef.current?.focus();
+  }, [open]);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ block: "end" });
+  }, [messages, busy]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  async function ask(e) {
+    e.preventDefault();
+    const question = text.trim();
+    if (!question || busy) return;
+    const history = messages.filter((m) => !m.error).map((m) => ({ role: m.role, text: m.text }));
+    setMessages((m) => [...m, { role: "user", text: question }]);
+    setText("");
+    setBusy(true);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, history, lang }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.answer) throw new Error(data.error || "Sorry, the chat could not answer just now.");
+      setMessages((m) => [...m, { role: "assistant", text: data.answer, stories: data.stories || [] }]);
+    } catch (err) {
+      setMessages((m) => [...m, { role: "assistant", text: err.message, error: true }]);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!open) {
+    return (
+      <button type="button" className="chat-open" onClick={() => setOpen(true)} aria-haspopup="dialog">
+        <span aria-hidden="true">💬</span> {t.button}
+      </button>
+    );
+  }
+  return (
+    <section className="chat-panel" role="dialog" aria-label={t.title}>
+      <header className="chat-head">
+        <strong>{t.title}</strong>
+        <button type="button" onClick={() => setOpen(false)} aria-label={t.close}>✕</button>
+      </header>
+      <div className="chat-log" aria-live="polite">
+        <p className="chat-intro">{t.intro}</p>
+        {messages.map((m, i) => (
+          <div key={i} className={`chat-msg ${m.role}${m.error ? " error" : ""}`}>
+            <p>{m.text}</p>
+            {m.stories?.length > 0 && (
+              <div className="chat-sources">
+                <span>{t.sources}</span>
+                <ul>
+                  {m.stories.map((s) => (
+                    <li key={s.url}><a href={s.url}>{s.headline}</a></li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        ))}
+        {busy && <div className="chat-msg assistant thinking">{t.thinking}</div>}
+        <div ref={endRef} />
+      </div>
+      <form className="chat-form" onSubmit={ask}>
+        <label className="sr-only" htmlFor="chat-q">{t.placeholder}</label>
+        <input id="chat-q" ref={inputRef} value={text} onChange={(e) => setText(e.target.value)} maxLength={300} placeholder={t.placeholder} autoComplete="off" />
+        <button type="submit" disabled={busy || !text.trim()}>{t.send}</button>
+      </form>
+    </section>
+  );
+}

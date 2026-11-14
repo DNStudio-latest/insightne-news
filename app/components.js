@@ -7,7 +7,8 @@ import { AI_CREDIT } from "../lib/images.js";
 import { pictureOf } from "../lib/proof-shot.js";
 import { responsiveImage } from "../lib/photo-url.js";
 import { lang, pick, tr, href as langHref } from "../lib/lang.js";
-import { LangSwitch, AlertsButton, NewsletterSignup, LanguageWelcome, ListenBriefing, CookieNotice } from "./client.js";
+import { LangSwitch, AlertsButton, NewsletterSignup, LanguageWelcome, ListenBriefing, CookieNotice, ReaderChat } from "./client.js";
+import { chatEnabled } from "../lib/reader-chat.js";
 import { topStories } from "../lib/top.js";
 import { newsletterReady } from "../lib/newsletter.js";
 import { pushPublicKey } from "../lib/push.js";
@@ -597,6 +598,20 @@ export function SiteFooter() {
   );
 }
 
+// The chat box's words in Bengali (other languages see English; the AI answers in the reader's language).
+const CHAT_LABELS = {
+  bn: {
+    button: "প্রশ্ন করুন",
+    title: "InsightNE-কে জিজ্ঞাসা করুন",
+    intro: "আমাদের প্রকাশিত খবর নিয়ে, অথবা যোগাযোগ, খবরের সূত্র পাঠানো বা ভুল জানানোর বিষয়ে প্রশ্ন করুন। উত্তর আমাদের খবর থেকে AI লেখে এবং ভুল হতে পারে: লিঙ্ক দেওয়া খবরটি পড়ে মিলিয়ে নিন।",
+    placeholder: "আপনার প্রশ্ন লিখুন",
+    send: "পাঠান",
+    close: "চ্যাট বন্ধ করুন",
+    thinking: "আমাদের খবর খোঁজা হচ্ছে…",
+    sources: "খবরগুলি পড়ুন:",
+  },
+};
+
 export async function PageShell({ current, children, ticker, updatedAt }) {
   // The reader's language was set by the page's layout (see app/[lang]/layout.js).
   const [[breaking], cricket, live] = await Promise.all([site.listStories({ status: "approved", breaking: true, limit: 1 }).catch(() => []), indiaMatch(), site.live()]);
@@ -608,6 +623,7 @@ export async function PageShell({ current, children, ticker, updatedAt }) {
       <LanguageWelcome current={lang()} />
       <CookieNotice current={lang()} />
       <TopBriefing />
+      {chatEnabled() && <ReaderChat lang={lang()} labels={CHAT_LABELS[lang()]} />}
     </>
   );
 }

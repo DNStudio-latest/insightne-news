@@ -75,7 +75,7 @@
   "onlyArticlesNewerThanHours": 48,
   "maxArticlesPerRun": 200,
   "readerChat": {
-    "_help": "The 'Ask InsightNE' chat box at the bottom-right of every public page. It answers visitors' questions only from stories published on this website and links to them. Change enabled to false to hide it. It needs the site's AI key (ANTHROPIC_API_KEY or OPENROUTER_API_KEY). The Vercel setting CHAT_DAILY_LIMIT (default 1500) caps the number of questions per day.",
+    "_help": "The 'Ask InsightNE' chat box at the bottom-right of every public page. It answers visitors' questions only from stories published on this website and links to them. Change enabled to false to hide it. It needs an AI key in Vercel: the free GEMINI_API_KEY is used first, otherwise ANTHROPIC_API_KEY or OPENROUTER_API_KEY. The Vercel setting CHAT_DAILY_LIMIT caps the number of questions per day (default 400 with Gemini, 1500 with Claude).",
     "enabled": true
   },
   "editors": {

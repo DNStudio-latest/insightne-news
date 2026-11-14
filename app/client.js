@@ -635,6 +635,23 @@ export function ReaderChat({ lang = "en", labels = {} }) {
   const [busy, setBusy] = useState(false);
   const endRef = useRef(null);
   const inputRef = useRef(null);
+  // The cookie notice (first visit) sits at the bottom of the screen; the button rides above it so it is never hidden.
+  const [lift, setLift] = useState(0);
+
+  useEffect(() => {
+    const measure = () => {
+      const notice = document.querySelector(".cookie-notice");
+      setLift(notice ? Math.ceil(notice.getBoundingClientRect().height) + 8 : 0);
+    };
+    measure();
+    const watcher = new MutationObserver(measure);
+    watcher.observe(document.body, { childList: true });
+    window.addEventListener("resize", measure);
+    return () => {
+      watcher.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
@@ -675,7 +692,7 @@ export function ReaderChat({ lang = "en", labels = {} }) {
 
   if (!open) {
     return (
-      <button type="button" className="chat-open" onClick={() => setOpen(true)} aria-haspopup="dialog">
+      <button type="button" className="chat-open" style={lift ? { marginBottom: lift } : undefined} onClick={() => setOpen(true)} aria-haspopup="dialog">
         <span aria-hidden="true">💬</span> {t.button}
       </button>
     );

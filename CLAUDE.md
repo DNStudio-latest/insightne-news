@@ -66,6 +66,13 @@ The owner's own tool for their PhD thesis in journalism and mass communication: 
 
 Replacements offered by the checker are fixed rules the owner chooses; none is made by an AI. Only the checker's `SAFE_REPLACEMENTS` are used. The thesis text is never stored on the website.
 
+## Ask InsightNE chat box (built November 2026)
+
+- A 💬 button at the bottom-right of every public page (`ReaderChat` in `app/client.js`, mounted in `PageShell`). Answers come from `app/api/chat/route.js` → `lib/reader-chat.js` (tests: `tests/reader-chat.test.js`).
+- The AI answers **only** from published stories found by `findStories()` (search words from the question plus the latest stories) and the site's own details (contact, tips, corrections, grievance, advertising). It must never answer from its own knowledge, gives no political opinions, cites stories as [n], and the stories are shown as links under the answer. `CHAT_SYSTEM` includes the house style; answers pass through `houseText()`.
+- Chats are not stored (the privacy page says so). Limits: 15 questions per visitor per 10 minutes and `CHAT_DAILY_LIMIT` (default 1500) for the whole site per day. `CLAUDE_CHAT_MODEL` can set a different model.
+- Switch off with `"readerChat": { "enabled": false }` in `settings.json`; it is also hidden when there is no AI key.
+
 ## Open items
 
 - **Thesis checker, next steps:** (1) add huggingface.co, arxiv.org, export.arxiv.org, api.openalex.org and shodhganga.inflibnet.ac.in to the environment's allowed domains, then add pre-2022 journalism and mass communication abstracts and Indian PhD theses as human text; (2) AI texts from current models (GPT-5, Claude, Gemini) in the owner's field, through an API key; (3) calibrate on the owner's own pre-2022 writing. See `docs/10-THESIS-AI-TOOLS.md`.

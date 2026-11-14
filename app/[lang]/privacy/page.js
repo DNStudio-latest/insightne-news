@@ -27,6 +27,11 @@ export default function PrivacyPage() {
           The emails are delivered by our email provider, Brevo. Every email has an unsubscribe link; when you unsubscribe, your
           address is deleted.
         </li>
+        <li>
+          If you use the <strong>Ask InsightNE</strong> chat box, your question and the conversation so far are sent to our AI
+          provider (Anthropic) to write the answer. We do not store the conversation, and it disappears when you close the
+          page. Please do not type personal details such as phone numbers or addresses into the chat.
+        </li>
         <li>We count visits with Vercel Web Analytics, which does not use cookies and does not identify you. It tells us things like how many people read a page and which country or state they read from.</li>
       </ul>
       <h2>Cookies</h2>

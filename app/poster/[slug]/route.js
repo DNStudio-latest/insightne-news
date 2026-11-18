@@ -99,7 +99,7 @@ export async function GET(request, { params }) {
           )}
         </div>
 
-        {ai && <div style={{ position: "absolute", right: 56, bottom: 132, display: "flex", background: "rgba(0,0,0,0.65)", fontSize: 24, fontWeight: 700, padding: "6px 14px", letterSpacing: 2 }}>AI ILLUSTRATION</div>}
+        {ai && <div style={{ position: "absolute", left: 56, top: 122, display: "flex", background: "rgba(0,0,0,0.65)", fontSize: 24, fontWeight: 700, padding: "6px 14px", letterSpacing: 2 }}>AI ILLUSTRATION</div>}
 
         {/* Bottom strip: where to read it */}
         <div style={{ position: "absolute", left: 0, bottom: 0, width: W, height: 84, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 56px", background: YELLOW, color: NAVY, fontSize: 36, fontWeight: 700 }}>

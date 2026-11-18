@@ -159,7 +159,9 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
               <CopyCaption story={story} />
               {/* The 16:9 news poster that is posted to Facebook and Instagram automatically (when the story has a photo). */}
               <span>🗞 Social poster:</span>
-              <a href={`/poster/${story.slug}`} target="_blank" rel="noopener">VIEW POSTER</a>
+              <a href={`/poster/${story.slug}?shape=landscape`} target="_blank" rel="noopener">FACEBOOK</a>
+              <a href={`/poster/${story.slug}?shape=portrait`} target="_blank" rel="noopener">INSTAGRAM</a>
+              <a href={`/poster/${story.slug}`} target="_blank" rel="noopener">WIDE</a>
             </div>
           </>
         )}

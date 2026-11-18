@@ -32,7 +32,8 @@ test("a story with a photo is posted to Facebook as a poster with the story link
   assert.equal(await postToFacebook(story), "123_9");
   assert.match(calls[0].url, /\/123\/photos$/);
   const form = new URLSearchParams(calls[0].body);
-  assert.equal(form.get("url"), posterUrl(story));
+  assert.equal(form.get("url"), posterUrl(story, "landscape")); // Facebook's 1.91:1 shape
+  assert.match(form.get("url"), /shape=landscape/);
   assert.match(form.get("caption"), /Full story: https:\/\/www\.insightnenews\.in\/story\/tripura-cabinet-plan-abc123/);
 });
 

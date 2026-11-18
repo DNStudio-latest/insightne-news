@@ -49,6 +49,26 @@ test("headline highlight: figures with Rs, abbreviations and one noun, never a v
   assert.deepEqual(keys("3 BSF jawans injured in Boxanagar"), ["3", "BSF", "Boxanagar"]);
 });
 
+test("the website shows the news graphic only for pictures labelled as AI illustrations, never for real photos", async () => {
+  const { usesGraphic, graphicUrl } = await import("../lib/poster-text.js");
+  const { settings } = await import("../lib/config.js");
+  const ai = { ...story, slug: "tripura-cabinet-plan-abc123", image_credit: "AI-generated illustration" };
+  assert.equal(usesGraphic(ai), true);
+  assert.equal(usesGraphic({ ...story, image_credit: "InsightNE" }), false, "a real photo stays as it is");
+  assert.equal(usesGraphic({ ...story, image_credit: null }), false);
+  assert.equal(usesGraphic({ ...ai, status: "pending" }), false);
+  assert.match(graphicUrl(ai, "card"), /^\/poster\/tripura-cabinet.*variant=web&size=card&v=[0-9a-f]{8}$/);
+  assert.match(graphicUrl(ai, "full"), /size=full/);
+  assert.match(graphicUrl(ai, "bogus"), /size=card/);
+  // the address changes when the story's words change, so the stored picture is never out of date
+  assert.notEqual(graphicUrl(ai), graphicUrl({ ...ai, headline: "A different headline" }));
+  assert.equal(graphicUrl(ai), graphicUrl({ ...ai }));
+  const before = settings.poster?.webGraphics;
+  settings.poster = { ...(settings.poster || {}), webGraphics: false };
+  assert.equal(usesGraphic(ai), false, "can be switched off in settings.json");
+  settings.poster.webGraphics = before;
+});
+
 test("a breaking flag shows only when the story really is marked breaking", () => {
   assert.equal(posterContent(story).breaking, false);
   assert.equal(posterContent({ ...story, is_breaking: true }).breaking, true);

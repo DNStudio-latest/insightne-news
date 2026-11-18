@@ -6,6 +6,7 @@ import { CopyLinkButton, NavBar } from "./client.js";
 import { AI_CREDIT } from "../lib/images.js";
 import { pictureOf } from "../lib/proof-shot.js";
 import { responsiveImage } from "../lib/photo-url.js";
+import { usesGraphic, graphicUrl } from "../lib/poster-text.js";
 import { lang, pick, tr, href as langHref } from "../lib/lang.js";
 import { LangSwitch, AlertsButton, NewsletterSignup, LanguageWelcome, ListenBriefing, CookieNotice, ReaderChat } from "./client.js";
 import { chatEnabled } from "../lib/reader-chat.js";
@@ -60,15 +61,19 @@ export function storyCategory(story) {
 export function StoryImage({ story, eager = false }) {
   const picture = pictureOf(story); // never the screenshot of an official page
   if (picture) {
+    // An AI illustration is shown as a news graphic (place, date and headline on it); real photos are shown as they are.
+    const graphic = usesGraphic(story);
+    const sizes = eager ? "(min-width: 1100px) 50vw, (min-width: 900px) 66vw, 100vw" : "(min-width: 900px) 33vw, 100vw";
     const img = (
       <img
         className="thumb"
-        src={picture}
+        src={graphic ? graphicUrl(story, eager ? "full" : "card") : picture}
+        {...(graphic ? { srcSet: `${graphicUrl(story, "card")} 1024w, ${graphicUrl(story, "full")} 1600w`, sizes } : {})}
         alt={story.image_caption || story.headline}
         loading={eager ? "eager" : "lazy"}
         decoding="async"
         {...(eager ? { fetchPriority: "high" } : {})}
-        {...responsiveImage(picture, eager ? "(min-width: 1100px) 50vw, (min-width: 900px) 66vw, 100vw" : "(min-width: 900px) 33vw, 100vw")}
+        {...(graphic ? {} : responsiveImage(picture, sizes))}
       />
     );
     if (story.image_credit !== AI_CREDIT) return img;

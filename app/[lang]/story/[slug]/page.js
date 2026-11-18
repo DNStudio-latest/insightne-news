@@ -6,6 +6,7 @@ import { articleBlocks, formatDate, readingMinutes, uniqueSources } from "../../
 import { AI_CREDIT } from "../../../../lib/images.js";
 import { responsiveImage } from "../../../../lib/photo-url.js";
 import { pictureOf, proofShotOf, photoGallery } from "../../../../lib/proof-shot.js";
+import { usesGraphic, graphicUrl } from "../../../../lib/poster-text.js";
 import { ViewCounter } from "../../../client.js";
 import { relatedStories, hubsForStory } from "../../../../lib/hubs.js";
 import { initLang, lang, pick, tr, isTranslated, href } from "../../../../lib/lang.js";
@@ -106,7 +107,8 @@ export default async function StoryPage({ params }) {
 
         {picture && (
           <figure className="figure">
-            <img src={picture} alt={story.image_caption || story.headline} fetchPriority="high" {...responsiveImage(picture, "(min-width: 900px) 760px, 100vw")} />
+            {/* An AI illustration is shown as a news graphic (place, date, headline on it); real photos are shown as they are. */}
+            <img src={usesGraphic(story) ? graphicUrl(story, "full") : picture} alt={story.image_caption || story.headline} fetchPriority="high" {...(usesGraphic(story) ? {} : responsiveImage(picture, "(min-width: 900px) 760px, 100vw"))} />
             {(story.image_caption || story.image_credit) && (
               <figcaption>
                 {story.image_credit === AI_CREDIT ? (

@@ -106,6 +106,9 @@
   "poster": {
     "_help": "News posters for Facebook and Instagram: when a story with a photo is published, a 1920x1080 poster made from its own photo and wording is posted with the story link (see /poster/<story>). enabled: false posts the old way (headline and link, news card on Instagram). maxPerDay: the most automatic posts per network in 24 hours; the rest are not posted and appear on /admin/social (Instagram allows 50 a day).",
     "enabled": true,
+    "facebookShape": "landscape",
+    "instagramShape": "portrait",
+    "webGraphics": true,
     "maxPerDay": 20
   },
   "autoPublish": {

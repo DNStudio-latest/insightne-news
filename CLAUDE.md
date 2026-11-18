@@ -19,6 +19,11 @@ A Next.js news website for Tripura and Northeast India, deployed on Vercel from 
 - **Photos:** `savePhoto()` in `lib/photo.js` stores `<id>.w1600.webp` and `<id>.w640.webp`; `responsiveImage()` in `lib/photo-url.js` adds `srcset` only for such photos. AI illustrations are now converted to WebP too.
 - **Layouts:** there is no `app/layout.js`: `app/[lang]/layout.js` and `app/admin/layout.js` are the two root layouts (fonts in `app/fonts.js`, metadata in `app/site-metadata.js`).
 
+## News posters for social media (built November 2026)
+
+- `/poster/<slug>` (`app/poster/[slug]/route.js`) draws a 1920×1080 poster with `next/og`; its words come only from the story (`lib/poster-text.js`: whole sentences, no AI writing). The photo is cropped (`sharp` attention crop) and brightened, never redrawn. `lib/facebook.js` (`postToFacebook`, falls back to a link post) and `lib/instagram.js` use it when `usePoster(story)`; `lib/after-publish.js` applies the daily limit (`poster.maxPerDay`, counted from the social log in `lib/social.js`). `proxy.js` must exclude `/poster/`. Settings: `poster` block, `facebook.autoPost` / `instagram.autoPost` = true.
+- `next build` may stop once with a Next.js "upgrade recommendation" notice (npm audit: moderate advisory for Next 16.2.0–16.4.4); running it again continues.
+
 ## Brief fact check and brief length (built November 2026)
 
 - `lib/fact-check.js` (`checkSummaryFacts`) compares each AI-written brief with its sources (headlines, snippets and the news site's name): figures (digits, number words, "15 thousand", "3 lakh"), months, quotations and names in the summary (not the headline: Title Case) must appear in the sources. Names are skipped when the sources are mostly Bengali; abbreviations spelled out in the brief count as found when the abbreviation is in the sources. Reasons go into `check_reasons` and set `needs_check`, which blocks auto-publish. Wired into both paths in `lib/pipeline.js` (new briefs and `fillMissingSummaries`). Tests: `tests/fact-check.test.js`.

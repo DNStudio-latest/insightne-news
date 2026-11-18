@@ -6,6 +6,16 @@ Facebook adds the picture by itself). It stays **hidden** until you finish these
 You must be an **admin of the Facebook page**. Do this on a computer. Claude will guide you step by step;
 never paste the tokens into chat.
 
+## News posters (added November 2026)
+
+When a story that has a photo is published, the site posts a **news poster** instead of a plain link: a 1920 × 1080 picture made from the story's own photo, with the headline, the place and date, one supporting line and up to three key points, all taken word for word from the story (nothing is written by an AI, so no fact can be invented). The story link is in the Facebook caption; on Instagram the poster is posted and the caption says "link in bio". The photo is only cropped and slightly brightened, never redrawn. A poster made from an AI illustration says "AI ILLUSTRATION". The website keeps the original photo.
+
+- **See any poster:** on the approval page, under a published story, tap **VIEW POSTER** (or open `/poster/<story>`).
+- **Switch on or off:** `poster.enabled` in `settings.json`. Off = the old way (link post; news card on Instagram).
+- **Which stories:** `facebook.autoPost` and `instagram.autoPost` are `true` = every published story. `"originals"` = your own reports only.
+- **Daily limit:** `poster.maxPerDay` (default 20 per network in 24 hours; Instagram allows 50). Stories over the limit are not posted and are listed on `/admin/social`; the POST button still works.
+- English only: Bengali letters do not join correctly in these pictures.
+
 ## 1. Make a free Meta developer app
 1. Go to **developers.facebook.com** → **Get started** (log in with the Facebook account that runs the page).
 2. **My Apps → Create app** → name it `InsightNE Website` → use case **"Manage everything on your Page"**.

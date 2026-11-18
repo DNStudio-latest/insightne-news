@@ -8,7 +8,7 @@ import { routeForLanguage } from "./lib/lang-routing.js";
 export const config = {
   // Everything except the private approval pages, scripts, files with an extension (images, sitemaps, feeds),
   // and the small service addresses (language switch, short links, news cards, icons, the AI-text checker).
-  matcher: ["/((?!_next|api|admin|lang/|card/|s/|ai-tools|icon|opengraph-image|manifest|.*\\..*).*)"],
+  matcher: ["/((?!_next|api|admin|lang/|card/|poster/|s/|ai-tools|icon|opengraph-image|manifest|.*\\..*).*)"],
 };
 
 export function proxy(request) {

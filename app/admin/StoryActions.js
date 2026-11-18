@@ -157,6 +157,9 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
               <a href={`/card/${story.slug}?type=breaking`} target="_blank" rel="noopener">BREAKING</a>
               <a href={`/card/${story.slug}?type=news`} target="_blank" rel="noopener">NEWS</a>
               <CopyCaption story={story} />
+              {/* The 16:9 news poster that is posted to Facebook and Instagram automatically (when the story has a photo). */}
+              <span>🗞 Social poster:</span>
+              <a href={`/poster/${story.slug}`} target="_blank" rel="noopener">VIEW POSTER</a>
             </div>
           </>
         )}

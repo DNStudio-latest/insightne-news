@@ -28,9 +28,10 @@ async function photo(url) {
   if (!url) return null;
   try {
     const res = await fetch(new URL(url, settings.siteUrl), { signal: AbortSignal.timeout(8000) });
-    const type = res.headers.get("content-type") || "";
-    if (!res.ok || !/image\/(jpeg|png)/.test(type)) return null;
-    return `data:${type};base64,${Buffer.from(await res.arrayBuffer()).toString("base64")}`;
+    if (!res.ok) return null;
+    // Photos are stored as WebP, which these pictures cannot show: convert any photo to JPEG.
+    const jpeg = await sharp(Buffer.from(await res.arrayBuffer()), { failOn: "none" }).rotate().resize({ width: 1400, withoutEnlargement: true }).jpeg({ quality: 88 }).toBuffer();
+    return `data:image/jpeg;base64,${jpeg.toString("base64")}`;
   } catch {
     return null;
   }

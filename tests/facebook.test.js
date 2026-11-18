@@ -34,9 +34,16 @@ test("only your own published reports are posted automatically", async () => {
   const { facebookAutoPost } = await import("../lib/facebook.js");
   process.env.FACEBOOK_PAGE_ID = "123";
   process.env.FACEBOOK_PAGE_TOKEN = "test-token";
+  const { settings } = await import("../lib/config.js");
+  const before = settings.facebook.autoPost;
+  settings.facebook.autoPost = "originals"; // the mode in which only your own reports are posted
   assert.equal(facebookAutoPost({ status: "approved", kind: "original" }), true);
   assert.equal(facebookAutoPost({ status: "approved", kind: "brief" }), false, "news briefs wait for the button");
   assert.equal(facebookAutoPost({ status: "pending", kind: "original" }), false, "drafts are never posted");
+  settings.facebook.autoPost = true; // every published story
+  assert.equal(facebookAutoPost({ status: "approved", kind: "brief" }), true);
+  assert.equal(facebookAutoPost({ status: "pending", kind: "brief" }), false, "drafts are never posted, in any mode");
+  settings.facebook.autoPost = before;
   delete process.env.FACEBOOK_PAGE_TOKEN;
   assert.equal(facebookAutoPost({ status: "approved", kind: "original" }), false, "nothing happens without the page key");
 });

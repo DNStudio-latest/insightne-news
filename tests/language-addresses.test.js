@@ -57,5 +57,5 @@ test("proxy matcher leaves admin, API, files and service addresses alone", () =>
   const pattern = JSON.parse(/matcher: \[("[^\n]*")\],/.exec(src)[1]);
   const re = new RegExp(`^${pattern}$`);
   for (const p of ["/", "/story/x", "/bn/story/x", "/category/tripura", "/about", "/tips"]) assert.ok(re.test(p), p);
-  for (const p of ["/admin", "/admin/write", "/api/view", "/_next/static/a.js", "/feed.xml", "/sitemap.xml", "/lang/bn", "/s/abc", "/card/x", "/ai-tools", "/icon", "/manifest.webmanifest", "/sw.js"]) assert.ok(!re.test(p), p);
+  for (const p of ["/admin", "/admin/write", "/api/view", "/_next/static/a.js", "/feed.xml", "/sitemap.xml", "/lang/bn", "/s/abc", "/card/x", "/poster/x", "/ai-tools", "/icon", "/manifest.webmanifest", "/sw.js"]) assert.ok(!re.test(p), p);
 });

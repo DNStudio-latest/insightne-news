@@ -9,7 +9,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 
-const [resultsFile, summaryFile, out = "data/rehearsal/village-committee-2026.json", limit = "345"] = process.argv.slice(2);
+const [resultsFile, summaryFile, out = "lib/results/fixtures/village-committee-2026.json", limit = "345"] = process.argv.slice(2);
 if (!resultsFile || !summaryFile) {
   console.error("Usage: node scripts/results-record.js <results.json> <summary.json> [out.json] [seats]");
   process.exit(1);

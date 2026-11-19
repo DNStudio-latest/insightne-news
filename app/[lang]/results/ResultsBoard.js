@@ -2,6 +2,7 @@
 // The live counting board (TV style). Reads the results from `endpoint` every 20 seconds and redraws; the numbers shown are
 // exactly what the official portal has marked as declared. In rehearsal mode (admin only) it plays a practice counting day.
 import { useEffect, useMemo, useRef, useState } from "react";
+import ResultsStrip from "./ResultsStrip.js";
 
 const WORDS = (n) => Number(n || 0).toLocaleString("en-IN");
 const marginText = (m) => (m == null ? "" : m === 0 ? "level on votes" : `${WORDS(m)} votes`);
@@ -18,7 +19,7 @@ function tally(snapshot, unit) {
 export default function ResultsBoard({ initial, endpoint, rehearsal = false }) {
   const [data, setData] = useState(initial);
   const [connection, setConnection] = useState("ok");
-  const [pct, setPct] = useState(0);
+  const [pct, setPct] = useState(rehearsal ? 55 : 0);
   const [playing, setPlaying] = useState(false);
   const [q, setQ] = useState("");
   const [party, setParty] = useState("");
@@ -110,6 +111,14 @@ export default function ResultsBoard({ initial, endpoint, rehearsal = false }) {
             <button type="button" onClick={() => (setPlaying(false), setPct(0))}>Restart</button>
           </div>
         </div>
+      )}
+
+      {rehearsal && snapshot && (
+        <>
+          <p className="rb-muted" style={{ margin: "14px 0 6px" }}>This is how the panel at the top of the news page will look on counting day:</p>
+          <ResultsStrip initial={data} endpoint={endpoint} href="#" rehearsal />
+          <p className="rb-muted" style={{ margin: "14px 0 0" }}>And this is the full results page:</p>
+        </>
       )}
 
       {!snapshot && (

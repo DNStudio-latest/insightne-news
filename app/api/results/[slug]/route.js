@@ -4,6 +4,7 @@
 import { after } from "next/server";
 import { db } from "../../../../lib/db.js";
 import { electionConfig, loadSnapshot, loadMeta, refreshResults, isLive } from "../../../../lib/results/store.js";
+import { loadTurnout } from "../../../../lib/results/turnout.js";
 import { shareMilestones } from "../../../../lib/results/social.js";
 
 export const dynamic = "force-dynamic";
@@ -14,9 +15,10 @@ export async function GET(_request, { params }) {
   if (!cfg) return Response.json({ error: "not found" }, { status: 404 });
   const live = isLive(cfg);
   if (live) after(() => refreshResults(cfg, { db, shareFn: shareMilestones }));
-  const [snapshot, meta] = await Promise.all([loadSnapshot(db, slug), loadMeta(db, slug)]);
+  const [snapshot, meta, turnout] = await Promise.all([loadSnapshot(db, slug), loadMeta(db, slug), loadTurnout(db, slug)]);
   return Response.json(
     {
+      turnout: { updates: turnout.updates.slice(-12).map(({ label, percent, note }) => ({ label, percent, note })), electors: cfg.polling?.electors || null, stations: cfg.polling?.stations || null, date: cfg.polling?.date || null },
       election: { slug, title: cfg.title, subtitle: cfg.subtitle, enabled: Boolean(cfg.enabled), live, countingDate: cfg.countingDate, window: cfg.window },
       snapshot: snapshot || null,
       // Only what readers need: no internal details.

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "../../../lib/db.js";
 import { currentRole } from "../../../lib/auth.js";
 import { electionConfig, loadMeta, refreshResults } from "../../../lib/results/store.js";
+import { loadTurnout, addTurnoutUpdate } from "../../../lib/results/turnout.js";
 import { shareMilestones } from "../../../lib/results/social.js";
 
 async function admin() {
@@ -54,5 +55,24 @@ export async function resetPosted(formData) {
   const slug = text(formData, "slug");
   const meta = await loadMeta(db, slug);
   await db.setSetting(`results_meta_${slug}`, { ...meta, posted: [], events: [] });
+  revalidatePath("/admin/results");
+}
+
+// Polling day: add one turnout figure (typed from the State Election Commission's official update).
+export async function addTurnout(formData) {
+  await admin();
+  const slug = text(formData, "slug");
+  const cur = await loadTurnout(db, slug);
+  const r = addTurnoutUpdate(cur, { label: text(formData, "label"), percent: text(formData, "percent"), note: text(formData, "note") });
+  if (r.ok) await db.setSetting(`turnout_${slug}`, r.turnout);
+  else await db.setSetting(`turnout_error_${slug}`, { error: r.error, at: Date.now() });
+  revalidatePath("/admin/results");
+}
+
+export async function removeLastTurnout(formData) {
+  await admin();
+  const slug = text(formData, "slug");
+  const cur = await loadTurnout(db, slug);
+  await db.setSetting(`turnout_${slug}`, { ...cur, updates: cur.updates.slice(0, -1) });
   revalidatePath("/admin/results");
 }

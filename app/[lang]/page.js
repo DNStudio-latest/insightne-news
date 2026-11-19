@@ -8,6 +8,11 @@ import { initLang, lang, href } from "../../lib/lang.js";
 import { alternatesFor } from "../../lib/seo.js";
 import { pictureOf } from "../../lib/proof-shot.js";
 import { pinnedForFront, withoutStories } from "../../lib/pins.js";
+import { db } from "../../lib/db.js";
+import { elections, electionConfig, loadSnapshot, loadMeta, isLive } from "../../lib/results/store.js";
+import { loadTurnout, pollingOpen } from "../../lib/results/turnout.js";
+import ResultsStrip from "./results/ResultsStrip.js";
+import "./results/results.css";
 
 // A story appears the moment you press APPROVE (the approval page empties the one-minute memory in lib/site-cache.js).
 // The homepage names itself; each language has its own address. The website keeps the page ready for a minute at a time.
@@ -62,9 +67,23 @@ async function readerPoll() {
   }
 }
 
+// On counting day the live results panel goes to the very top of the news page (every language; the numbers are the same).
+async function liveCounting() {
+  try {
+    for (const e of elections()) {
+      const cfg = await electionConfig(db, e.slug);
+      if (!isLive(cfg)) continue;
+      const [snapshot, meta] = await Promise.all([loadSnapshot(db, e.slug), loadMeta(db, e.slug)]);
+      if (!snapshot) continue;
+      return { slug: e.slug, initial: { election: { slug: e.slug, title: cfg.title }, snapshot, status: { paused: Boolean(meta.paused), delayed: Boolean(meta.lastError) } } };
+    }
+  } catch {}
+  return null;
+}
+
 export default async function HomePage({ params }) {
   await initLang((await params).lang);
-  const [stories, articles, videos, mostRead, weather, poll, cricket, live, pinnedRaw] = await Promise.all([
+  const [stories, articles, videos, mostRead, weather, poll, cricket, live, pinnedRaw, counting] = await Promise.all([
     site.listStories({ status: "approved", limit: 100 }),
     site.listStories({ status: "approved", topic: ARTICLES, limit: 6 }),
     site.videos(4),
@@ -74,6 +93,7 @@ export default async function HomePage({ params }) {
     indiaMatch(),
     site.live(),
     site.pinned().catch(() => []), // stories the editor pinned (empty until the pin column exists)
+    liveCounting(),
   ]);
 
   if (!stories.length) {
@@ -108,6 +128,7 @@ export default async function HomePage({ params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteInfo).replace(/</g, "\\u003c") }} />
       <h1 className="sr-only">{settings.siteName}: {settings.tagline}</h1>
 
+      {counting && <ResultsStrip initial={counting.initial} endpoint={`/api/results/${counting.slug}`} href={href(`/results/${counting.slug}`)} />}
       <LivePlayer live={live} />
       <WeatherStrip weather={weather} />
       <CricketBox match={cricket} />

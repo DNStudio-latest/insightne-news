@@ -79,3 +79,18 @@ test("captions credit the source and never claim projections", () => {
   assert.match(cap, /State Election Commission/i);
   assert.doesNotMatch(cap, /project|trend|lead(s|ing)/i);
 });
+
+import { addTurnoutUpdate, pollingOpen } from "../lib/results/turnout.js";
+test("turnout only goes up, stays within 0-100 and polling window works", () => {
+  let t = { updates: [] };
+  let r = addTurnoutUpdate(t, { label: "9 am", percent: 12.5 });
+  assert.equal(r.ok, true);
+  t = r.turnout;
+  assert.equal(addTurnoutUpdate(t, { label: "11 am", percent: 10 }).ok, false);
+  assert.equal(addTurnoutUpdate(t, { label: "11 am", percent: 120 }).ok, false);
+  assert.equal(addTurnoutUpdate(t, { label: "", percent: 30 }).ok, false);
+  assert.equal(addTurnoutUpdate(t, { label: "11 am", percent: 31 }).turnout.updates.length, 2);
+  const cfg = { polling: { window: { from: "2026-11-27T06:00:00+05:30", to: "2026-11-28T06:00:00+05:30" } } };
+  assert.equal(pollingOpen(cfg, Date.parse("2026-11-27T12:00:00+05:30")), true);
+  assert.equal(pollingOpen(cfg, Date.parse("2026-11-29T12:00:00+05:30")), false);
+});

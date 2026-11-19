@@ -75,3 +75,22 @@
 .rb-would ul { margin: 0; padding-left: 18px; font-size: 0.86rem; line-height: 1.5; }
 .rb-would a { color: var(--yellow); }
 @media (prefers-reduced-motion: reduce) { .rb-ticker-track { animation: none; } .rb-dot { animation: none; } .rb-bar div, .rb-card-bar i { transition: none; } }
+
+/* The compact panel at the top of the news page */
+.rs { margin: 0 0 18px; }
+.rs-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 8px; }
+.rs-head h2 { margin: 0; font-size: 1.15rem; color: #fff; letter-spacing: 0.02em; }
+.rs-count { margin-left: auto; color: #cfe0f2; font-size: 0.95rem; }
+.rs-count strong { color: var(--yellow); font-size: 1.3rem; }
+.rs-tally { grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); margin-top: 10px; }
+.rs .rb-card-num { font-size: 2.1rem; }
+.rs-rest { margin: 8px 0 0; font-size: 0.85rem; color: #cfe0f2; }
+.rs-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-top: 10px; font-size: 0.76rem; color: var(--muted); }
+.rs-foot a { color: var(--yellow); font-weight: 700; font-size: 0.9rem; }
+.rs-turnout { margin: 4px 0 10px; }
+.rs-turnout-top { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; color: #cfe0f2; }
+.rs-turnout-num { font-family: var(--font-headline), sans-serif; font-size: 2.6rem; font-weight: 800; color: var(--yellow); line-height: 1; }
+.rb-card-name { overflow-wrap: anywhere; }
+.rs-tally .rb-card { min-width: 0; }
+.rs .rb-card-name { font-size: 1rem; overflow-wrap: normal; word-break: normal; }
+.rs-tally { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }

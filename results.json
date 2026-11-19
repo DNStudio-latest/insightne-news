@@ -7,7 +7,10 @@
       "subtitle": "General election to the urban local bodies",
       "enabled": false,
       "countingDate": "2 December 2026",
-      "window": { "from": "2026-12-02T06:00:00+05:30", "to": "2026-12-03T06:00:00+05:30" },
+      "window": {
+        "from": "2026-12-02T06:00:00+05:30",
+        "to": "2026-12-03T06:00:00+05:30"
+      },
       "pollSeconds": 120,
       "expectedSeats": 345,
       "keyContests": [],
@@ -15,11 +18,28 @@
         "type": "sec-tripura",
         "base": "https://sec-results.tripura.gov.in",
         "api": "/electionresultscheduler/dashboard/get-data",
-        "keys": { "results": "GP_Results_Summary", "summary": "Dashboard_Page_Summary", "time": "Current_DateTime" },
+        "keys": {
+          "results": "GP_Results_Summary",
+          "summary": "Dashboard_Page_Summary",
+          "time": "Current_DateTime"
+        },
         "summarySection": "GP_Result",
         "_note": "These keys are those of the TTAADC Village Committee portal. The municipal results portal may use other keys or another address: set them here or on /admin/results when it is published."
       },
-      "social": { "enabled": true, "maxPerDay": 25 }
+      "social": {
+        "enabled": true,
+        "maxPerDay": 25
+      },
+      "polling": {
+        "date": "27 November 2026",
+        "window": {
+          "from": "2026-11-27T06:00:00+05:30",
+          "to": "2026-11-28T06:00:00+05:30"
+        },
+        "hours": "7 am to 4 pm",
+        "electors": 629903,
+        "stations": 783
+      }
     }
   ]
 }

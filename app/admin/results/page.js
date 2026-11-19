@@ -22,6 +22,7 @@ export default async function ResultsAdminPage() {
   );
   return (
     <div className="wrap">
+      <style>{`.stack{display:flex;flex-direction:column;gap:12px;margin:8px 0 16px}.stack label{display:flex;flex-direction:column;gap:4px;font-size:.92rem}.stack label:has(input[type=checkbox]){flex-direction:row;align-items:center;gap:8px}.stack input:not([type=checkbox]),.stack textarea{width:100%;padding:8px 10px;font:inherit;border:1px solid #c9c4b8;border-radius:6px;background:#fff}`}</style>
       <div className="admin-bar">
         <h1>🗳️ Live results</h1>
         <a className="btn btn-plain" href="/admin">← Back</a>

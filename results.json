@@ -1,0 +1,25 @@
+{
+  "_help": "Live election results pages (/results/<slug>). Each election reads an official results portal. Change anything here, or on /admin/results (that overrides this file without a new deploy). enabled: false = the page shows 'results will appear here on counting day'. window: the page and the reader are only active between these times (India time). pollSeconds: how often the portal is asked (the portal itself refreshes every 120). expectedSeats: the known number of seats; a different number stops the update. keyContests: seats (or parts of seat names, e.g. 'Ward 27') that get their own social post when declared. social: automatic Facebook and Instagram posts for big updates; maxPerDay is the most per network in 24 hours.",
+  "elections": [
+    {
+      "slug": "tripura-civic-polls-2026",
+      "title": "Tripura Civic Polls 2026: Counting",
+      "subtitle": "General election to the urban local bodies",
+      "enabled": false,
+      "countingDate": "2 December 2026",
+      "window": { "from": "2026-12-02T06:00:00+05:30", "to": "2026-12-03T06:00:00+05:30" },
+      "pollSeconds": 120,
+      "expectedSeats": 345,
+      "keyContests": [],
+      "source": {
+        "type": "sec-tripura",
+        "base": "https://sec-results.tripura.gov.in",
+        "api": "/electionresultscheduler/dashboard/get-data",
+        "keys": { "results": "GP_Results_Summary", "summary": "Dashboard_Page_Summary", "time": "Current_DateTime" },
+        "summarySection": "GP_Result",
+        "_note": "These keys are those of the TTAADC Village Committee portal. The municipal results portal may use other keys or another address: set them here or on /admin/results when it is published."
+      },
+      "social": { "enabled": true, "maxPerDay": 25 }
+    }
+  ]
+}

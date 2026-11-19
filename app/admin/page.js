@@ -83,6 +83,7 @@ export default async function AdminPage({ searchParams }) {
             <a href="/admin/live">🔴 Live</a>
             <a href="/admin/whatsapp">📲 WhatsApp posts</a>
             <a href="/admin/social">📘 Facebook & Instagram</a>
+            <a href="/admin/results">🗳️ Live results</a>
             <a href="/admin/polls">📊 Polls</a>
             <a href="/admin/newsletter">✉ Daily email</a>
             <a href="/admin/editors">👥 Editors</a>

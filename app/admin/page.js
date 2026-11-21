@@ -73,6 +73,7 @@ export default async function AdminPage({ searchParams }) {
         <a href="/admin?view=published" aria-current={view === "published" ? "page" : undefined}>{sub && !kokborokEditor ? "My published stories" : "Published"}</a>
         {admin && <a href="/admin?view=rejected" aria-current={view === "rejected" ? "page" : undefined}>Rejected</a>}
         <a href="/admin/write">✍ Write story</a>
+        {!sub && <a href="/admin/desk">📱 News desk</a>}
         <a href="/admin/ai-check">🤖 AI checker</a>
         <a href="/admin/ai-lessons">🧠 Teach the AI</a>
         {admin && (

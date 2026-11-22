@@ -4,5 +4,6 @@ import { db } from "../../../lib/db.js";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return Response.json({ latest: await db.latestPublishedAt() }, { headers: { "Cache-Control": "no-store" } });
+  // Cached at the edge for 2 minutes: readers' "New stories" check does not need to be instant.
+  return Response.json({ latest: await db.latestPublishedAt() }, { headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300" } });
 }

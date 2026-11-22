@@ -89,7 +89,7 @@ export function LiveUpdates({ since }) {
         if (latest && new Date(latest) > new Date(since)) setHasNew(true);
       } catch {}
     };
-    const timer = setInterval(check, 60000);
+    const timer = setInterval(check, 180000); // every 3 minutes (was 1): fewer server calls, "New stories" still shows
     return () => clearInterval(timer);
   }, [since]);
   if (!hasNew) return null;

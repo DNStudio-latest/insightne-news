@@ -94,3 +94,33 @@ test("turnout only goes up, stays within 0-100 and polling window works", () => 
   assert.equal(pollingOpen(cfg, Date.parse("2026-11-27T12:00:00+05:30")), true);
   assert.equal(pollingOpen(cfg, Date.parse("2026-11-29T12:00:00+05:30")), false);
 });
+
+import { cleanEntry, upsertEntry, snapshotFromManual } from "../lib/results/manual.js";
+test("typed seats: checked, corrected by retyping, and shown as a snapshot", () => {
+  const a = cleanEntry({ unit: "Ward group 1", seat: "Ward 3", winnerName: "A B", winnerParty: "tmp", winnerVotes: "1,204", runnerName: "C D", runnerParty: "BJP", runnerVotes: "980" }, 0);
+  assert.equal(a.ok, true);
+  assert.equal(a.entry.winnerParty, "TMP");
+  assert.equal(cleanEntry({ unit: "U", seat: "S", winnerName: "A", winnerParty: "TMP", winnerVotes: "5", runnerName: "B", runnerParty: "BJP", runnerVotes: "9" }).ok, false);
+  assert.equal(cleanEntry({ unit: "U", seat: "S", winnerName: "A", winnerParty: "TMP", winnerVotes: "x" }).ok, false);
+  let list = upsertEntry([], a.entry);
+  list = upsertEntry(list, { ...a.entry, winnerVotes: 1300 });
+  assert.equal(list.length, 1);
+  const snap = snapshotFromManual(list, { slug: "t", expectedSeats: 345 });
+  assert.equal(snap.totals.seats, 345);
+  assert.equal(snap.totals.declared, 1);
+  assert.equal(snap.units[0].seats[0].margin, 320);
+  assert.equal(tally(snap)[0].key, "TMP");
+});
+
+test("manual mode replaces the portal reading during a refresh", async () => {
+  const s = new Map();
+  const db = { getSetting: async (k) => s.get(k) ?? null, setSetting: async (k, v) => void s.set(k, JSON.parse(JSON.stringify(v))) };
+  const a = cleanEntry({ unit: "U", seat: "S1", winnerName: "A", winnerParty: "TMP", winnerVotes: "10" }).entry;
+  s.set("results_manual_t", { on: true, entries: [a] });
+  const cfg = { slug: "t", enabled: true, window: {}, expectedSeats: 345, source: {} };
+  let fetched = false;
+  const r = await refreshResults(cfg, { db, force: true, fetchFn: async () => { fetched = true; throw new Error("no"); } });
+  assert.equal(r.status, "updated");
+  assert.equal(fetched, false);
+  assert.equal((await db.getSetting("results_t")).totals.declared, 1);
+});

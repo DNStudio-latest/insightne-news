@@ -4,7 +4,8 @@ import { currentRole } from "../../../lib/auth.js";
 import { formatDate } from "../../../lib/format.js";
 import { elections, electionConfig, loadSnapshot, loadMeta, isLive } from "../../../lib/results/store.js";
 import { loadTurnout } from "../../../lib/results/turnout.js";
-import { saveElectionSettings, setPaused, fetchNow, resetPosted, addTurnout, removeLastTurnout } from "./actions.js";
+import { loadManual } from "../../../lib/results/manual.js";
+import { saveElectionSettings, setPaused, fetchNow, resetPosted, addTurnout, removeLastTurnout, saveManualEntry, setManualMode } from "./actions.js";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Live results", robots: { index: false, follow: false } };
@@ -16,8 +17,8 @@ export default async function ResultsAdminPage() {
   const rows = await Promise.all(
     elections().map(async (e) => {
       const cfg = await electionConfig(db, e.slug);
-      const [snap, meta, turnout, tErr] = await Promise.all([loadSnapshot(db, e.slug), loadMeta(db, e.slug), loadTurnout(db, e.slug), db.getSetting(`turnout_error_${e.slug}`).catch(() => null)]);
-      return { cfg, snap, meta, turnout, tErr };
+      const [snap, meta, turnout, tErr, manual, mErr] = await Promise.all([loadSnapshot(db, e.slug), loadMeta(db, e.slug), loadTurnout(db, e.slug), db.getSetting(`turnout_error_${e.slug}`).catch(() => null), loadManual(db, e.slug), db.getSetting(`results_manual_error_${e.slug}`).catch(() => null)]);
+      return { cfg, snap, meta, turnout, tErr, manual, mErr };
     }),
   );
   return (
@@ -29,7 +30,7 @@ export default async function ResultsAdminPage() {
       </div>
       <p className="hint">Reads the official results portal during counting, shows it on the website and posts the big updates to Facebook and Instagram. Switch it on the evening before counting.</p>
       <p><a className="btn btn-plain" href="/admin/results/rehearsal">▶ Practice counting day (rehearsal)</a></p>
-      {rows.map(({ cfg, snap, meta, turnout, tErr }) => (
+      {rows.map(({ cfg, snap, meta, turnout, tErr, manual, mErr }) => (
         <section key={cfg.slug} className="run-box">
           <h2>{cfg.title}</h2>
           <p>
@@ -45,6 +46,32 @@ export default async function ResultsAdminPage() {
             <form action={fetchNow}><input type="hidden" name="slug" value={cfg.slug} /><input type="hidden" name="share" value="1" /><button className="btn btn-approve" type="submit">Read now and post</button></form>
             <form action={resetPosted}><input type="hidden" name="slug" value={cfg.slug} /><button className="btn btn-plain" type="submit">Forget posted updates</button></form>
           </div>
+
+          <h3>Plan B: type results by hand (if the portal cannot be read)</h3>
+          <p className="hint">Use this only if the official portal is down or wrong. Type each declared seat exactly as the Returning Officer announces it. Typing a seat again corrects it. While manual entry is ON, the portal is not read and these seats are what the public sees.</p>
+          <p>Manual entry: <strong>{manual.on ? "ON (typed seats are shown)" : "OFF (the portal is read)"}</strong> · {manual.entries.length} seat{manual.entries.length === 1 ? "" : "s"} typed</p>
+          <form action={setManualMode} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <input type="hidden" name="slug" value={cfg.slug} />
+            <input type="hidden" name="on" value={manual.on ? "0" : "1"} />
+            <button className="btn btn-plain" type="submit">{manual.on ? "Turn manual entry OFF (read the portal)" : "Turn manual entry ON"}</button>
+          </form>
+          {mErr && Date.now() - mErr.at < 60000 && <p style={{ color: "var(--danger)" }}>{mErr.error}</p>}
+          <form action={saveManualEntry} className="stack">
+            <input type="hidden" name="slug" value={cfg.slug} />
+            <label>Ward group or area<input name="unit" required /></label>
+            <label>Seat or ward<input name="seat" required /></label>
+            <label>Winner's name<input name="winnerName" required /></label>
+            <label>Winner's party (short name, e.g. TMP, BJP, IND)<input name="winnerParty" required /></label>
+            <label>Winner's votes<input name="winnerVotes" inputMode="numeric" required /></label>
+            <label>Runner-up's name (optional)<input name="runnerName" /></label>
+            <label>Runner-up's party<input name="runnerParty" /></label>
+            <label>Runner-up's votes<input name="runnerVotes" inputMode="numeric" /></label>
+            <label><input type="checkbox" name="verified" defaultChecked /> Confirmed by the official count (only confirmed seats are posted to social media)</label>
+            <button className="btn btn-approve" type="submit">Save this seat</button>
+          </form>
+          {manual.entries.length > 0 && (
+            <ul>{manual.entries.slice(-15).reverse().map((e) => <li key={e.id}>{e.unit}, {e.seat}: {e.winnerName} ({e.winnerParty}) {e.winnerVotes}{e.runnerName ? ` over ${e.runnerName} (${e.runnerParty}) ${e.runnerVotes}` : ""}</li>)}</ul>
+          )}
 
           <h3>Voter turnout (polling day, {cfg.polling?.date})</h3>
           <p className="hint">Type each figure from the State Election Commission's official update. It appears at once on the panel at the top of the news page. Turnout can only go up.</p>

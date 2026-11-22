@@ -5,6 +5,7 @@ import { db } from "../../../lib/db.js";
 import { currentRole } from "../../../lib/auth.js";
 import { electionConfig, loadMeta, refreshResults } from "../../../lib/results/store.js";
 import { loadTurnout, addTurnoutUpdate } from "../../../lib/results/turnout.js";
+import { loadManual, manualKey, cleanEntry, upsertEntry } from "../../../lib/results/manual.js";
 import { shareMilestones } from "../../../lib/results/social.js";
 
 async function admin() {
@@ -74,5 +75,45 @@ export async function removeLastTurnout(formData) {
   const slug = text(formData, "slug");
   const cur = await loadTurnout(db, slug);
   await db.setSetting(`turnout_${slug}`, { ...cur, updates: cur.updates.slice(0, -1) });
+  revalidatePath("/admin/results");
+}
+
+// Plan B: type one declared seat by hand. It is saved, then the results are rebuilt and shown at once.
+export async function saveManualEntry(formData) {
+  await admin();
+  const slug = text(formData, "slug");
+  const cfg = await electionConfig(db, slug);
+  if (!cfg) return;
+  const r = cleanEntry({
+    unit: formData.get("unit"),
+    seat: formData.get("seat"),
+    winnerName: formData.get("winnerName"),
+    winnerParty: formData.get("winnerParty"),
+    winnerVotes: formData.get("winnerVotes"),
+    runnerName: formData.get("runnerName"),
+    runnerParty: formData.get("runnerParty"),
+    runnerVotes: formData.get("runnerVotes"),
+    verified: formData.get("verified") === "on",
+  });
+  if (!r.ok) {
+    await db.setSetting(`results_manual_error_${slug}`, { error: r.error, at: Date.now() });
+    revalidatePath("/admin/results");
+    return;
+  }
+  const cur = await loadManual(db, slug);
+  await db.setSetting(manualKey(slug), { on: true, entries: upsertEntry(cur.entries, r.entry) });
+  await db.setSetting(`results_manual_error_${slug}`, null);
+  await refreshResults(cfg, { db, force: true, shareFn: shareMilestones });
+  revalidatePath("/admin/results");
+}
+
+// Turns manual entry on (typed seats are shown) or off (the portal is read again).
+export async function setManualMode(formData) {
+  await admin();
+  const slug = text(formData, "slug");
+  const cur = await loadManual(db, slug);
+  await db.setSetting(manualKey(slug), { ...cur, on: text(formData, "on") === "1" });
+  const cfg = await electionConfig(db, slug);
+  if (cfg && text(formData, "on") === "1") await refreshResults(cfg, { db, force: true, shareFn: null });
   revalidatePath("/admin/results");
 }

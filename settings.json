@@ -98,6 +98,10 @@
     "_help": "Posting to your Facebook page. Needs FACEBOOK_PAGE_ID and FACEBOOK_PAGE_TOKEN in Vercel (see docs/5-FACEBOOK.md). autoPost: \"originals\" = your own reports are posted automatically when published; true = every story you approve; false = only with the POST TO FACEBOOK button.",
     "autoPost": true
   },
+  "telegramChannel": {
+    "_help": "Posting to your public Telegram channel. Needs TELEGRAM_BOT_TOKEN and TELEGRAM_CHANNEL (the channel @username) in the server file, and the bot made an administrator of the channel. autoPost: \"originals\" = your own reports automatically; true = every story you approve; false = off.",
+    "autoPost": true
+  },
   "bluesky": {
     "_help": "Posting to your Bluesky account. Needs BLUESKY_HANDLE and BLUESKY_APP_PASSWORD (an app password made in Bluesky settings) in the server file. autoPost: \"originals\" = your own reports automatically; true = every story you approve; false = off.",
     "autoPost": true

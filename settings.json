@@ -102,6 +102,10 @@
     "_help": "Posting to your public Telegram channel. Needs TELEGRAM_BOT_TOKEN and TELEGRAM_CHANNEL (the channel @username) in the server file, and the bot made an administrator of the channel. autoPost: \"originals\" = your own reports automatically; true = every story you approve; false = off.",
     "autoPost": true
   },
+  "threads": {
+    "_help": "Posting to your Threads account. Needs THREADS_USER_ID and THREADS_TOKEN (a Threads access token) in the server file. The token is refreshed automatically. autoPost: \"originals\" = your own reports automatically; true = every story you approve; false = off.",
+    "autoPost": true
+  },
   "bluesky": {
     "_help": "Posting to your Bluesky account. Needs BLUESKY_HANDLE and BLUESKY_APP_PASSWORD (an app password made in Bluesky settings) in the server file. autoPost: \"originals\" = your own reports automatically; true = every story you approve; false = off.",
     "autoPost": true

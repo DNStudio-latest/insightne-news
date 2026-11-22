@@ -10,11 +10,12 @@ export const maxDuration = 60;
 export const metadata = { title: "Facebook and Instagram", robots: { index: false, follow: false } };
 
 // What happened to the last Facebook / Instagram posts, and a button that checks the connection step by step.
-export default async function SocialAdminPage() {
+export default async function SocialAdminPage({ searchParams }) {
   const role = await currentRole();
   if (!role) redirect("/admin/login");
   if (role !== "admin") redirect("/admin"); // admin only
-  const [log, check] = await Promise.all([readSocialLog(db), db.getSetting("social_check").catch(() => null)]);
+  const [log, check, threadsSaved] = await Promise.all([readSocialLog(db), db.getSetting("social_check").catch(() => null), db.getSetting("threads_token").catch(() => null)]);
+  const threadsMessage = String((await searchParams)?.threads || "");
 
   return (
     <div className="wrap">
@@ -27,6 +28,17 @@ export default async function SocialAdminPage() {
         <button className="btn btn-approve" type="submit" style={{ width: "100%" }}>CHECK CONNECTION</button>
       </form>
       <p className="hint">Asks Facebook and Instagram, step by step, whether the website can post. Takes up to half a minute.</p>
+
+      <div className="run-box">
+        <strong>Threads:</strong>{" "}
+        {threadsSaved?.token ? `connected (token saved ${formatDate(new Date(threadsSaved.at).toISOString())}, renewed automatically)` : "not connected yet"}
+        {threadsMessage && (
+          <p style={{ color: threadsMessage === "connected" ? undefined : "var(--danger)" }}>
+            {threadsMessage === "connected" ? "✓ Threads is connected." : `✗ ${threadsMessage}`}
+          </p>
+        )}
+        <a className="btn btn-plain" href="/api/threads/connect" style={{ display: "block", textAlign: "center", marginTop: 8 }}>CONNECT THREADS</a>
+      </div>
 
       {check && (
         <div className="run-box">

@@ -33,12 +33,13 @@ test("connecting swaps the code for a long-lived token and saves it", async () =
     seen.push(u);
     if (u.endsWith("/oauth/access_token")) return Response.json({ access_token: "short", user_id: 4242 });
     if (u.includes("th_exchange_token")) return Response.json({ access_token: "long", expires_in: 5184000 });
+    if (u.includes("/v1.0/me")) return new Response('{"id":"40199749849668891"}'); // 17 digits, kept as exact text
     return Response.json({ error: { message: "unexpected" } }, { status: 400 });
   };
   const db = fakeDb();
   const id = await connectThreads(db, "the-code", { fetchFn, now: 1000 });
-  assert.equal(id, "4242");
-  assert.deepEqual(db.store.threads_token, { userId: "4242", token: "long", at: 1000 });
+  assert.equal(id, "40199749849668891");
+  assert.deepEqual(db.store.threads_token, { userId: "40199749849668891", token: "long", at: 1000 });
 });
 
 test("creates a draft, waits until it is ready, publishes and returns the post id", async () => {
@@ -56,7 +57,8 @@ test("creates a draft, waits until it is ready, publishes and returns the post i
   };
   const id = await postToThreads(db, story, { fetchFn, wait: async () => {} });
   assert.equal(id, "post99");
-  assert.ok(calls.some((c) => c.endsWith("/v1.0/123/threads_publish")));
+  assert.ok(calls.some((c) => c.endsWith("/v1.0/me/threads_publish")));
+  assert.ok(calls.some((c) => c.endsWith("/v1.0/me/threads")));
 });
 
 test("an old token is refreshed and the new one is saved", async () => {

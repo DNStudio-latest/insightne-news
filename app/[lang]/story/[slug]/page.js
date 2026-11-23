@@ -12,6 +12,7 @@ import { relatedStories, hubsForStory } from "../../../../lib/hubs.js";
 import { initLang, lang, pick, tr, isTranslated, href } from "../../../../lib/lang.js";
 import { alternatesFor, noindexUnlessTranslated } from "../../../../lib/seo.js";
 import { storyText } from "../../../../lib/languages.js";
+import { searchTitle, searchDescription } from "../../../../lib/seo-text.js";
 import { WhatsAppFollow, EmailSignup, PageShell, Kicker, Byline, ShareButtons, StoryGrid, SectionHead, storyUrl, absoluteUrl } from "../../../components.js";
 
 // The website keeps each story page ready for a minute at a time (publishing or editing refreshes it at once).
@@ -39,8 +40,8 @@ export async function generateMetadata({ params }) {
   const headline = storyText(story, "headline", shown);
   const summary = storyText(story, "summary", shown);
   return {
-    title: headline,
-    description: summary,
+    title: searchTitle(headline),
+    description: searchDescription(summary),
     alternates: alternatesFor(code, path, { translated }),
     ...noindexUnlessTranslated(code, translated),
     openGraph: {

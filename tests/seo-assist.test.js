@@ -41,6 +41,13 @@ test("a reply that is not JSON gives a plain error", async () => {
   await assert.rejects(() => suggestSeo(story, { generate: async () => "Sorry, I cannot do that.", provider: "gemini" }), /could not read/);
 });
 
+test("the free-limit error is explained in plain words", async () => {
+  const generate = async () => { throw new Error("Gemini error 429: Quota exceeded for metric generate_content_free_tier_requests"); };
+  await assert.rejects(() => suggestSeo(story, { generate, provider: "gemini" }), /free limit is reached for this minute/);
+  const slow = async () => { throw new Error("Gemini did not answer in 30 seconds"); };
+  await assert.rejects(() => suggestSeo(story, { generate: slow, provider: "gemini" }), /did not answer in time/);
+});
+
 test("nothing written asks for text; no AI key is explained", async () => {
   await assert.rejects(() => suggestSeo({ headline: "", summary: "", body: "" }, { generate: async () => "" }), /Write the headline/);
   await assert.rejects(() => suggestSeo(story, { provider: null }), /No AI key/);

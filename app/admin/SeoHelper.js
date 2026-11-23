@@ -40,14 +40,17 @@ export default function SeoHelper() {
     setBusy(true);
     setError("");
     setResult(null);
+    const stop = new AbortController();
+    const timer = setTimeout(() => stop.abort(), 45000);
     try {
-      const res = await fetch("/api/seo-suggest", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ headline, summary, body, region }) });
+      const res = await fetch("/api/seo-suggest", { method: "POST", signal: stop.signal, headers: { "content-type": "application/json" }, body: JSON.stringify({ headline, summary, body, region }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
       setResult(data);
     } catch (err) {
-      setError(err.message);
+      setError(err.name === "AbortError" ? "No answer after 45 seconds. Press the button again in a minute." : err.message);
     } finally {
+      clearTimeout(timer);
       setBusy(false);
     }
   }

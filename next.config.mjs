@@ -9,6 +9,8 @@ const nextConfig = {
       {
         source: "/:path*",
         headers: [
+          // Browsers must always use https for this site for the next 30 days (renewed on every visit).
+          { key: "Strict-Transport-Security", value: "max-age=2592000" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

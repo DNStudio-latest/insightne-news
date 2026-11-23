@@ -18,6 +18,13 @@ test("returns cleaned headlines and a description from the AI answer", async () 
   assert.ok(out.description.length > 50);
 });
 
+test("a description a few characters over 155 is cut at a sentence", () => {
+  const long = "Assamese content creator Jugamaya Dutta died, and her family appealed against speculation. Police are examining her mobile phone as the investigation continues.";
+  const out = cleanSeoAnswer(reply({ headlines: ["Jugamaya Dutta Death: Family Appeals Against Speculation"], description: long }), buildSeoInput(story));
+  assert.ok([...out.description].length <= 155);
+  assert.ok(out.description.endsWith("speculation."));
+});
+
 test("a suggestion with a number that is not in the text is dropped", () => {
   const out = cleanSeoAnswer(reply({ headlines: ["Jugamaya Dutta Death: Police Question 5 People", "Jugamaya Dutta Death: Family Appeals Against Speculation"], description: "Police questioned 7 people." }), buildSeoInput(story));
   assert.equal(out.headlines.length, 1);

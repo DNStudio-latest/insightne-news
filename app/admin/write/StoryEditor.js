@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { saveOriginal } from "../actions.js";
 import { shrinkPhoto } from "../photo.js";
 import { HANDOFF_KEY, DRAFT_KEY, take } from "../ai-check/handoff.js";
+import SeoHelper from "../SeoHelper.js";
 
 export default function StoryEditor({ story, regions, topics, defaultAuthor, role = "admin", editorsPublish = false }) {
   const admin = role === "admin";
@@ -63,6 +64,8 @@ export default function StoryEditor({ story, regions, topics, defaultAuthor, rol
         Intro <span className="hint">— 1–2 sentences shown under the headline and on the front page</span>
         <textarea name="summary" defaultValue={story?.summary} maxLength={600} rows={3} placeholder="The most important facts: who, what, where, when." />
       </label>
+
+      <SeoHelper />
 
       <label>
         Story text

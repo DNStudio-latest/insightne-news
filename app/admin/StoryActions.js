@@ -1,6 +1,7 @@
 "use client";
 // The APPROVE / EDIT / REJECT buttons under each story.
 import { useState } from "react";
+import SeoHelper from "./SeoHelper.js";
 import { approve, reject, saveEdit, unpublish, restore, makeLead, togglePin, toggleBreaking, notifyReaders, postFacebook, postInstagram } from "./actions.js";
 import { shrinkPhoto } from "./photo.js";
 
@@ -206,6 +207,7 @@ export default function StoryActions({ story, view, regions, topics, facebook = 
             Summary
             <textarea name="summary" defaultValue={story.summary} required maxLength={1200} placeholder="Write 2–3 sentences in your own words. Don't copy sentences from the source." />
           </label>
+          <SeoHelper />
           <details className="bn-fields" open={Boolean(story.summary_bn)}>
             <summary>বাংলা (Bengali version)</summary>
             <label>

@@ -202,7 +202,8 @@ test("Claude requests use Haiku, low effort and a strict answer format", async (
   assert.deepEqual(s, { headline: "H", summary: "S", region: "Northeast", topic: null, needsCheck: true, checkReasons: ["Rumour"] });
 
   for (const c of calls) {
-    assert.equal(c.model, "claude-haiku-5-5");
+    // Direct Anthropic uses "claude-haiku-5-5"; OpenRouter (set in some environments) uses "anthropic/claude-haiku-5.5".
+    assert.match(c.model, /^(anthropic\/)?claude-haiku-5[-.]5$/);
     assert.equal(c.output_config.effort, "low");
     assert.equal(c.output_config.format.type, "json_schema");
   }

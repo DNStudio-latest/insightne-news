@@ -79,10 +79,11 @@
     "enabled": true
   },
   "listen": {
-    "_help": "The 'Listen' player on the Top 5 page: today's five headlines and summaries read aloud with an ElevenLabs voice, labelled as AI. It stays hidden until voiceId is set to an ElevenLabs voice ID the owner has chosen and licensed for this website, and ELEVENLABS_API_KEY is set in Vercel. model is the ElevenLabs model. Audio is cached for an hour per text.",
+    "_help": "The 'Listen Top News' tool: today's five headlines and summaries read aloud with an Azure Speech neural voice (free tier, about 500,000 characters a month), labelled as AI. It stays hidden until AZURE_SPEECH_KEY and AZURE_SPEECH_REGION are set on the server. azureVoice is the Azure voice name. Audio is cached for an hour per text.",
     "enabled": true,
-    "voiceId": "FfXWmNrZ6WE0kCyKBfpU",
-    "model": "eleven_multilingual_v2"
+    "azureVoice": "en-IN-NeerjaNeural",
+    "siteDailyLimit": 8,
+    "visitorDailyLimit": 5
   },
   "editors": {
     "_help": "People who sign in with EDITOR_PASSWORD. If canPublish is true, the stories they write go live straight away; if false, they wait in Pending for the admin.",

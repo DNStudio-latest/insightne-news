@@ -387,7 +387,7 @@ export function ListenBriefing({ items, lang = "en", texts }) {
   const run = useRef({ token: 0, pieces: [], index: 0, voice: null, english: null, langCode: "en-IN", utter: null, heard: false });
   const drag = useRef(null);
   const justDragged = useRef(false);
-  const audioRef = useRef(null); // the ElevenLabs audio, while it plays
+  const audioRef = useRef(null); // the server audio, while it plays
 
   useEffect(() => {
     if (!("speechSynthesis" in window)) return;
@@ -450,7 +450,7 @@ export function ListenBriefing({ items, lang = "en", texts }) {
     window.speechSynthesis.speak(u);
   }
 
-  // Titli (ElevenLabs) first, English only. If the audio is unavailable or the daily limit is reached,
+  // Server audio first, English only. If the audio is unavailable or the daily limit is reached,
   // the device's own voice reads the same stories instead.
   function play(from = 0) {
     if (from === 0 && lang === "en") return playAudio();

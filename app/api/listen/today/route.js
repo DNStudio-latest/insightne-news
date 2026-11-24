@@ -1,5 +1,5 @@
 // Audio of today's Top 5, read aloud (see lib/listen.js). Hidden (404) until it is switched on.
-// ElevenLabs is called only when a visitor presses Listen and the audio is not already cached. Past the limits,
+// Azure Speech is called only when a visitor presses Listen and the audio is not already cached. Past the limits,
 // the route answers with the text so the browser can read it with the device's own voice.
 import { db } from "../../../../lib/db.js";
 import { topStories } from "../../../../lib/top.js";
@@ -33,7 +33,7 @@ export async function GET(request) {
     const cached = cachedAudio(text);
     if (cached) return audioResponse(cached);
 
-    // Only a real ElevenLabs generation counts against the site's daily total.
+    // Only a real Azure generation counts against the site's daily total.
     const site = await rateLimit({ key: "listen:site", limit: SITE_DAILY_LIMIT, windowSec: DAY_SECONDS });
     if (!site.ok) return Response.json({ fallback: true, text });
 

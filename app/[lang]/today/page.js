@@ -3,8 +3,6 @@ import { db } from "../../../lib/db.js";
 import { settings } from "../../../lib/config.js";
 import { formatDay } from "../../../lib/format.js";
 import { topStories } from "../../../lib/top.js";
-import { listenEnabled } from "../../../lib/listen.js";
-import { ListenButton } from "../../listen-button.js";
 import { CopyTextButton } from "../../client.js";
 import { PageShell, SectionHead, Kicker, WhatsAppFollow, EmailSignup, storyUrl } from "../../components.js";
 
@@ -53,9 +51,6 @@ export default async function TodayPage() {
           </ol>
         ) : (
           <div className="empty">No stories yet today. Please check back soon.</div>
-        )}
-        {stories.length > 0 && listenEnabled() && (
-          <ListenButton count={stories.length} />
         )}
         {stories.length > 0 && (
           <a className="wa-share" href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer">

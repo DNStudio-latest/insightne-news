@@ -387,6 +387,7 @@ export function ListenBriefing({ items, lang = "en", texts }) {
   const run = useRef({ token: 0, pieces: [], index: 0, voice: null, english: null, langCode: "en-IN", utter: null, heard: false });
   const drag = useRef(null);
   const justDragged = useRef(false);
+  const audioRef = useRef(null); // the ElevenLabs audio, while it plays
 
   useEffect(() => {
     if (!("speechSynthesis" in window)) return;
@@ -401,6 +402,8 @@ export function ListenBriefing({ items, lang = "en", texts }) {
     return () => {
       run.current.token += 1;
       window.speechSynthesis.cancel();
+      if (audioRef.current) audioRef.current.pause();
+      audioRef.current = null;
     };
   }, []);
 
@@ -447,7 +450,32 @@ export function ListenBriefing({ items, lang = "en", texts }) {
     window.speechSynthesis.speak(u);
   }
 
+  // Titli (ElevenLabs) first, English only. If the audio is unavailable or the daily limit is reached,
+  // the device's own voice reads the same stories instead.
   function play(from = 0) {
+    if (from === 0 && lang === "en") return playAudio();
+    playDevice(from);
+  }
+
+  function playAudio() {
+    const audio = new Audio("/api/listen/today");
+    audioRef.current = audio;
+    const fail = () => {
+      if (audioRef.current !== audio) return;
+      audioRef.current = null;
+      playDevice(0);
+    };
+    audio.onended = () => {
+      if (audioRef.current !== audio) return;
+      audioRef.current = null;
+      setState("idle");
+    };
+    audio.onerror = fail;
+    setState("playing");
+    audio.play().catch(fail);
+  }
+
+  function playDevice(from = 0) {
     const synth = window.speechSynthesis;
     if (synth.speaking || synth.pending) synth.cancel();
     const r = run.current;
@@ -481,12 +509,24 @@ export function ListenBriefing({ items, lang = "en", texts }) {
     window.speechSynthesis.cancel();
   }
   function stop() {
+    if (audioRef.current) {
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     halt();
     setState("idle");
     setCurrent(-1);
     setTip(false);
   }
   const onTap = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      if (audio.paused) (audio.play().catch(() => {}), setState("playing"));
+      else (audio.pause(), setState("paused"));
+      return;
+    }
     if (state === "idle") play();
     else if (state === "playing") (halt(), setState("paused")); // pausing restarts the sentence later (phones' own pause is unreliable)
     else play(run.current.index);

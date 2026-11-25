@@ -1,0 +1,121 @@
+HINDI NARRATION SCRIPT: FULL DOCUMENTARY (with English caption text)
+Voice: ElevenLabs 'DN News' (cloned, Hindi), model eleven_v4. Each section generated separately.
+
+[F01]
+  HI: त्रिपुरा के एक छोटे-से इलाक़े से बॉलीवुड के बड़े पर्दे तक।
+  EN: From a small locality in Tripura to the big screen of Bollywood.
+  HI: सलमान ख़ान की फ़िल्म 'मातृभूमि' में अब त्रिपुरा की बेटी सौमी शैलेश की आवाज़ सुनाई दे रही है।
+  EN: Tripura's Soumee Sailesh can now be heard in Salman Khan's film Maatrubhumi.
+
+[F02]
+  HI: गीत का नाम है 'मदिरापन'।
+  EN: The song is called Madirapan.
+  HI: यह कहानी है खोवाई ज़िले के चेबरी की उस लड़की की, जो संगीत का सपना लेकर लगभग दो हज़ार किलोमीटर दूर मुंबई पहुँची।
+  EN: This is the story of a young woman from Chebri, Khowai, who took her dream of music to Mumbai, about 2,000 km away.
+
+[F03]
+  HI: सौमी शैलेश को संहिता देबनाथ के नाम से भी जाना जाता है।
+  EN: Soumee Sailesh is also known as Sanhita Debnath.
+  HI: उनका जन्म त्रिपुरा में हुआ और बचपन खोवाई ज़िले के चेबरी में बीता।
+  EN: She was born in Tripura and grew up in Chebri, in Khowai district.
+  HI: चेबरी, खोवाई शहर से कुछ किलोमीटर दूर बसा एक इलाक़ा है।
+  EN: Chebri lies a few kilometres from Khowai town.
+
+[F04]
+  HI: संगीत से उनका रिश्ता बचपन में ही जुड़ गया था।
+  EN: Her bond with music began in childhood.
+  HI: संगीत की पहली सीख उन्हें अपनी माँ से मिली।
+  EN: Her first lessons in music came from her mother.
+
+[F04b]
+  HI: खोवाई ज़िला दो हज़ार बारह में पश्चिम त्रिपुरा से अलग होकर बना था।
+  EN: Khowai district was carved out of West Tripura in 2012.
+  HI: इसकी उत्तरी सीमा बांग्लादेश से लगती है।
+  EN: Its northern edge is the international border with Bangladesh.
+
+[F05]
+  HI: इसके बाद उन्होंने शास्त्रीय संगीत के साथ-साथ संगीत की दूसरी विधाओं का भी प्रशिक्षण लिया।
+  EN: She then trained in classical music as well as other musical forms.
+  HI: आगे चलकर उन्होंने एस. डी. बर्मन कॉलेज से बैचलर ऑफ़ म्यूज़िक की डिग्री हासिल की।
+  EN: She later earned a Bachelor of Music degree from S.D. Barman College.
+
+[F06]
+  HI: हिंदी फ़िल्म संगीत से त्रिपुरा का रिश्ता पुराना है।
+  EN: Tripura's link with Hindi film music goes back a long way.
+  HI: महान संगीतकार सचिन देव बर्मन त्रिपुरा के राजपरिवार से थे।
+  EN: The celebrated composer Sachin Dev Burman belonged to Tripura's royal family.
+  HI: उसी धरती से निकली सौमी ने भी संगीत को ही अपना रास्ता चुना।
+  EN: Soumee, from the same land, also chose music as her path.
+
+[F07]
+  HI: साल दो हज़ार सत्रह में सौमी पेशेवर गायन में करियर बनाने के लिए मुंबई चली गईं।
+  EN: In 2017, Soumee moved to Mumbai to build a career as a professional singer.
+  HI: चेबरी से मुंबई की सीधी दूरी लगभग दो हज़ार किलोमीटर है।
+  EN: The straight-line distance from Chebri to Mumbai is about 2,000 km.
+
+[F08]
+  HI: मुंबई का संगीत उद्योग बड़ा है, लेकिन यहाँ मुक़ाबला भी उतना ही कड़ा है।
+  EN: Mumbai's music industry is big, and the competition is just as tough.
+  HI: देश भर से बड़ी संख्या में कलाकार यहाँ अपनी जगह बनाने आते हैं।
+  EN: Large numbers of artists from across India come here to find a place.
+  HI: इन चुनौतियों के बीच सौमी ने लगातार काम किया।
+  EN: Amid these challenges, Soumee kept working.
+  HI: उन्होंने टेलीविज़न धारावाहिकों, म्यूज़िक एल्बमों, फ़िल्मों, विज्ञापनों और लाइव कार्यक्रमों में काम किया।
+  EN: She worked on television series, music albums, films, advertisements and live shows.
+
+[F09]
+  HI: और फिर उन्हें एक बड़ा अवसर मिला।
+  EN: Then came a major opportunity.
+  HI: सलमान ख़ान अभिनीत फ़िल्म 'मातृभूमि' के गीत 'मदिरापन' में सौमी शैलेश ने पार्श्वगायन किया है।
+  EN: Soumee Sailesh has sung playback on Madirapan, a song from the Salman Khan-starrer Maatrubhumi.
+
+[F09b]
+  HI: हिंदी फ़िल्मों में गीत पार्श्वगायक रिकॉर्ड करते हैं, और पर्दे पर कलाकार उन पर अभिनय करते हैं।
+  EN: In Hindi films, playback singers record the songs, and actors perform them on screen.
+  HI: इसलिए गीत के दृश्यों में सौमी नहीं, बल्कि फ़िल्म के कलाकार दिखाई देते हैं।
+  EN: So the song's visuals show the film's actors, not Soumee.
+
+[F10]
+  HI: इस गीत का संगीत हिमेश रेशमिया ने दिया है और बोल समीर अनजान ने लिखे हैं।
+  EN: The song's music is by Himesh Reshammiya, and the lyrics are by Sameer Anjaan.
+  HI: गीत के आधिकारिक वीडियो में गायकों के रूप में जावेद अली, मोहम्मद दानिश और सौमी शैलेश के नाम दिए गए हैं।
+  EN: The official video credits Javed Ali, Mohd Danish and Soumee Sailesh as its singers.
+
+[F11]
+  HI: किसी बड़े बैनर की फ़िल्म में गाने का मौक़ा किसी भी उभरते गायक के लिए अहम माना जाता है।
+  EN: A chance to sing in a major banner's film is seen as important for any emerging singer.
+  HI: सौमी के लिए भी यह उनके संगीत सफ़र का एक अहम पड़ाव है।
+  EN: For Soumee, it is an important milestone in her musical journey.
+
+[F12]
+  HI: आगे की राह को लेकर सौमी के सपने बड़े हैं।
+  EN: Soumee has big dreams for the road ahead.
+  HI: वह एक स्थापित पार्श्वगायिका के रूप में अपनी पहचान बनाना चाहती हैं।
+  EN: She wants to establish herself as a recognised playback singer.
+  HI: वह रोमांटिक, रूहानी, भावनात्मक, रॉक और समकालीन संगीत में भी अपनी आवाज़ आज़माना चाहती हैं।
+  EN: She wants to try her voice in romantic, soulful, emotional, rock and contemporary music.
+
+[F13]
+  HI: उनका एक बड़ा सपना है, संगीतकार ए. आर. रहमान के साथ काम करना।
+  EN: One of her big dreams is to work with composer A.R. Rahman.
+  HI: और अगले पाँच वर्षों में वह संगीत की दुनिया में अपनी एक अलग पहचान बनाना चाहती हैं।
+  EN: Within the next five years, she wants to build a distinct identity in music.
+
+[F14]
+  HI: संगीत की राह चुनने वाले युवाओं के लिए उनका संदेश साफ़ है।
+  EN: Her message to young people choosing music is clear.
+  HI: अपने सपनों पर भरोसा रखें, लगातार अभ्यास करें और धैर्य रखें।
+  EN: Believe in your dreams, practise consistently and be patient.
+  HI: अस्वीकार या असफलता से डरें नहीं।
+  EN: Do not be afraid of rejection or failure.
+
+[F15]
+  HI: मुंबई में रहते हुए भी सौमी का अपनी जन्मभूमि त्रिपुरा से गहरा भावनात्मक रिश्ता है।
+  EN: Though she lives in Mumbai, Soumee has a deep emotional bond with Tripura, where she was born.
+
+[F16]
+  HI: त्रिपुरा के एक छोटे-से इलाक़े से शुरू हुआ संगीत का यह सफ़र आज बॉलीवुड की एक फ़िल्म के संगीत तक पहुँच गया है।
+  EN: A musical journey that began in a small locality of Tripura has now reached the music of a Bollywood film.
+  HI: चेबरी से बॉलीवुड तक, सौमी शैलेश का सफ़र अभी जारी है।
+  EN: From Chebri to Bollywood, Soumee Sailesh's journey continues.
+

@@ -1,0 +1,45 @@
+INTERVIEW TRANSCRIPT: Soumee Sailesh (self-recorded selfie video, 65 s, Bengali)
+Source: 01_SOURCE_MEDIA/INTERVIEW/interview_selfie_vertical.mov
+
+METHOD AND LIMITS: Transcribed with Whisper large-v3 (several passes, incl. short windows), then cleaned by hand.
+Some words were unclear to the machine (marked [check]). A Bengali-speaking editor must check this
+transcript and the English translation against the recording before publication.
+
+[B1] 00:00.30 - 00:05.95
+Bengali: নমস্কার, আমি সৌমী শৈলেশ। আমি ত্রিপুরার খোয়াইয়ের মেয়ে। ত্রিপুরার মাটিতেই আমার জন্ম আর বেড়ে ওঠা।
+English: Namaskar, I am Soumee Sailesh. I am a girl from Khowai, Tripura. I was born and raised on Tripura's soil.
+[check] 'খোয়াইয়ের মেয়ে' (a girl from Khowai): partly unclear in the recording.
+
+[B2] 00:06.35 - 00:13.45
+Bengali: ছোটবেলা থেকেই গান ছিল আমার ড্রিম আর প্যাশন, আর নিজের মনোভাব, ইমোশন প্রকাশ করার একটা সুন্দর মাধ্যম।
+English: Since childhood, music has been my dream and my passion, and a beautiful way to express my feelings and emotions.
+
+[B3] 00:13.55 - 00:21.35
+Bengali: সেই ড্রিমকে নিয়ে একদিন চলে গেলাম মুম্বইতে। জার্নিটা খুব ইজি ছিল না, কিন্তু নিজের ড্রিম আর মিউজিকের প্রতি বিশ্বাস কখনও হারাইনি।
+English: One day, I left for Mumbai with that dream. The journey was not easy, but I never lost faith in my dream and in music.
+
+[B4] 00:21.60 - 00:36.00
+Bengali: আজ আমার কণ্ঠে বলিউডের মেগাস্টার সলমন খান স্যারের ফিল্ম মাতৃভূমি, ওই ফিল্মে আমার গান মদিরাপন রিলিজ হয়েছে। এটা আমার জন্য একটা অনেক স্পেশাল মোমেন্ট। এই গানের কম্পোজার হিমেশ রেশমিয়া স্যার এবং লিরিসিস্ট সমীর অনজান স্যার।
+English: Today, my song in Bollywood megastar Salman Khan sir's film Maatrubhumi, Madirapan, sung in my voice, has been released. This is a very special moment for me. The song's composer is Himesh Reshammiya sir, and the lyricist is Sameer Anjaan sir.
+
+[B5] 00:36.00 - 00:46.20
+Bengali: ত্রিপুরা থেকে মুম্বই আসা আর সেখান থেকে বলিউডের জার্নি, এটা আমার জন্য জাস্ট একটা অ্যাচিভমেন্ট নয়। এটা আমার বহু বছরের ড্রিম, হার্ডওয়ার্ক আর পেশেন্সের একটা রেজাল্ট।
+English: Coming from Tripura to Mumbai, and from there the journey to Bollywood, is not just an achievement for me. It is the result of many years of dreams, hard work and patience.
+[check] 'পেশেন্স' heard as patience; could also be 'passion'. English uses 'patience'.
+
+[B6] 00:46.40 - 00:53.00
+Bengali: যারা সবসময় আমার পাশে থেকেছেন, আমাকে সাপোর্ট করেছেন, আমার গানকে ভালোবেসেছেন, তাদের কাছে আমি অনেক কৃতজ্ঞ।
+English: To everyone who has always stood by me and supported me, and loved my songs, I am very grateful.
+
+[B7] 00:53.10 - 00:59.00
+Bengali: এটা শুধু একটা বিগিনিং, আমার ড্রিম অনেক বড়। আর মিউজিকের সাথে জার্নি আরও অনেকটা বাকি।
+English: This is only the beginning. My dreams are big. And my journey with music still has a long way to go.
+[check] second sentence partly unclear: 'মিউজিকের সাথে জার্নি আরও অনেকটা বাকি'.
+
+[B8] 00:59.00 - 01:04.95
+Bengali: আশা করি আগামী দিনেও আমার এই জার্নিতে আপনারা সবসময় আমার পাশে থাকবেন। থ্যাঙ্ক ইউ।
+English: I hope that in the days ahead, too, you will always stand by me on this journey. Thank you.
+
+NOT IN THE INTERVIEW: A.R. Rahman, her mother, music genres, advice to young singers, working with
+Himesh Reshammiya. These points come from the editorial brief and are used only in attributed narration,
+never as quotations.

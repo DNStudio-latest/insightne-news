@@ -1,0 +1,29 @@
+HINDI NARRATION SCRIPT: SHORT 16:9 (with English caption text)
+Voice: ElevenLabs 'DN News' (cloned, Hindi), model eleven_v4. Each section generated separately.
+
+[H01]
+  HI: त्रिपुरा से बॉलीवुड तक!
+  EN: From Tripura to Bollywood.
+  HI: सलमान ख़ान की फ़िल्म 'मातृभूमि' में त्रिपुरा की सौमी शैलेश को पार्श्वगायन का मौक़ा मिला है।
+  EN: Tripura's Soumee Sailesh has sung playback in Salman Khan's film Maatrubhumi.
+
+[H02]
+  HI: खोवाई ज़िले के चेबरी की सौमी को संहिता देबनाथ के नाम से भी जाना जाता है।
+  EN: Soumee, from Chebri in Khowai district, is also known as Sanhita Debnath.
+  HI: माँ से संगीत की पहली सीख लेने वाली सौमी, दो हज़ार सत्रह में अपना सपना लेकर मुंबई पहुँचीं।
+  EN: She learnt music first from her mother, and moved to Mumbai in 2017 to follow her dream.
+
+[H03]
+  HI: अब उन्होंने फ़िल्म के गीत 'मदिरापन' में अपनी आवाज़ दी है।
+  EN: She has now sung on the film's song, Madirapan.
+  HI: संगीत हिमेश रेशमिया का है और बोल समीर अनजान के।
+  EN: The music is by Himesh Reshammiya and the lyrics by Sameer Anjaan.
+  HI: जावेद अली और मोहम्मद दानिश भी इस गीत के गायक हैं।
+  EN: Javed Ali and Mohd Danish are also among the song's singers.
+
+[H04]
+  HI: सौमी का सपना है एक स्थापित पार्श्वगायिका बनना और ए. आर. रहमान के साथ काम करना।
+  EN: Soumee dreams of becoming an established playback singer and working with A.R. Rahman.
+  HI: चेबरी से बॉलीवुड तक, उनका सफ़र अभी जारी है।
+  EN: From Chebri to Bollywood, her journey continues.
+

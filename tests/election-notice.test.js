@@ -32,7 +32,7 @@ test("election schedules, press notes and the model code are always news; forms 
   assert.equal(notice("Schedule of General Election to the Urban Local Bodies 2026"), true);
   assert.equal(notice("Prees Note on Declaration of Election Schedule"), true);
   assert.equal(notice("Model Code of Conduct (MCC) in connection with General Election"), true);
-  // every phone-alerted election notice is drafted; the "election" flag keeps it out of auto-publishing
+  // every phone-alerted election notice is drafted; the "election" flag only marks it (see the auto-publish test below)
   assert.equal(notice("Nomination Form (Form-2) in connection with General Election"), true);
   assert.equal(notice("List of Final Polling Stations in connection with General Election"), true);
   assert.equal(notice("ARO Notification for General Election"), true);
@@ -41,10 +41,19 @@ test("election schedules, press notes and the model code are always news; forms 
   assert.equal(isElectionNotice({ source_name: "CMO Tripura", title: "Schedule of visits", url: "" }), false);
 });
 
-test("an election notice draft is never auto-published, even with a high score", () => {
+test("an election draft follows the normal auto-publish rule, with a score of at least 8; other flags still hold it", () => {
+  const rules = { enabled: true, minScore: 7 };
   const draft = { headline: "Sector officers named", body: "The letter lists sector officers.", flags: ["election"], score: 9 };
-  assert.equal(autoPublishCheck(draft, { enabled: true, minScore: 7 }).ok, false);
-  assert.equal(autoPublishCheck({ ...draft, flags: [] }, { enabled: true, minScore: 7 }).ok, true);
+  assert.equal(autoPublishCheck(draft, rules).ok, true);
+  assert.equal(autoPublishCheck({ ...draft, score: 8 }, rules).ok, true);
+  // a non-election draft is still allowed from the general minimum (7), an election draft is not
+  assert.equal(autoPublishCheck({ ...draft, flags: [], score: 7 }, rules).ok, true);
+  assert.match(autoPublishCheck({ ...draft, score: 7 }, rules).reason, /below 8/);
+  // sensitive, [CHECK] notes, video and scanned sources still wait for the editor
+  assert.match(autoPublishCheck({ ...draft, flags: ["election", "sensitive"] }, rules).reason, /flagged: sensitive/);
+  assert.match(autoPublishCheck({ ...draft, body: "Reply not heard [CHECK: other side not heard]" }, rules).reason, /CHECK/);
+  assert.equal(autoPublishCheck({ ...draft, sources: [{ kind: "video" }] }, rules).ok, false);
+  assert.equal(autoPublishCheck(draft, { enabled: false }).ok, false);
 });
 
 test("an election press note from the police or a department counts as election news; ordinary notices do not", () => {

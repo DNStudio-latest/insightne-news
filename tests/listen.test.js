@@ -21,8 +21,7 @@ test("long scripts are cut at a sentence end and stay under the limit", () => {
   assert.ok(text.endsWith("."));
 });
 
-test("listening stays off without the Azure key and region", () => {
-  delete process.env.AZURE_SPEECH_KEY;
-  delete process.env.AZURE_SPEECH_REGION;
+test("listening stays off without a voice ID and API key", () => {
+  delete process.env.ELEVENLABS_API_KEY;
   assert.equal(listenEnabled(), false);
 });

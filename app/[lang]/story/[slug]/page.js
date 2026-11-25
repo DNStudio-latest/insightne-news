@@ -13,6 +13,7 @@ import { initLang, lang, pick, tr, isTranslated, href } from "../../../../lib/la
 import { alternatesFor, noindexUnlessTranslated } from "../../../../lib/seo.js";
 import { storyText } from "../../../../lib/languages.js";
 import { searchTitle, searchDescription } from "../../../../lib/seo-text.js";
+import { quickFacts } from "../../../../lib/quick-facts.js";
 import { WhatsAppFollow, EmailSignup, PageShell, Kicker, Byline, ShareButtons, StoryGrid, SectionHead, storyUrl, absoluteUrl } from "../../../components.js";
 
 // The website keeps each story page ready for a minute at a time (publishing or editing refreshes it at once).
@@ -69,6 +70,8 @@ export default async function StoryPage({ params }) {
   const picture = pictureOf(story);
   const proof = proofShotOf(story);
   const gallery = photoGallery(story);
+  // A short box of facts already stored with the story, near the top of original reports (nothing is written for it).
+  const facts = isOriginal ? quickFacts(story, { sources, byline: bylineName(story.author), when: formatDate(story.published_at) }) : [];
 
   // Tells Google this is a news article (helps search and Google News).
   const jsonLd = {
@@ -123,6 +126,20 @@ export default async function StoryPage({ params }) {
               </figcaption>
             )}
           </figure>
+        )}
+
+        {isOriginal && blocks.length > 0 && facts.length > 0 && (
+          <aside className="quick-facts" aria-label={tr("Quick facts")}>
+            <h2>{tr("Quick facts")}</h2>
+            <dl>
+              {facts.map((f) => (
+                <div key={f.label}>
+                  <dt>{tr(f.label)}</dt>
+                  <dd>{f.translate ? tr(f.value) : f.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </aside>
         )}
 
         {blocks.length > 0 && (

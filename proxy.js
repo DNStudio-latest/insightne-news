@@ -4,6 +4,7 @@
 // The rules are in lib/lang-routing.js.
 import { NextResponse } from "next/server";
 import { routeForLanguage } from "./lib/lang-routing.js";
+import { wwwRedirectTarget } from "./lib/canonical-host.js";
 
 export const config = {
   // Everything except the private approval pages, scripts, files with an extension (images, sitemaps, feeds),
@@ -12,6 +13,9 @@ export const config = {
 };
 
 export function proxy(request) {
+  // The plain address (insightnenews.in) is sent to the one real address (www.insightnenews.in).
+  const www = wwwRedirectTarget(request.headers.get("x-forwarded-host") || request.headers.get("host"), request.nextUrl.pathname, request.nextUrl.search);
+  if (www) return NextResponse.redirect(www, 301);
   const decision = routeForLanguage({
     pathname: request.nextUrl.pathname,
     savedLang: request.cookies.get("lang")?.value,

@@ -25,7 +25,10 @@ export async function generateMetadata({ params }) {
     ...siteMetadata,
     openGraph: { ...siteMetadata.openGraph, locale: OG_LOCALE[lang] || "en_IN" },
     // Languages whose machine translations have not been reviewed stay readable but out of search results.
-    ...(INDEXED_LANGUAGES.includes(lang) ? {} : { robots: { index: false, follow: true } }),
+    // Indexed languages also allow big preview pictures and full snippets: Google Discover only shows a story with a large image.
+    robots: INDEXED_LANGUAGES.includes(lang)
+      ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } }
+      : { index: false, follow: true },
   };
 }
 

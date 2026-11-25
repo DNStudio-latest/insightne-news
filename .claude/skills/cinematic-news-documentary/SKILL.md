@@ -5,6 +5,8 @@ description: Produce an InsightNE human-interest documentary news feature (full 
 
 # Cinematic news documentary (InsightNE)
 
+**Read `reference.md` in this folder first.** It holds everything the owner taught in the first project, including repeated requests, spending rules and review lessons.
+
 Worked example and code: `docs/soumee-sailesh-documentary/` (code in `code/`, lessons in `notes/reel_lessons.md`).
 The owner is a journalist: plain English, accurate facts, no hype.
 
@@ -31,7 +33,7 @@ The owner is a journalist: plain English, accurate facts, no hype.
 7. Mix: narration clear, interview natural, music ducked under speech, loudness about -14 LUFS, true peak under -1 dB.
 8. Captions: English, sentence case, no overlaps, at most 21 characters per second, at most 2 lines, inside platform safe areas.
 9. Quality control before delivery: duration and resolution with ffprobe, black and frozen frame detection, loudness, lip sync check against the source, contact sheets read frame by frame, caption checks. Say plainly that a person must still watch each file once with sound.
-10. Deliver: three videos, SRT files, Hindi scripts, interview transcript, thumbnails (her own portraits, not film stills), full social copy (YouTube, Facebook, Instagram, with complete credits and placeholders for unknown names), editorial notes, copyright review, export report, asset inventory.
+10. Deliver (without waiting to be asked; see reference.md section 3): three videos, SRT files, Hindi scripts, interview transcript, thumbnails (her own portraits, not film stills), full social copy (YouTube, Facebook, Instagram, with complete credits and placeholders for unknown names), editorial notes, copyright review, export report, asset inventory.
 
 ## Platform notes
 - Post the vertical to Instagram Reels, YouTube Shorts and Facebook Reels. Keep 16:9 for YouTube and the Facebook feed. (A reviewed Reel was the 16:9 short by mistake; label files clearly.)

@@ -59,3 +59,11 @@ Do not copy from the review: invented drama ("no contacts in Mumbai"), "her sing
 - This repository deploys the website from `main` to Vercel. Work on a branch, commit text and code only, open a pull request, merge only when the owner says to publish.
 - Never commit videos, film clips, photos, audio or large map data to this repository. Keep media in Google Drive or on the production computer.
 - Documentary records for the first project are in `docs/soumee-sailesh-documentary/`.
+
+## 9. YouTube review lessons (full documentary, 25 Nov 2026)
+Details in `docs/soumee-sailesh-documentary/notes/youtube_review_lessons.md`.
+- A reviewer may be reading the description, not watching the film (it said 6 minutes for a 7:03 video). Check its claims before acting.
+- Ask the subject early: which part she sang, how she was chosen. A breakthrough story needs it; never guess.
+- Narration flatness was raised in two reviews: plan expressive narration, especially the ending; estimate credits first and tell the owner.
+- Plan a second voice (teacher, parent, fellow musician), more music-making visuals and a "what next" ending.
+- Fill every credit placeholder before posting; check the live description for leftover brackets.

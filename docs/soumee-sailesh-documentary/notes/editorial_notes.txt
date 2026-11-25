@@ -1,0 +1,94 @@
+EDITORIAL NOTES: Soumee Sailesh documentary (InsightNE)
+Prepared 22 November 2026
+
+1. ITEMS THAT NEED AN EDITOR'S DECISION BEFORE PUBLICATION
+
+1.1 Singers credit differs from the brief
+    The brief lists Javed Ali as the male playback singer. The official song video
+    (supplied clip, about 36-40 s) credits three singers: JAVED ALI, MOHD DANISH,
+    SOUMEE SAILESH. All three videos follow the official credit ("Singers: Javed Ali,
+    Mohd Danish, Soumee Sailesh", marked "as credited in the official song video").
+    The narration says the official video names these three. Nothing claims she is
+    the lead or only singer.
+
+1.2 College name
+    The brief says "S.D. Barman College". The college's official name appears to be
+    Sachin Deb Barman Memorial Government Music College, Agartala (sdmgovtmusiccollege.in).
+    The video keeps the brief's wording ("S.D. Barman College") and the card adds only
+    "Tripura". Please confirm the full name with Soumee and change the card if needed.
+    Listings also differ on whether the degree is called B.Mus or B.A. (Music); the
+    video uses "Bachelor of Music (B.Mus)" as supplied.
+
+1.3 Constituency
+    The brief gives "Kalyanpur". The assembly constituency is officially named
+    Kalyanpur-Pramodenagar. Because this could not be confirmed for Chebri, the
+    constituency is NOT mentioned in the videos.
+
+1.4 "Released"
+    In the interview Soumee says the song "has been released" in the film. This is in
+    her words (captioned). The narration does not state a release date or the film's
+    release status.
+
+1.5 Interview translation
+    The interview is in Bengali (not Hindi). The transcript was made with Whisper
+    large-v3 and corrected by hand; three places are marked [check] in
+    02_TRANSCRIPTS/interview_transcript.txt (Khowai phrase in B1, "patience" vs
+    "passion" in B5, end of B7). A Bengali-speaking editor should confirm the English
+    captions against the recording.
+
+1.6 What is NOT in her interview
+    The interview does not mention A.R. Rahman, her mother, music genres, a five-year
+    goal, advice to young singers, or working with Himesh Reshammiya. These points come
+    from the brief and appear only as attributed narration and plain info cards (no
+    quotation marks). Quotation graphics use only her actual (translated) words.
+
+1.7 Which vocal is hers
+    The song clips do not let us isolate Soumee's voice from the other singers. The
+    song excerpts are labelled as the song, not as "her voice".
+
+2. FACTS ADDED BEYOND THE BRIEF (all checked)
+    - Chebri is a few kilometres from Khowai town (about 11 km: villageinfo.in /
+      Census 2011 village code 271915).
+    - Khowai district was carved out of West Tripura in January 2012; its northern edge
+      is the international border with Bangladesh (khowai.nic.in; Wikipedia).
+    - Sachin Dev Burman (1906-1975) belonged to Tripura's royal family; his son Rahul Dev
+      Burman (1939-1994) became a major name in Hindi film music.
+    - Straight-line distance Chebri/Khowai to Mumbai: 2,012 km great-circle from Khowai
+      town (24.065 N, 91.605 E) to Mumbai (19.076 N, 72.878 E); Chebri is about 11 km
+      away, so it is shown as "about 2,000 km", labelled as aerial, not road or travel
+      distance.
+    - A narration line explains playback singing, so viewers do not take the film's
+      actors in the song footage for Soumee.
+
+3. NARRATION AND LANGUAGE
+    - Voice: ElevenLabs cloned voice "DN News" (Hindi), model eleven_v4. Each section
+      generated separately, two takes each; the better take chosen after automatic
+      back-transcription (Whisper) and level checks. Scores 0.87-0.99 (lower scores are
+      only ASR writing English words/numbers in Latin script).
+    - "पार्श्वगायन/पार्श्वगायिका" was slurred in the first takes (heard as "पाशु/पार्शु"); those
+      five sections were rewritten with "प्लेबैक सिंगर / प्लेबैक सिंगिंग" and regenerated.
+      Rejected takes are kept in 03_VOICEOVER/rejected_takes/.
+    - Numbers were written as words for the voice ("दो हज़ार सत्रह", "दो हज़ार किलोमीटर").
+    - A human listen-through of the narration is still recommended (automatic checks
+      cannot judge tone fully).
+    - The end card discloses that the narration is an AI voice and that the score is
+      AI-generated.
+
+4. MISSING MATERIAL (handled with original graphics)
+    - No footage of Tripura, Chebri or Khowai, no Mumbai skyline or studio footage, no
+      childhood or family photographs, and no stock footage library was available here.
+      Instead: an accurate animated map (India, Tripura, Chebri/Khowai, Mumbai), the
+      three supplied portraits, her interview, and designed information cards.
+      Nothing is presented as her childhood or her personal places.
+    - If InsightNE can supply real Chebri/Khowai footage, Chapters 2 and 6 would gain
+      most from it; the build is reproducible and scenes can be swapped.
+
+5. STRUCTURE (full documentary, 7:03)
+    Ch 1 Hook (map, portrait, song teaser, poster, title)
+    Ch 2 Roots and musical foundation (interview, Chebri locator map, Khowai district,
+         education cards, S.D. Burman and R.D. Burman context)
+    Ch 3 Journey to Mumbai (signature map sequence, interview, career timeline)
+    Ch 4 Bollywood breakthrough (poster, playback explanation, credits sequence,
+         "Playback vocals" card, song excerpt, interview, official singers credit)
+    Ch 5 Dreams and message (ambitions card, interview quote, message card)
+    Ch 6 A daughter of Tripura (narration, interview, montage, closing titles, end card)

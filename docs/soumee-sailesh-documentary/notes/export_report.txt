@@ -1,0 +1,72 @@
+EXPORT AND QUALITY-CONTROL REPORT: Soumee Sailesh documentary (InsightNE)
+Prepared 22 November 2026
+
+1. DELIVERABLES (08_FINAL_EXPORTS)
+File                     Duration          Resolution   Aspect  FPS  Video / audio                 Loudness / true peak
+SOUMEE_FULL_16X9.mp4     7:03.48 (423.5s)  1920x1080    16:9    25   H.264 High, AAC 192k 48 kHz   -14.1 LUFS / -1.3 dBTP
+SOUMEE_SHORT_16X9.mp4    1:17.92 (77.9s)   1920x1080    16:9    25   H.264 High, AAC 192k 48 kHz   -14.2 LUFS / -1.4 dBTP
+SOUMEE_SHORT_9X16.mp4    0:53.44 (53.4s)   1080x1920    9:16    25   H.264 High, AAC 192k 48 kHz   -14.1 LUFS / -1.3 dBTP
+Targets met: full 7-9 min; short 60-90 s; vertical under 60 s (target 50-55 s), checked with ffprobe.
+Frame rate: 25 fps as preferred (source clips were 24 fps).
+
+2. NARRATION
+Voice: ElevenLabs cloned voice "DN News" (Hindi), model eleven_v4; found in the account and used as asked.
+Full: 19 separately generated sections (F01-F16 plus F04b, F06b, F09b). Short 16:9: 4 sections (H01-H04).
+Vertical: no voice-over (original interview audio, song audio, English captions), as asked.
+Pronunciation test of all proper nouns passed (back-transcription). Five sections were rewritten and
+regenerated because "पार्श्व..." was slurred (see editorial_notes.txt).
+
+3. INTERVIEW EXCERPTS (her own Bengali voice, English captions)
+Full: 8 excerpts (all 65 s of the interview, in story order across chapters).
+Short 16:9: 2 excerpts. Vertical: 4 excerpts.
+
+4. MOTION GRAPHICS CREATED (all original, rendered from code)
+- Tripura-to-Mumbai map sequence (India, Tripura highlight, zoom to Chebri/Khowai, route arc,
+  Mumbai, distance badge "about 2,000 km, approximate straight-line distance") in 16:9 long,
+  16:9 short and 9:16 versions, plus an opening Tripura push-in and a Chebri locator map.
+- Opening and closing cinematic titles; six chapter slates.
+- Lower thirds; "also known as" and place labels; animated quotation panels (her words only).
+- Education card and B.Mus card; S.D. Burman / R.D. Burman context card.
+- Career timeline (2017 / professional work / Bollywood opportunity).
+- Film and song title sequence (Maatrubhumi, Madirapan, music, lyrics, singers as credited).
+- "Playback vocals: Soumee Sailesh" card; ambitions card; message-to-young-singers card.
+- Animated waveforms; InsightNE channel logo; end card with AI and source disclosures.
+
+5. QUALITY CONTROL CARRIED OUT
+- Black frames (blackdetect) and frozen frames (freezedetect, 3 s): none in all three files
+  (an earlier pass found graphic cards holding still; slow drift was added and the cards re-rendered).
+- Loudness and true peak (EBU R128): see table; no clipping.
+- Lip sync: audio of every interview excerpt cross-correlated with the source recording: constant
+  25 ms (AAC encoder delay), within the EBU R37 tolerance; video frames match the source within one
+  frame at every interview scene.
+- Captions: 69 (full), 16 (short), 14 (vertical); no overlaps; minimum 0.9 s on screen; reading
+  speed 21 characters a second or less; at most 2 lines; vertical captions placed above the
+  platform interface areas.
+- Visual review: contact sheets at one frame every 2 s (full) and every 1 s (shorts) were checked
+  for layout, safe areas, text, and correct sources. This is an automated and still-frame review, not a
+  person watching in real time; please watch each file once, with sound, before publishing.
+- Narration: each take transcribed back to Hindi and scored against the script (0.87-0.99).
+
+6. MISSING ASSETS
+- No Tripura, Chebri or Khowai footage; no Mumbai, studio or stock footage; no childhood or family
+  photographs. Replaced by the map sequences, portraits, interview and information cards.
+  Nothing is presented as her personal places or childhood.
+
+7. MATERIAL NEEDING CLEARANCE (details in copyright_review.txt)
+- Official "Madirapan" song video (Salman Khan Films Music): about 27 s of picture in the full
+  documentary, about 8 s in the short and about 4 s in the vertical, plus song audio.
+- Promotional vertical video of unconfirmed origin (film footage and poster).
+- Portrait photographs: confirm photographer credits; interview: confirm consent on file.
+- ElevenLabs voice and music: check that the account plan covers commercial use.
+
+8. EDITORIAL ITEMS TO CONFIRM (details in editorial_notes.txt)
+- Singers credit: the official video credits Javed Ali, Mohd Danish and Soumee Sailesh (brief: Javed Ali only).
+- College's full official name; constituency not used; interview translation to be checked by a
+  Bengali speaker (three places marked).
+
+9. TECHNICAL LIMITATIONS
+- Built with Python (Pillow, numpy), FFmpeg and libass in a cloud container; no After Effects or
+  Remotion. The build is reproducible: see 06_PROJECT_FILES/README.md.
+- Upscaling: the interview (576x1024) and the official clip (1056x560) are lower than 1080p, so
+  these shots are slightly soft in the final files.
+- The cloud container is temporary: download the files (or copy them to Drive) to keep them.

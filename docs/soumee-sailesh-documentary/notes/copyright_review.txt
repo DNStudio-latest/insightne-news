@@ -1,0 +1,51 @@
+COPYRIGHT REVIEW: Soumee Sailesh documentary (InsightNE)
+Prepared 22 November 2026. This is a production note, not legal advice.
+
+1. THIRD-PARTY MATERIAL USED
+
+A. Official song video excerpt, "Madirapan" (Maatrubhumi), Salman Khan Films Music
+   File: 01_SOURCE_MEDIA/FILM_CLIPS/madirapan_official_song_excerpt_16x9.mov
+   - Full documentary: about 27 s of picture in five pieces (teaser 4.2 s, composer
+     credit under narration 7.5 s, song excerpt 8.4 s, singers credit 5.2 s, blurred
+     backdrop behind the credits title). Song audio is heard for about 25 s, partly
+     under narration.
+   - Short 16:9: about 8.4 s (teaser 3.4 s, singers credit 5.0 s), plus blurred backdrop.
+   - Vertical: about 4.4 s (singers credit) plus the song audio under the credits card
+     (6.4 s) and blurred backdrop.
+   - The SKF logo, YouTube/Instagram/Facebook handles and on-screen credits are kept.
+     Nothing is cropped out to hide ownership (the vertical crop keeps the SKF logo).
+   - Labelled on screen: "COURTESY: SALMAN KHAN FILMS MUSIC · OFFICIAL SONG VIDEO".
+
+B. Promotional vertical video (film footage with the song poster)
+   File: 01_SOURCE_MEDIA/FILM_CLIPS/madirapan_promo_vertical.mov
+   - Publisher not confirmed. Full: poster 2 x about 3.3 s, film part 14 s under the
+     playback-singing narration; short: none; vertical: 3 s hook with song audio.
+   - Labelled "COURTESY: MADIRAPAN PROMOTIONAL VIDEO".
+
+2. ASSESSMENT
+   - Indian Copyright Act, 1957, s.52(1)(a)(iii) and s.52(1)(b) allow fair dealing for
+     reporting current events. Short excerpts used to report on a local singer's credit,
+     with attribution, are the kind of use these provisions cover, but the exception is
+     decided case by case. It is NOT automatic, and platforms (YouTube Content ID,
+     Facebook Rights Manager) may still claim, block or demonetise the videos.
+   - The footage is never presented as InsightNE's, never altered to suggest that any
+     actor endorses Soumee, and the story is about her credit, not the film's promotion.
+   - Before publishing, please either (a) get written permission from Salman Khan Films /
+     the music label (Soumee or the music team may be able to help), or (b) have the
+     editor approve the fair-dealing use. If neither is possible, see section 4.
+
+3. MATERIAL THAT IS ORIGINAL OR CLEARED
+   - Interview and three portraits: supplied for this story (confirm the subject's consent
+     and the photographers' credits in writing).
+   - Hindi narration: generated on InsightNE's ElevenLabs account (voice "DN News").
+   - Background score: generated with ElevenLabs Music on the same account; no vocals;
+     not modelled on any existing song. Check that the account plan allows commercial use.
+   - Sound effects: synthesised in this project.
+   - Map: drawn from Natural Earth (public domain), India point-of-view boundaries.
+   - Fonts: Inter (SIL Open Font License), DejaVu Serif (free licence).
+
+4. FALLBACK IF CLEARANCE IS REFUSED
+   - Every film-footage scene is a separate entry in 06_PROJECT_FILES/src/build.py.
+     Replace OfficialScene/PromoScene entries with the CreditsTitle or HeroCard graphics
+     and remove the matching tl.song(...) lines, then run the build again. The
+     narration and captions do not depend on the footage.

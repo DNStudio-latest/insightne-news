@@ -1,0 +1,39 @@
+# Weekly database backup on GitHub (backup option 2). Runs every Monday 03:00 India time, or by hand: Actions > "Backup database" > Run workflow.
+# The file is locked with the BACKUP_PASSPHRASE secret before it is saved, so even though this repository is public,
+# the saved file cannot be read without the passphrase. GitHub keeps it for 90 days.
+# Needs three repository secrets: SUPABASE_URL, SUPABASE_SECRET_KEY (already used by the News Hunter) and BACKUP_PASSPHRASE.
+name: Backup database
+
+on:
+  schedule:
+    - cron: "30 21 * * 0" # Sunday 21:30 UTC = Monday 03:00 India time
+  workflow_dispatch:
+
+concurrency:
+  group: backup-db
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Make the locked backup
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: node scripts/backup-db.js --out backup
+      - uses: actions/upload-artifact@v4
+        with:
+          name: insightne-db-backup
+          path: backup/*.enc
+          retention-days: 90
+          if-no-files-found: error

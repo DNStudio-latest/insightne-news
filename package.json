@@ -9,6 +9,7 @@
     "start": "next start",
     "collect": "node scripts/collect.js",
     "hunt": "node --env-file-if-exists=.env scripts/hunt.js",
+    "backup": "node --env-file-if-exists=.env.local scripts/backup-db.js",
     "test": "node --test tests/*.test.js",
     "refile-states": "node scripts/refile-states.js",
     "alert-keys": "node scripts/alert-keys.js",

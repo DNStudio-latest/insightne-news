@@ -195,3 +195,31 @@ test("auto-publish rules: only clean, high-scoring, non-sensitive drafts from we
   assert.equal(safeShot(good).proof, "a.webp");
   assert.equal(safeShot({ sources: [{ kind: "pdf", proof: "b.webp" }] }), null);
 });
+
+test("election watcher: a police site alerts only for election links; an election office alerts for any important link", async () => {
+  const { watchElections } = await import("../lib/hunter/watch.js");
+  const store = createLocalHunterStore(path.join(os.tmpdir(), `hunter-watch2-${Date.now()}.json`));
+  const config = {
+    sites: [
+      { enabled: true, watch: true, state: "Tripura", name: "Tripura Police", pages: ["https://police.example.gov.in/press_release"] },
+      { enabled: true, watch: true, state: "Tripura", name: "Tripura State Election Commission", kind: "Election office", pages: ["https://sec.example.gov.in/press-release"] },
+    ],
+  };
+  const mk = (url, links) => ({ ok: true, url, text: `<html><body><main>${links.map(([h, t]) => `<p><a href="${h}">${t}</a></p>`).join("")}</main></body></html>` });
+  const old = [["/f/a.pdf", "Old circular one 2025"], ["/f/b.pdf", "Old circular two 2025"], ["/f/c.pdf", "Old circular three 2025"]];
+  const alerts = [];
+  const alert = async (a) => alerts.push(a);
+  const pages = (extra) => async (u) => (u.includes("police") ? mk(u, [...old, ...extra.police]) : mk(u, [...old, ...extra.sec]));
+  await watchElections({ store, get: pages({ police: [], sec: [] }), config, alert, log: () => {} });
+  await watchElections({
+    store,
+    get: pages({
+      police: [["/f/d.pdf", "Press release: road safety week begins"], ["/f/e.pdf", "Press release: security plan for the Municipal Election"]],
+      sec: [["/f/g.pdf", "Press release: voter helpline numbers"]],
+    }),
+    config,
+    alert,
+    log: () => {},
+  });
+  assert.deepEqual(alerts.map((a) => a.title).sort(), ["Press release: security plan for the Municipal Election", "Press release: voter helpline numbers"]);
+});

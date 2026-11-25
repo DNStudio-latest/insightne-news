@@ -46,3 +46,11 @@ test("an election notice draft is never auto-published, even with a high score",
   assert.equal(autoPublishCheck(draft, { enabled: true, minScore: 7 }).ok, false);
   assert.equal(autoPublishCheck({ ...draft, flags: [] }, { enabled: true, minScore: 7 }).ok, true);
 });
+
+test("an election press note from the police or a department counts as election news; ordinary notices do not", () => {
+  const note = (source_name, title) => isElectionNotice({ source_name, title, url: "" });
+  assert.equal(note("Tripura Police", "Press release: security arrangements for the Municipal Election, 2026"), true);
+  assert.equal(note("Urban Development Department, Tripura (municipal bodies)", "Notice: Model Code of Conduct applies to all municipal bodies"), true);
+  assert.equal(note("Tripura Police", "Press release: road safety week begins"), false);
+  assert.equal(note("Tripura Police", "Candidate list of the sports quota"), false); // a topic word alone, no press note or notice words
+});

@@ -5,10 +5,10 @@
   "autoPublish": { "enabled": true, "minScore": 7, "perDay": 10 },
 
   "sites": [
-    { "enabled": true, "state": "Tripura", "name": "ICA Tripura", "kind": "Information department", "pages": ["https://ica.tripura.gov.in/press-release", "https://ica.tripura.gov.in/notifications", "https://ica.tripura.gov.in/orders", "https://ica.tripura.gov.in/circulars", "https://ica.tripura.gov.in/news"] },
+    { "enabled": true, "state": "Tripura", "watch": true, "name": "ICA Tripura", "kind": "Information department", "pages": ["https://ica.tripura.gov.in/press-release", "https://ica.tripura.gov.in/notifications", "https://ica.tripura.gov.in/orders", "https://ica.tripura.gov.in/circulars", "https://ica.tripura.gov.in/news"] },
     { "enabled": true, "state": "Tripura", "name": "ICA Tripura e-Sambad", "kind": "Daily government news bulletin", "pages": ["https://ica.tripura.gov.in/eSambad"] },
-    { "enabled": true, "state": "Tripura", "name": "Tripura Government portal", "kind": "State portal", "pages": ["https://tripura.gov.in", "https://tripura.gov.in/notifications"] },
-    { "enabled": true, "state": "Tripura", "name": "Lok Bhavan Tripura", "kind": "Governor's office", "pages": ["https://lokbhavan.tripura.gov.in", "https://lokbhavan.tripura.gov.in/press-release", "https://lokbhavan.tripura.gov.in/speeches"] },
+    { "enabled": true, "state": "Tripura", "watch": true, "name": "Tripura Government portal", "kind": "State portal", "pages": ["https://tripura.gov.in", "https://tripura.gov.in/notifications"] },
+    { "enabled": true, "state": "Tripura", "watch": true, "name": "Lok Bhavan Tripura", "kind": "Governor's office", "pages": ["https://lokbhavan.tripura.gov.in", "https://lokbhavan.tripura.gov.in/press-release", "https://lokbhavan.tripura.gov.in/speeches"] },
 
     { "enabled": true, "state": "Assam", "name": "DIPR Assam", "kind": "Information department", "pages": ["https://dipr.assam.gov.in/taxonomy/term/5836", "https://dipr.assam.gov.in/documents/notifications-0"] },
     { "enabled": true, "state": "Assam", "name": "Assam CMO", "kind": "Chief Minister's office", "pages": ["https://cm.assam.gov.in/updates/pressreleases", "https://cm.assam.gov.in/updates/news-articles", "https://cm.assam.gov.in/cm-s-speeches"] },
@@ -34,7 +34,7 @@
     { "_note": "Election offices. 'watch': true = also checked every 15 minutes by the election watcher (supabase/election-watch.sql), with a phone alert for new schedules and press notes." },
     { "enabled": true, "watch": true, "state": "Tripura", "name": "Chief Electoral Officer, Tripura", "kind": "Election office", "pages": ["https://ceotripura.nic.in/press-release", "https://ceotripura.nic.in/notification"] },
     { "enabled": true, "watch": true, "state": "Tripura", "name": "Tripura State Election Commission", "kind": "Election office", "pages": ["https://sec.tripura.gov.in/press-release", "https://sec.tripura.gov.in/notifications", "https://sec.tripura.gov.in/news"] },
-    { "enabled": true, "state": "Tripura", "name": "TTAADC (Tripura Tribal Areas Autonomous District Council)", "kind": "Autonomous district council", "pages": ["https://ttaadc.gov.in/press-release", "https://ttaadc.gov.in/new-notification-view"] },
+    { "enabled": true, "state": "Tripura", "watch": true, "name": "TTAADC (Tripura Tribal Areas Autonomous District Council)", "kind": "Autonomous district council", "pages": ["https://ttaadc.gov.in/press-release", "https://ttaadc.gov.in/new-notification-view"] },
     { "enabled": true, "state": "Tripura", "name": "Principal Accountant General (Audit) Tripura: TTAADC reports", "kind": "Audit reports", "pages": ["https://cag.gov.in/ag/tripura/en/page-ag-tripura-ttaadc-reports"] },
     { "enabled": true, "state": "Northeast", "name": "NECTAR (North East Centre for Technology Application and Reach, DST)", "kind": "Science and technology body for the Northeast", "pages": ["https://nectar.dst.gov.in/home/resources/conclave-and-conferences"] },
     { "enabled": true, "watch": true, "state": "Assam", "name": "Chief Electoral Officer, Assam", "kind": "Election office", "pages": ["https://ceoassam.nic.in/"] },

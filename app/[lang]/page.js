@@ -72,6 +72,11 @@ async function liveCounting() {
   try {
     for (const e of elections()) {
       const cfg = await electionConfig(db, e.slug);
+      // Polling day (7 am to 4 pm): the top panel shows the turnout figures typed in on /admin/results, before any counting.
+      if (cfg && pollingOpen(cfg)) {
+        const t = await loadTurnout(db, e.slug);
+        return { slug: e.slug, initial: { election: { slug: e.slug, title: cfg.title, polling: true }, snapshot: null, status: {}, turnout: { updates: t.updates.slice(-12).map(({ label, percent, note }) => ({ label, percent, note })), electors: cfg.polling?.electors || null, stations: cfg.polling?.stations || null, date: cfg.polling?.date || null } } };
+      }
       if (!isLive(cfg)) continue;
       const [snapshot, meta] = await Promise.all([loadSnapshot(db, e.slug), loadMeta(db, e.slug)]);
       if (!snapshot) continue;

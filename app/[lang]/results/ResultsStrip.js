@@ -53,7 +53,7 @@ export default function ResultsStrip({ initial, endpoint, href, rehearsal = fals
           {turnout.updates.length > 1 && <p className="rs-rest">Through the day: {turnout.updates.map((u) => `${u.label} ${u.percent}%`).join(" · ")}</p>}
         </div>
       )}
-      {!counting && !turnout?.updates?.length && <p className="rb-muted">Polling is under way ({turnout?.date || "today"}). Turnout figures will appear here as the State Election Commission announces them.</p>}
+      {!counting && !turnout?.updates?.length && <p className="rb-muted">{election.stage === "upcoming" ? `Polling starts at 7 am today (${turnout?.date || "polling day"}) and runs until 4 pm.` : election.stage === "closed" ? "Polling has closed for the day." : `Polling is under way (${turnout?.date || "today"}).`} Turnout figures will appear here as the State Election Commission announces them.</p>}
       {counting && <div className="rb-bar"><div style={{ width: `${pctDone}%` }} /></div>}
       {!counting ? null : top.length === 0 ? (
         <p className="rb-muted">Counting has started. The first result will appear here.</p>

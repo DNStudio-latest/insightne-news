@@ -123,7 +123,9 @@ export default function DeskApp({ initialItems, canPublish, autoPost }) {
       <Shell>
         <div className="d-top">
           <h1>News desk</h1>
-          <a className="d-link" href="/admin">Approvals</a>
+          <span>
+            <a className="d-link" href="/admin/desk/check">Phone check</a> · <a className="d-link" href="/admin">Approvals</a>
+          </span>
         </div>
         <button className="d-big" onClick={newItem}>+ New item</button>
         {status && <p className="d-err">{status}</p>}

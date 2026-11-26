@@ -56,6 +56,21 @@ test("an election draft follows the normal auto-publish rule, with a score of at
   assert.equal(autoPublishCheck(draft, { enabled: false }).ok, false);
 });
 
+test("election hold: until polling ends no election story is auto-published; other stories and the time after are not affected", () => {
+  const rules = { enabled: true, minScore: 7, holdElectionUntil: "2026-11-27T16:00:00+05:30" };
+  const before = Date.parse("2026-11-26T12:00:00+05:30");
+  const after = Date.parse("2026-11-27T16:00:01+05:30");
+  const flagged = { headline: "Sector officers named", body: "The letter lists sector officers.", flags: ["election"], score: 9 };
+  const byWords = { headline: "Candidates file nominations", body: "Nominations closed for the municipal polls.", flags: [], score: 9 };
+  const other = { headline: "Tripura to observe Ekta Diwas", body: "The state will observe it on October 31.", flags: [], score: 9 };
+  assert.match(autoPublishCheck(flagged, rules, before).reason, /held for the editor/);
+  assert.match(autoPublishCheck(byWords, rules, before).reason, /held for the editor/);
+  assert.equal(autoPublishCheck(other, rules, before).ok, true);
+  assert.equal(autoPublishCheck(flagged, rules, after).ok, true);
+  assert.equal(autoPublishCheck(byWords, rules, after).ok, true);
+  assert.equal(autoPublishCheck(flagged, { enabled: true, minScore: 7 }, before).ok, true); // no hold set
+});
+
 test("an election press note from the police or a department counts as election news; ordinary notices do not", () => {
   const note = (source_name, title) => isElectionNotice({ source_name, title, url: "" });
   assert.equal(note("Tripura Police", "Press release: security arrangements for the Municipal Election, 2026"), true);

@@ -48,6 +48,7 @@
     "grievanceEmail": "insightnenews@gmail.com"
   },
   "defaultAuthor": "InsightNE News Desk",
+  "testkartAd": { "running": false },
   "generalRegion": "Northeast",
   "states": [
     "Tripura",

@@ -1,6 +1,10 @@
+import { settings } from "../../lib/config.js";
+
 // A sponsor box for the owner's own test-series platform, Testkart. It sits in the page's own space, below the front page
 // and above the InsightNE Originals, and is always labelled "Advertisement" so readers can tell it from news.
+// It shows only while settings.json has "testkartAd": { "running": true }. With no ad running, nothing is rendered.
 export default function AdTestkart() {
+  if (settings.testkartAd?.running !== true) return null;
   return (
     <aside className="ad-box" aria-label="Advertisement">
       <span className="ad-label">Advertisement</span>

@@ -48,7 +48,13 @@
     "grievanceEmail": "insightnenews@gmail.com"
   },
   "defaultAuthor": "InsightNE News Desk",
-  "testkartAd": { "running": false },
+  "testkartAd": {
+    "running": true,
+    "title": "UGC NET Paper 2 (Journalism & Mass Communication): mock tests",
+    "text": "Practise with mock tests for UGC NET Paper 2 in Journalism and Mass Communication, on Testkart.",
+    "button": "Try the mock test",
+    "url": "https://testkart.in/mock-test/ugc-net-jmc-paper-2-mock-tests-kb9gbzpz"
+  },
   "generalRegion": "Northeast",
   "states": [
     "Tripura",

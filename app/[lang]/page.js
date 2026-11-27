@@ -4,6 +4,7 @@ import { capitalsWeather } from "../../lib/weather.js";
 import { indiaMatch } from "../../lib/cricket.js";
 import { LivePlayer, CricketBox, WhatsAppFollow, WeatherStrip, PageShell, LeadStory, LatestList, ArticlesList, Card, CategoryBlock, StatesBoxes, SectionHead, StoryGrid, Videos, categoryUrl } from "../components.js";
 import { LiveUpdates, PollBox } from "../client.js";
+import AdTestkart from "./AdTestkart.js";
 import { initLang, lang, href } from "../../lib/lang.js";
 import { alternatesFor } from "../../lib/seo.js";
 import { pictureOf } from "../../lib/proof-shot.js";
@@ -158,6 +159,8 @@ export default async function HomePage({ params }) {
           </div>
         )}
       </div>
+
+      <AdTestkart />
 
       {originals.length > 0 && (
         <section className="section">

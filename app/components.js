@@ -5,7 +5,7 @@ import { formatDate, formatDay, timeAgo, uniqueSources } from "../lib/format.js"
 import { CopyLinkButton, NavBar } from "./client.js";
 import { AI_CREDIT } from "../lib/images.js";
 import { pictureOf } from "../lib/proof-shot.js";
-import { responsiveImage } from "../lib/photo-url.js";
+import { responsiveImage, smallPhotoUrl } from "../lib/photo-url.js";
 import { usesGraphic, graphicUrl } from "../lib/poster-text.js";
 import { lang, pick, tr, href as langHref } from "../lib/lang.js";
 import { LangSwitch, AlertsButton, NewsletterSignup, LanguageWelcome, ListenBriefing, CookieNotice, ReaderChat } from "./client.js";
@@ -355,7 +355,7 @@ export function ArticlesList({ stories }) {
             </div>
             <a href={storyUrl(s)} tabIndex={-1} aria-hidden="true">
               {pictureOf(s) ? (
-                <img className="article-thumb" src={pictureOf(s)} alt="" loading="lazy" width={64} height={64} />
+                <img className="article-thumb" src={smallPhotoUrl(pictureOf(s)) || pictureOf(s)} alt="" loading="lazy" width={64} height={64} />
               ) : (
                 <span className="article-thumb article-thumb-pen">✍</span>
               )}
